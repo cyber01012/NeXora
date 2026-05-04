@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap');
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Nasaliza';
+  src: url('./assets/fonts/nasaliza.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@theme {
+  --color-hud-bg: #030a10;
+  --color-cyan-glow: #00f0ff;
+  --color-cyan-dim: #00f0ff40;
+  
+  --font-hud-title: 'Nasaliza', sans-serif;
+  --font-hud-data: 'Orbitron', sans-serif;
+  --font-hud-mono: 'Share Tech Mono', monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--color-hud-bg)] text-white font-hud-mono antialiased overflow-x-hidden;
+    background-color: var(--color-hud-bg);
+  }
+}
+
+@layer utilities {
+  .font-title { font-family: var(--font-hud-title); }
+  .font-data { font-family: var(--font-hud-data); }
+  .font-mono { font-family: var(--font-hud-mono); }
+
+  .text-glow-cyan {
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 20px rgba(0, 240, 255, 0.4);
+    color: var(--color-cyan-glow);
+  }
+
+  .border-hud {
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1), 0 0 10px rgba(0, 240, 255, 0.1);
+  }
+
+  .hud-glass {
+    background: rgba(0, 20, 30, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+  }
+
+  /* Glitch Text Effect */
+  .glitch-text {
+    position: relative;
+  }
+  .glitch-text::before, .glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-hud-bg);
+  }
+  .glitch-text::before {
+    left: 2px;
+    text-shadow: -1px 0 var(--color-cyan-glow);
+    clip: rect(24px, 550px, 90px, 0);
+    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+  }
+  .glitch-text::after {
+    left: -2px;
+    text-shadow: -1px 0 #0055ff;
+    clip: rect(85px, 550px, 140px, 0);
+    animation: glitch-anim 2.5s infinite linear alternate-reverse;
+  }
+}
+
+@keyframes glitch-anim {
+  0% { clip: rect(10px, 9999px, 44px, 0); }
+  20% { clip: rect(66px, 9999px, 86px, 0); }
+  40% { clip: rect(84px, 9999px, 10px, 0); }
+  60% { clip: rect(14px, 9999px, 56px, 0); }
+  80% { clip: rect(24px, 9999px, 78px, 0); }
+  100% { clip: rect(98px, 9999px, 34px, 0); }
+}
+
+@keyframes glitch-anim-2 {
+  0% { clip: rect(35px, 9999px, 92px, 0); }
+  20% { clip: rect(11px, 9999px, 25px, 0); }
+  40% { clip: rect(59px, 9999px, 73px, 0); }
+  60% { clip: rect(92px, 9999px, 12px, 0); }
+  80% { clip: rect(4px, 9999px, 88px, 0); }
+  100% { clip: rect(74px, 9999px, 46px, 0); }
+}
+
+/* Scanline Effect */
+.scanlines::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0),
+    rgba(255,255,255,0) 50%,
+    rgba(0,0,0,0.2) 50%,
+    rgba(0,0,0,0.2)
+  );
+  background-size: 100% 4px;
+  z-index: 50;
+  pointer-events: none;
+}
