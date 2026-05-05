@@ -1,106 +1,112 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { User, Shield, Ambulance } from 'lucide-react';
 
 const testimonials = [
-  {
-    id: 1,
-    name: 'Sarah J.',
-    role: 'Citizen',
-    icon: User,
-    color: 'text-cyan-400',
-    border: 'border-cyan-500/30',
-    quote: "During the flash floods, NeXora's live heatmap guided my family to safety. The SOS feature dispatched rescue teams in under 10 minutes."
-  },
-  {
-    id: 2,
-    name: 'Capt. Reynolds',
-    role: 'Emergency Responder',
-    icon: Ambulance,
-    color: 'text-red-400',
-    border: 'border-red-500/30',
-    quote: "The AI-driven resource allocation means my team no longer wastes time on manual routing. We get to the high-priority zones faster than ever."
-  },
-  {
-    id: 3,
-    name: 'Director Vance',
-    role: 'City Admin',
-    icon: Shield,
-    color: 'text-purple-400',
-    border: 'border-purple-500/30',
-    quote: "NeXora transformed our chaotic dispatch system into a synchronized, intelligent command center. Transparency and efficiency have never been higher."
-  }
+  { init: 'SJ', name: 'Sarah J.', role: 'Citizen', badge: 'Flood Response',
+    quote: "The SOS button got rescue teams to our street before we even finished evacuating. I didn't have to fill a single form." },
+  { init: 'CR', name: 'Capt. Reynolds', role: 'Emergency Responder', badge: 'Task Assignment',
+    quote: "NeXora gives me a full picture — severity, location, people affected — before I even leave the station." },
+  { init: 'DV', name: 'Director Vance', role: 'City Administrator', badge: 'Admin Dashboard',
+    quote: "The live heatmap and AI suggestions turned our dispatch room into a proper command center. Nothing falls through the cracks." },
+  { init: 'LM', name: 'Lt. Marcus', role: 'Responder', badge: 'Navigation',
+    quote: "Optimal routing through flooded roads saved us critical minutes. The system knew alternate paths we didn't." },
+  { init: 'AK', name: 'Amara K.', role: 'NGO Coordinator', badge: 'Resource Management',
+    quote: "Managing food and medicine dispatch across six zones used to take hours. NeXora gets it done in minutes." },
+  { init: 'RH', name: 'R. Hassan', role: 'Volunteer', badge: 'Mission Coordination',
+    quote: "I can see nearby tasks, join a mission, and sync with the response team — all from one dashboard." },
+  { init: 'TN', name: 'Tanya N.', role: 'Citizen', badge: 'Civic Reporting',
+    quote: "I reported a broken water main and could track the repair status in real time. Didn't need a single phone call." },
+  { init: 'PW', name: 'P. Walsh', role: 'Admin', badge: 'AI Prioritization',
+    quote: "The AI flagged a cluster of SOS reports as a likely gas leak before any of us connected the dots. That's the value." },
 ];
 
-const Testimonials = () => {
+function TestimonialCard({ init, name, role, badge, quote }) {
   return (
-    <section className="py-16 bg-cyan-400 relative overflow-hidden border-t border-cyan-300/30">
-      
-      <div className="container mx-auto px-6 max-w-7xl relative z-10">
-        <div className="flex flex-col items-center text-center mb-16">
-          <motion.div 
-            className="flex items-center gap-2 mb-4 opacity-70"
-            initial={{ opacity: 0, y: -10 }}
-            whileInView={{ opacity: 0.7, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <div className="w-2 h-2 bg-slate-900 shadow-[0_0_10px_rgba(0,0,0,0.3)]" />
-            <h3 className="font-data text-slate-900 text-xs tracking-widest uppercase">
-              FIELD REPORTS
-            </h3>
-            <div className="w-12 h-px bg-gradient-to-r from-slate-900/50 to-transparent" />
-          </motion.div>
-          
-          <motion.h2 
-            className="text-3xl md:text-5xl font-data tracking-widest text-slate-900"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-          >
-            SYSTEM <span className="font-bold">VALIDATION</span>
-          </motion.h2>
+    <div
+      className="group relative flex-shrink-0 w-[340px] rounded-2xl p-[30px] overflow-hidden border border-white/70 transition-all duration-300 hover:-translate-y-1 hover:border-white/90"
+      style={{
+        background: 'linear-gradient(145deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.30) 60%, rgba(255,255,255,0.15) 100%)',
+        boxShadow: '0 8px 32px rgba(6,182,212,0.15), inset 0 1px 0 rgba(255,255,255,0.9)',
+      }}
+    >
+      <div className="absolute top-0 left-[5%] right-[5%] h-px bg-gradient-to-r from-transparent via-white to-transparent" />
+
+      <div className="flex items-center gap-3.5 mb-[18px]">
+        <div className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 border border-[#0a0f1d]/15 bg-[#0a0f1d]/10 font-mono text-[12px] font-bold text-[#0a0f1d] tracking-wide">
+          {init}
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <motion.div
-                key={item.id}
-                className="bg-white/30 backdrop-blur-sm border border-slate-900/20 p-8 rounded-xl relative group hover:border-slate-900/50 hover:bg-white/50 transition-all"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2, duration: 0.5 }}
-                viewport={{ once: true }}
-              >
-                {/* Decorative corner accents */}
-                <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-slate-900/50 rounded-tl-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-slate-900/50 rounded-br-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                <div className="flex items-center gap-4 mb-6">
-                  <div className={`w-12 h-12 rounded-full border border-slate-900/30 flex items-center justify-center bg-white/40`}>
-                    <Icon className={`w-5 h-5 text-slate-900`} />
-                  </div>
-                  <div>
-                    <h4 className="text-slate-900 font-data text-sm tracking-wider">{item.name}</h4>
-                    <p className="font-mono text-[10px] uppercase tracking-widest text-slate-700">{item.role}</p>
-                  </div>
-                </div>
-                
-                <p className="text-[#0a0f1d] font-mono text-sm leading-relaxed relative z-10 opacity-80">
-                  "{item.quote}"
-                </p>
-                
-                {/* Subtle background glow on hover */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl pointer-events-none" />
-              </motion.div>
-            );
-          })}
+        <div>
+          <p className="font-mono text-[13px] font-bold text-[#0a0f1d] tracking-wide">{name}</p>
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#0a0f1d]/50 mt-0.5">{role}</p>
         </div>
       </div>
+
+      <span className="inline-block font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full border border-[#0a0f1d]/20 text-[#0a0f1d] bg-[#0a0f1d]/8 mb-3.5">
+        {badge}
+      </span>
+
+      <p className="font-mono text-[13px] text-[#0a0f1d]/75 leading-[1.8]">"{quote}"</p>
+    </div>
+  );
+}
+
+function MarqueeRow({ items, reverse = false, duration = '42s' }) {
+  const doubled = [...items, ...items];
+  return (
+    <div
+      className="flex gap-5 w-max hover:[animation-play-state:paused]"
+      style={{
+        animation: `marquee ${duration} linear infinite`,
+        animationDirection: reverse ? 'reverse' : 'normal',
+      }}
+    >
+      {doubled.map((t, i) => (
+        <TestimonialCard key={i} {...t} />
+      ))}
+    </div>
+  );
+}
+
+export function TestimonialsMarquee() {
+  const row1 = testimonials.slice(0, 4);
+  const row2 = testimonials.slice(4);
+
+  return (
+    <section className="relative overflow-hidden bg-cyan-400 py-[72px]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-5%,rgba(255,255,255,0.2),transparent)]" />
+
+      <div className="relative z-10 text-center mb-[52px] px-6">
+        <div className="inline-flex items-center gap-2 mb-3.5">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#0a0f1d]" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#0a0f1d] opacity-60">
+            Field Reports
+          </span>
+        </div>
+        <h2 className="font-mono text-4xl uppercase tracking-widest text-[#0a0f1d] font-normal">
+          Voices from the <span className="font-extrabold">Network</span>
+        </h2>
+        <p className="mt-2.5 font-mono text-sm text-[#0a0f1d]/55 max-w-md mx-auto leading-relaxed">
+          Real feedback from citizens, responders, volunteers and administrators using NeXora every day.
+        </p>
+      </div>
+
+      <div className="relative">
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-r from-cyan-400 to-transparent" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-l from-cyan-400 to-transparent" />
+
+        <div className="flex flex-col gap-5 overflow-hidden">
+          <MarqueeRow items={row1} duration="42s" />
+          <MarqueeRow items={row2} reverse duration="50s" />
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+      `}</style>
     </section>
   );
-};
+}
 
-export default Testimonials;
+export default TestimonialsMarquee;

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Activity, ShieldAlert, Cpu, Database, ChevronRight } from 'lucide-react';
+import { CheckCircle2, Shield, Activity, Map as MapIcon, Send, Wifi, ShieldAlert, Cpu, Database, ChevronRight } from 'lucide-react';
+import Heatmap from './Heatmap';
 
 const steps = [
   {
@@ -55,7 +56,7 @@ const Workflow = () => {
             INTELLIGENT <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">WORKFLOW</span>
           </motion.h2>
           <motion.p 
-            className="text-cyan-500/60 font-mono text-sm max-w-2xl mx-auto"
+            className="text-cyan-500 font-mono text-sm max-w-2xl mx-auto"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -115,56 +116,69 @@ const Workflow = () => {
           })}
         </div>
 
-        {/* Heatmap Visualization Demo */}
+        {/* Heatmap Visualization Section */}
         <motion.div 
-          className="mt-24 max-w-4xl mx-auto rounded-xl border border-cyan-500/20 bg-[#050a18]/50 backdrop-blur-md overflow-hidden relative h-[300px]"
+          className="mt-24 max-w-5xl mx-auto rounded-xl border border-cyan-500/20 bg-[#050a18]/50 backdrop-blur-md overflow-hidden relative"
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4, duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
-          
+          {/* Header */}
           <div className="p-4 border-b border-cyan-500/20 flex items-center justify-between bg-[#030a10]">
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-cyan-400" />
-              <span className="font-mono text-xs text-cyan-400 tracking-widest uppercase">Live Heatmap feed</span>
+              <span className="font-data text-xs text-cyan-400 tracking-widest uppercase">Live Heatmap feed</span>
             </div>
             <div className="flex gap-2">
-              <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-              <div className="w-2 h-2 rounded-full bg-cyan-500/80 animate-pulse delay-75" />
-              <div className="w-2 h-2 rounded-full bg-cyan-500/60 animate-pulse delay-150" />
+              <div className="px-2 py-0.5 rounded-sm bg-cyan-500/10 border border-cyan-500/30 text-[9px] font-mono text-cyan-300">
+                AUTO_SCAN: ACTIVE
+              </div>
             </div>
           </div>
 
-          <div className="relative w-full h-full p-8 flex items-center justify-center">
-            {/* Simulating radar / heatmap scan */}
-            <motion.div 
-              className="absolute w-[400px] h-[400px] rounded-full border border-cyan-500/10 bg-[radial-gradient(ellipse_at_center,rgba(0,240,255,0.1)_0%,transparent_60%)]"
-              animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            />
-            
-            {/* Fake data points */}
-            <motion.div 
-              className="absolute top-[30%] left-[40%] w-4 h-4 bg-cyan-500 rounded-full blur-[2px] shadow-[0_0_20px_#00f0ff]"
-              animate={{ opacity: [0.4, 1, 0.4] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            />
-            <motion.div 
-              className="absolute top-[60%] left-[20%] w-6 h-6 bg-cyan-400 rounded-full blur-[3px] shadow-[0_0_20px_#00f0ff]"
-              animate={{ opacity: [0.2, 0.8, 0.2] }}
-              transition={{ duration: 2.2, repeat: Infinity }}
-            />
-            <motion.div 
-              className="absolute top-[40%] right-[30%] w-3 h-3 bg-cyan-400 rounded-full blur-[1px] shadow-[0_0_15px_#22d3ee]"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 1.8, repeat: Infinity }}
-            />
+          <div className="relative w-full h-[400px] flex flex-col lg:flex-row">
+            {/* The Real Data Heatmap Component */}
+            <div className="w-full lg:w-3/4 h-full relative">
+              <Heatmap />
+            </div>
 
-            <div className="absolute bottom-4 left-4 font-mono text-[10px] text-cyan-500/40">
-              COORD: 34.0522° N, 118.2437° W<br/>
-              STATUS: PROCESSING SCAN...
+            {/* Live Data Feed Log (Visible on Desktop) */}
+            <div className="w-full lg:w-1/4 h-full bg-[#050a18]/40 border-l border-cyan-500/10 p-4 hidden lg:flex flex-col gap-3 font-mono text-[10px]">
+              <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2">
+                <span className="text-cyan-400 font-data tracking-widest uppercase">Incident_Log</span>
+                <span className="text-cyan-500/50 animate-pulse">● LIVE</span>
+              </div>
+              <div className="flex-1 overflow-hidden flex flex-col gap-3 opacity-80">
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-cyan-300">[15:42] ID:702 - SECTOR 7</p>
+                  <p className="text-cyan-500/50 text-[9px]">TYPE: WATER_LEAKAGE</p>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-cyan-400">[15:45] ID:941 - DISTRICT 3</p>
+                  <p className="text-cyan-500/50 text-[9px]">TYPE: ROAD_OBSTRUCTION</p>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-cyan-300">[15:48] ID:104 - SECTOR 2</p>
+                  <p className="text-cyan-500/50 text-[9px]">TYPE: CRITICAL_EMERGENCY</p>
+                </div>
+                <div className="flex flex-col gap-0.5 animate-pulse">
+                  <p className="text-white"> [SCANNING...] NEW_ENTRY</p>
+                </div>
+              </div>
+              <div className="pt-2 border-t border-cyan-500/20">
+                <div className="flex justify-between mb-1">
+                  <span className="text-cyan-500/40 uppercase">Buffer</span>
+                  <span className="text-cyan-400">92%</span>
+                </div>
+                <div className="w-full h-1 bg-cyan-900/30 rounded-full overflow-hidden">
+                   <motion.div 
+                    className="h-full bg-cyan-500"
+                    animate={{ width: ['0%', '92%', '85%', '92%'] }}
+                    transition={{ duration: 5, repeat: Infinity }}
+                   />
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>

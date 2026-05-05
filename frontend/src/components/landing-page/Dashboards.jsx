@@ -46,9 +46,10 @@ const Dashboards = () => {
           <h2 className="text-4xl md:text-5xl font-data text-white mb-6 uppercase tracking-wider">
             One Platform. <span className="text-glow-cyan">Four Views.</span>
           </h2>
-          <p className="text-white/60 text-base max-w-2xl mx-auto font-mono">
+          <p className="text-cyan-500 font-mono text-sm max-w-2xl mx-auto">
             // TAILORED INTERFACES ENSURE EVERYONE HAS EXACTLY THE TOOLS THEY NEED.
           </p>
+         
         </div>
 
         <div className="flex flex-col lg:flex-row gap-12 items-center">
@@ -86,6 +87,9 @@ const Dashboards = () => {
 
           {/* Dashboard Preview Visuals */}
           <div className="w-full lg:w-2/3">
+          <div className="text-[11px] text-white/70 font-mono tracking-wider mb-3 text-center">
+  [WARNING] This visualization is based on simulation data.
+</div>
             <div className="hud-glass rounded-sm p-4 border-hud aspect-[4/3] md:aspect-[16/9] relative overflow-hidden flex items-center justify-center">
               
               <AnimatePresence mode="wait">
@@ -109,26 +113,130 @@ const Dashboards = () => {
                   </div>
                   
                   {/* Mock UI Content - Dynamic based on role */}
-                  <div className="flex-1 p-6 relative">
-                    <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${activeRole.color} opacity-10 rounded-full blur-[80px]`}></div>
-                    
-                    <div className="flex gap-4 h-full">
-                      <div className="w-1/3 flex flex-col gap-4">
-                        <div className="h-24 rounded-xl bg-white/5 border border-white/5"></div>
-                        <div className="flex-1 rounded-xl bg-white/5 border border-white/5 p-4 flex flex-col gap-3">
-                           <div className="h-4 w-1/2 bg-white/10 rounded"></div>
-                           <div className="h-4 w-3/4 bg-white/10 rounded"></div>
-                           <div className="h-4 w-2/3 bg-white/10 rounded"></div>
-                        </div>
-                      </div>
-                      <div className="flex-1 rounded-xl bg-white/5 border border-white/5 relative overflow-hidden">
-                        {/* Map mockup */}
-                        <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#ffffff1a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff1a_1px,transparent_1px)] bg-[size:2rem_2rem]"></div>
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-cyan-500 shadow-[0_0_20px_#00f0ff]"></div>
-                        <div className="absolute top-1/3 left-1/4 w-4 h-4 rounded-full bg-cyan-400 shadow-[0_0_15px_#00f0ff]"></div>
-                      </div>
-                    </div>
-                  </div>
+                 <div className="flex-1 p-6 relative text-white font-mono text-xs">
+  <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${activeRole.color} opacity-10 rounded-full blur-[80px]`} />
+
+  {/* CITIZEN VIEW */}
+  {activeRole.id === 'citizens' && (
+    <div className="grid grid-cols-2 gap-4 h-full">
+      {/* Report Card */}
+      <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-2">
+        <span className="text-cyan-400">// NEW REPORT</span>
+        <div className="h-3 w-3/4 bg-white/20 rounded"></div>
+        <div className="h-3 w-1/2 bg-white/20 rounded"></div>
+        <div className="text-green-400 text-[10px]">STATUS: ASSIGNED</div>
+      </div>
+
+      {/* SOS */}
+      <div className="bg-red-500/10 border border-red-400 rounded-xl flex items-center justify-center text-red-400 font-bold text-lg">
+        SOS
+      </div>
+
+      {/* Reports List */}
+      <div className="col-span-2 bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-2">
+        <div className="text-cyan-400">// MY REPORTS</div>
+        <div className="flex justify-between">
+          <span>Flood Area</span>
+          <span className="text-yellow-400">PENDING</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Broken Road</span>
+          <span className="text-green-400">DONE</span>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {/* RESPONDER VIEW */}
+  {activeRole.id === 'responders' && (
+    <div className="grid grid-cols-2 gap-4 h-full">
+      <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+        <div className="text-cyan-400">// TASK</div>
+        <div className="mt-2">Flood Rescue</div>
+        <div className="text-red-400 text-[10px]">HIGH PRIORITY</div>
+      </div>
+
+      <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col justify-between">
+        <span>Distance: 1.2km</span>
+        <span className="text-green-400">NAVIGATING</span>
+      </div>
+
+      {/* Map */}
+      <div className="col-span-2 relative rounded-xl bg-black border border-white/10 overflow-hidden">
+        <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#ffffff1a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff1a_1px,transparent_1px)] bg-[size:2rem_2rem]" />
+        <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-cyan-400 rounded-full animate-ping" />
+      </div>
+    </div>
+  )}
+
+  {/* NGO VIEW */}
+  {activeRole.id === 'ngos' && (
+    <div className="grid grid-cols-2 gap-4 h-full">
+      <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+        <div className="text-cyan-400">// INVENTORY</div>
+        <div>Food: 120</div>
+        <div>Med Kits: 45</div>
+      </div>
+
+      <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+        <div className="text-cyan-400">// DISPATCH</div>
+        <div>Karachi Flood Zone</div>
+        <div className="text-green-400 text-[10px]">SENT</div>
+      </div>
+
+      <div className="col-span-2 bg-white/5 border border-white/10 rounded-xl p-4">
+        <div className="text-cyan-400">// VOLUNTEERS</div>
+        <div>12 Active</div>
+      </div>
+    </div>
+  )}
+
+  {/* ADMIN VIEW */}
+  {activeRole.id === 'admins' && (
+    <div className="grid grid-cols-2 gap-4 h-full">
+      <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+        <div className="text-cyan-400">// REPORTS</div>
+        <div>+24 Incoming</div>
+      </div>
+
+      <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+        <div className="text-cyan-400">// AI SUGGESTION</div>
+        <div>Deploy 2 teams</div>
+      </div>
+
+      {/* Heatmap */}
+      <div className="col-span-2 relative rounded-xl bg-black border border-white/10 overflow-hidden">
+
+  {/* Grid */}
+  <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#ffffff14_1px,transparent_1px),linear-gradient(to_bottom,#ffffff14_1px,transparent_1px)] bg-[size:2rem_2rem]" />
+
+  {/* Ambient glow */}
+  <div className="absolute inset-0 bg-orange-400/5" />
+
+  {/* Heat blobs (same hue, diff intensity) */}
+  <div className="absolute top-1/3 left-1/3 w-40 h-40 bg-orange-400/25 rounded-full blur-3xl"></div>
+  <div className="absolute top-1/2 left-2/3 w-32 h-32 bg-orange-300/20 rounded-full blur-3xl"></div>
+  <div className="absolute bottom-1/4 left-1/2 w-28 h-28 bg-yellow-300/15 rounded-full blur-3xl"></div>
+
+  {/* Core hotspots */}
+  <div className="absolute top-1/3 left-1/3 w-3 h-3 bg-yellow-300 rounded-full shadow-[0_0_12px_#facc15]"></div>
+  <div className="absolute top-1/2 left-2/3 w-3 h-3 bg-yellow-300 rounded-full shadow-[0_0_12px_#facc15]"></div>
+
+  {/* Pulse */}
+  <div className="absolute top-1/3 left-1/3 w-6 h-6 bg-yellow-300/40 rounded-full animate-ping"></div>
+
+  {/* Scan line */}
+  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-yellow-300/10 to-transparent animate-[scan_4s_linear_infinite]" />
+
+  {/* Label */}
+  <div className="absolute top-2 left-3 text-[10px] text-white/50 font-mono">
+    // VISUALS
+  </div>
+
+</div>
+    </div>
+  )}
+</div>
                 </motion.div>
               </AnimatePresence>
 

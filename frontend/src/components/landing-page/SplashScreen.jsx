@@ -55,8 +55,8 @@ const SplashScreen = ({ onComplete }) => {
         {/* System Diagnostics */}
         <div className="text-cyan-500/70 text-sm tracking-widest uppercase mb-12">
           <div>[SYS_BOOT_SEQ_INIT]</div>
-          <div>ESTABLISHING SATELLITE UPLINK... OK</div>
-          <div>LOADING NEURAL TRIAGE PROTOCOLS... OK</div>
+          <div>ESTABLISHING CONNECTIONS... OK</div>
+          <div>INITIALIZING AI ASSISTANTS... OK</div>
         </div>
 
         {/* Counter */}

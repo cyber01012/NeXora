@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Navbar from '../components/Common/Navbar';
+import Navbar from '../components/common/Navbar';
 import Hero from '../components/landing-page/Hero';
 import Features from '../components/landing-page/Features';
 import Dashboards from '../components/landing-page/Dashboards';
@@ -9,7 +9,7 @@ import FAQ from '../components/landing-page/FAQ';
 import SplashScreen from '../components/landing-page/SplashScreen';
 import { AnimatePresence, motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { ArrowUp } from 'lucide-react';
-import Footer from '../components/Common/Footer';
+import Footer from '../components/common/Footer';
 const LandingPage = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);

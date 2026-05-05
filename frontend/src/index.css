@@ -90,7 +90,10 @@
   80% { clip: rect(4px, 9999px, 88px, 0); }
   100% { clip: rect(74px, 9999px, 46px, 0); }
 }
-
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
 /* Scanline Effect */
 .scanlines::before {
   content: " ";

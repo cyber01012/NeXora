@@ -36,7 +36,7 @@ const FAQ = () => {
             viewport={{ once: true }}
           >
             <Terminal className="w-4 h-4 text-cyan-400" />
-            <h3 className="font-data text-cyan-400 text-xs tracking-widest uppercase">
+            <h3 className="font-data text-cyan-500 text-xs tracking-widest uppercase">
               QUERY DATABASE
             </h3>
           </motion.div>

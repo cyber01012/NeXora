@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; // v2-nav-update-fix
 import { ShieldAlert, Map, Activity, User, Shield, Users, Building, Ambulance, Cpu, LayoutDashboard, Code, Network } from 'lucide-react';
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
+import logo from '../../assets/images/nexlogo.png';
 
 const portals = [
   { icon: Users,    label: 'Citizen',   color: 'group-hover:text-cyan-400',   bg: 'hover:bg-cyan-500/15' },
@@ -58,9 +59,12 @@ const Navbar = () => {
         style={{ border: '1px solid transparent' }}
       >
         {/* LEFT — Logo */}
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div 
+          className="flex items-center gap-3 flex-shrink-0 cursor-pointer"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
           <div className="w-9 h-9 rounded-full bg-cyan-500/10 flex items-center justify-center border border-cyan-500/30 shadow-[0_0_15px_rgba(0,240,255,0.2)] flex-shrink-0">
-            <ShieldAlert className="w-4 h-4 text-cyan-400" />
+          <img src={logo} alt="logo" />
           </div>
           <span className="font-data text-lg text-cyan-300 tracking-widest whitespace-nowrap">
             NEXORA
@@ -68,7 +72,7 @@ const Navbar = () => {
         </div>
 
         {/* CENTER — Nav links */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden lg:flex items-center gap-6">
           <button 
             onClick={() => scrollToSection('features')}
             className="flex items-center gap-2 text-cyan-400/70 hover:text-cyan-300 transition-colors duration-200 cursor-pointer"
@@ -91,11 +95,18 @@ const Navbar = () => {
             <span className="font-data text-xs tracking-widest uppercase">Dashboards</span>
           </button>
           <button 
+            onClick={() => scrollToSection('testimonials')}
+            className="flex items-center gap-2 text-cyan-400/70 hover:text-cyan-300 transition-colors duration-200 cursor-pointer"
+          >
+            <Activity className="w-4 h-4" />
+            <span className="font-data text-xs tracking-widest uppercase">Reports</span>
+          </button>
+          <button 
             onClick={() => scrollToSection('faq')}
             className="flex items-center gap-2 text-cyan-400/70 hover:text-cyan-300 transition-colors duration-200 cursor-pointer"
           >
             <Code className="w-4 h-4" />
-            <span className="font-data text-xs tracking-widest uppercase">Protocol</span>
+            <span className="font-data text-xs tracking-widest uppercase">FAQ</span>
           </button>
         </div>
 

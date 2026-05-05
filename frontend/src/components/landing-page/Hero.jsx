@@ -26,7 +26,7 @@ const TypewriterText = ({ text, delay = 0, speed = 50 }) => {
 const Hero = () => {
   return (
     // ── Static 100vh layout instead of messy scrolling ──
-    <section className="relative h-screen overflow-hidden bg-[#02050a]">
+    <section id="hero" className="relative h-screen overflow-hidden bg-[#02050a]">
 
      
       <div className="relative w-full h-full overflow-hidden">
@@ -89,12 +89,14 @@ const Hero = () => {
             transition={{ duration: 1, delay: 1.5 }}
           >
             <button
-              className="font-data px-8 py-3 bg-gradient-to-r from-cyan-400 to-cyan-600 rounded-sm text-white text-sm tracking-widest hover:shadow-[0_0_25px_rgba(0,240,255,0.5)] hover:from-cyan-300 hover:to-cyan-500 transition-all duration-300"
+              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              className="font-data px-8 py-3 bg-gradient-to-r from-cyan-400 to-cyan-600 rounded-sm text-white text-sm tracking-widest hover:shadow-[0_0_25px_rgba(0,240,255,0.5)] hover:from-cyan-300 hover:to-cyan-500 transition-all duration-300 pointer-events-auto cursor-pointer"
             >
               GET STARTED
             </button>
             <button
-              className="font-data px-8 py-3 border border-cyan-400/60 bg-transparent backdrop-blur-sm rounded-sm text-cyan-300 text-sm tracking-widest hover:bg-cyan-500/10 hover:border-cyan-300 hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all duration-300"
+              onClick={() => document.getElementById('dashboards')?.scrollIntoView({ behavior: 'smooth' })}
+              className="font-data px-8 py-3 border border-cyan-400/60 bg-transparent backdrop-blur-sm rounded-sm text-cyan-300 text-sm tracking-widest hover:bg-cyan-500/10 hover:border-cyan-300 hover:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all duration-300 pointer-events-auto cursor-pointer"
             >
               PREVIEW
             </button>
