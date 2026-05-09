@@ -22,29 +22,35 @@ const testimonials = [
 function TestimonialCard({ init, name, role, badge, quote }) {
   return (
     <div
-      className="group relative flex-shrink-0 w-[340px] rounded-2xl p-[30px] overflow-hidden border border-white/70 transition-all duration-300 hover:-translate-y-1 hover:border-white/90"
+      className="relative flex-shrink-0 w-[340px] rounded-2xl p-[30px] overflow-hidden border border-primary-400/20 transition-all duration-300 hover:-translate-y-1 hover:border-primary-400/45"
       style={{
-        background: 'linear-gradient(145deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.30) 60%, rgba(255,255,255,0.15) 100%)',
-        boxShadow: '0 8px 32px rgba(6,182,212,0.15), inset 0 1px 0 rgba(255,255,255,0.9)',
+        background: 'linear-gradient(160deg, #0e1a2b 0%, #0c2233 50%, #0a1e2e 100%)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(34,211,238,0.25), inset 0 -1px 0 rgba(0,0,0,0.2)',
       }}
     >
-      <div className="absolute top-0 left-[5%] right-[5%] h-px bg-gradient-to-r from-transparent via-white to-transparent" />
+      {/* Cyan sheen */}
+      <div className="pointer-events-none absolute top-0 left-0 right-0 h-1/2 rounded-t-2xl bg-gradient-to-b from-primary-400/[0.07] to-transparent" />
+      {/* Cyan edge highlight */}
+      <div className="absolute top-0 left-[5%] right-[5%] h-px bg-gradient-to-r from-transparent via-primary-400/60 to-transparent" />
 
-      <div className="flex items-center gap-3.5 mb-[18px]">
-        <div className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 border border-[#0a0f1d]/15 bg-[#0a0f1d]/10 font-mono text-[12px] font-bold text-[#0a0f1d] tracking-wide">
+      <div className="relative z-10 flex items-center gap-3.5 mb-[18px]">
+        <div
+          className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 border border-primary-400/35 font-mono text-[12px] font-bold text-primary-400 tracking-wide"
+          style={{ background: 'rgba(34,211,238,0.12)', boxShadow: 'inset 0 1px 0 rgba(34,211,238,0.3)' }}
+        >
           {init}
         </div>
         <div>
-          <p className="font-mono text-[13px] font-bold text-[#0a0f1d] tracking-wide">{name}</p>
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#0a0f1d]/50 mt-0.5">{role}</p>
+          <p className="font-mono text-[13px] font-bold text-primary-400 tracking-wide">{name}</p>
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-primary-400/45 mt-0.5">{role}</p>
         </div>
       </div>
 
-      <span className="inline-block font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full border border-[#0a0f1d]/20 text-[#0a0f1d] bg-[#0a0f1d]/8 mb-3.5">
+      <span className="relative z-10 inline-block font-mono text-[9px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full border border-primary-400/25 text-primary-400 bg-primary-400/[0.08] mb-3.5">
         {badge}
       </span>
 
-      <p className="font-mono text-[13px] text-[#0a0f1d]/75 leading-[1.8]">"{quote}"</p>
+      <p className="relative z-10 font-mono text-[13px] text-primary-400/70 leading-[1.8]">"{quote}"</p>
     </div>
   );
 }
@@ -71,27 +77,29 @@ export function TestimonialsMarquee() {
   const row2 = testimonials.slice(4);
 
   return (
-    <section className="relative overflow-hidden bg-cyan-400 py-[72px]">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-5%,rgba(255,255,255,0.2),transparent)]" />
+    <section
+    id="testimonials"
+     className="relative overflow-hidden bg-primary-400 transition-colors duration-1000 py-[72px]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-5%,rgba(255,255,255,0.18),transparent)]" />
 
+      {/* Header — matches original font-data style */}
       <div className="relative z-10 text-center mb-[52px] px-6">
-        <div className="inline-flex items-center gap-2 mb-3.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#0a0f1d]" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-[#0a0f1d] opacity-60">
-            Field Reports
-          </span>
-        </div>
-        <h2 className="font-mono text-4xl uppercase tracking-widest text-[#0a0f1d] font-normal">
-          Voices from the <span className="font-extrabold">Network</span>
-        </h2>
-        <p className="mt-2.5 font-mono text-sm text-[#0a0f1d]/55 max-w-md mx-auto leading-relaxed">
-          Real feedback from citizens, responders, volunteers and administrators using NeXora every day.
-        </p>
-      </div>
+  <div className="inline-flex items-center gap-2 mb-3.5 opacity-70">
+    <div className="w-2 h-2 bg-slate-900" />
+    <span style={{ fontFamily: "'Orbitron', monospace" }} className="text-[10px] tracking-[0.25em] uppercase text-slate-900">
+      Field Reports
+    </span>
+    <div className="w-12 h-px bg-gradient-to-r from-slate-900/50 to-transparent" />
+  </div>
+
+  <h2 style={{ fontFamily: "'Orbitron', monospace" }} className="text-[clamp(24px,3.5vw,46px)] tracking-[0.1em] text-slate-900 text-lg uppercase font-normal">
+    System <span className="font-black">Validation</span>
+  </h2>
+</div>
 
       <div className="relative">
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-r from-cyan-400 to-transparent" />
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-l from-cyan-400 to-transparent" />
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-r from-primary-400 to-transparent" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-l from-primary-400 to-transparent" />
 
         <div className="flex flex-col gap-5 overflow-hidden">
           <MarqueeRow items={row1} duration="42s" />
@@ -99,12 +107,7 @@ export function TestimonialsMarquee() {
         </div>
       </div>
 
-      <style>{`
-        @keyframes marquee {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-      `}</style>
+     
     </section>
   );
 }

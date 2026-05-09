@@ -14,7 +14,7 @@ const GradientText = ({ text, className, style }) => {
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
           color: 'transparent',
-          filter: 'drop-shadow(0 0 25px rgba(0,240,255,0.55)) drop-shadow(0 0 60px rgba(0,220,255,0.2))',
+          filter: 'drop-shadow(0 0 25px rgba(0, 240, 255, 0.55)) drop-shadow(0 0 60px rgba(0,220,255,0.2))',
         }}
       >
         {text}

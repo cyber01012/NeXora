@@ -1,14 +1,15 @@
 import React from 'react';
-import './App.css';
 import LandingPage from './pages/LandingPage';
-
+import { DisasterProvider } from './context/DisasterContext';
 
 
 function App() {
   return (
-    <div className="w-full min-h-screen bg-[var(--color-hud-bg)] text-white">
-      <LandingPage />
-    </div>
+    <DisasterProvider>
+      <div className="w-full min-h-screen bg-[var(--color-hud-bg)] text-white transition-colors duration-1000">
+        <LandingPage />
+      </div>
+    </DisasterProvider>
   );
 }
 

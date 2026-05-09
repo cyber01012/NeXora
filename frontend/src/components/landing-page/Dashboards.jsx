@@ -8,28 +8,28 @@ const roles = [
     title: 'Citizens',
     icon: <User className="w-5 h-5" />,
     desc: 'Report issues instantly with exact geolocation. Track the status of your reports and receive updates as responders act.',
-    color: 'from-cyan-500 to-blue-500'
+    color: 'from-primary-500 to-blue-500'
   },
   {
     id: 'responders',
     title: 'Responders',
     icon: <Shield className="w-5 h-5" />,
     desc: 'Receive AI-optimized tasks based on proximity and severity. Navigate directly to incidents with integrated live routing.',
-    color: 'from-cyan-400 to-blue-400'
+    color: 'from-primary-400 to-blue-400'
   },
   {
     id: 'ngos',
     title: 'NGOs',
     icon: <HandHeart className="w-5 h-5" />,
     desc: 'Coordinate volunteer efforts, manage incoming relief resources, and dispatch help to the highest priority areas.',
-    color: 'from-cyan-400 to-blue-400'
+    color: 'from-primary-400 to-blue-400'
   },
   {
     id: 'admins',
     title: 'Admins',
     icon: <Settings className="w-5 h-5" />,
     desc: 'Full system oversight. Monitor heatmaps, manage users, and manually override AI triage decisions when necessary.',
-    color: 'from-cyan-500 to-blue-500'
+    color: 'from-primary-500 to-blue-500'
   }
 ];
 
@@ -37,16 +37,16 @@ const Dashboards = () => {
   const [activeRole, setActiveRole] = useState(roles[0]);
 
   return (
-    <section id="dashboards" className="py-16 bg-[#0a0f1d] relative overflow-hidden">
+    <section id="dashboards" className="py-16 bg-[var(--bg-light)] transition-colors duration-1000 relative overflow-hidden">
       {/* Decorative bg */}
       <div className="absolute top-1/2 right-0 w-[800px] h-[800px] bg-blue-900/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3"></div>
 
       <div className="container mx-auto px-6 max-w-7xl relative z-10">
         <div className="text-center mb-12 mt-0">
           <h2 className="text-4xl md:text-5xl font-data text-white mb-6 uppercase tracking-wider">
-            One Platform. <span className="text-glow-cyan">Four Views.</span>
+            One Platform. <span className="text-glow-primary">Four Views.</span>
           </h2>
-          <p className="text-cyan-500 font-mono text-sm max-w-2xl mx-auto">
+          <p className="text-primary-500 font-mono text-sm max-w-2xl mx-auto">
             // TAILORED INTERFACES ENSURE EVERYONE HAS EXACTLY THE TOOLS THEY NEED.
           </p>
          
@@ -62,8 +62,8 @@ const Dashboards = () => {
                 onClick={() => setActiveRole(role)}
                 className={`text-left p-6 rounded-sm border transition-all duration-300 flex items-start gap-4 ${
                   activeRole.id === role.id 
-                    ? 'bg-cyan-500/10 border-cyan-400 shadow-[0_0_15px_rgba(0,240,255,0.2)]' 
-                    : 'bg-transparent border-white/10 hover:border-cyan-500/30'
+                    ? 'bg-primary-500/10 border-primary-400 shadow-[0_0_15px_rgba(var(--primary-glow-rgb), 0.2)]' 
+                    : 'bg-transparent border-white/10 hover:border-primary-500/30'
                 }`}
               >
                 <div className={`mt-1 p-2 rounded-sm bg-gradient-to-br ${role.color} bg-opacity-20`}>
@@ -71,7 +71,7 @@ const Dashboards = () => {
                 </div>
                 <div>
                   <h3 className={`text-xl font-data mb-2 uppercase tracking-wide ${
-                    activeRole.id === role.id ? 'text-cyan-400' : 'text-white/70'
+                    activeRole.id === role.id ? 'text-primary-400' : 'text-white/70'
                   }`}>
                     {role.title}
                   </h3>
@@ -121,7 +121,7 @@ const Dashboards = () => {
     <div className="grid grid-cols-2 gap-4 h-full">
       {/* Report Card */}
       <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-2">
-        <span className="text-cyan-400">// NEW REPORT</span>
+        <span className="text-primary-400">// NEW REPORT</span>
         <div className="h-3 w-3/4 bg-white/20 rounded"></div>
         <div className="h-3 w-1/2 bg-white/20 rounded"></div>
         <div className="text-green-400 text-[10px]">STATUS: ASSIGNED</div>
@@ -134,7 +134,7 @@ const Dashboards = () => {
 
       {/* Reports List */}
       <div className="col-span-2 bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-2">
-        <div className="text-cyan-400">// MY REPORTS</div>
+        <div className="text-primary-400">// MY REPORTS</div>
         <div className="flex justify-between">
           <span>Flood Area</span>
           <span className="text-yellow-400">PENDING</span>
@@ -151,7 +151,7 @@ const Dashboards = () => {
   {activeRole.id === 'responders' && (
     <div className="grid grid-cols-2 gap-4 h-full">
       <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-        <div className="text-cyan-400">// TASK</div>
+        <div className="text-primary-400">// TASK</div>
         <div className="mt-2">Flood Rescue</div>
         <div className="text-red-400 text-[10px]">HIGH PRIORITY</div>
       </div>
@@ -164,7 +164,7 @@ const Dashboards = () => {
       {/* Map */}
       <div className="col-span-2 relative rounded-xl bg-black border border-white/10 overflow-hidden">
         <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#ffffff1a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff1a_1px,transparent_1px)] bg-[size:2rem_2rem]" />
-        <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-cyan-400 rounded-full animate-ping" />
+        <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-primary-400 rounded-full animate-ping" />
       </div>
     </div>
   )}
@@ -173,19 +173,19 @@ const Dashboards = () => {
   {activeRole.id === 'ngos' && (
     <div className="grid grid-cols-2 gap-4 h-full">
       <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-        <div className="text-cyan-400">// INVENTORY</div>
+        <div className="text-primary-400">// INVENTORY</div>
         <div>Food: 120</div>
         <div>Med Kits: 45</div>
       </div>
 
       <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-        <div className="text-cyan-400">// DISPATCH</div>
+        <div className="text-primary-400">// DISPATCH</div>
         <div>Karachi Flood Zone</div>
         <div className="text-green-400 text-[10px]">SENT</div>
       </div>
 
       <div className="col-span-2 bg-white/5 border border-white/10 rounded-xl p-4">
-        <div className="text-cyan-400">// VOLUNTEERS</div>
+        <div className="text-primary-400">// VOLUNTEERS</div>
         <div>12 Active</div>
       </div>
     </div>
@@ -195,12 +195,12 @@ const Dashboards = () => {
   {activeRole.id === 'admins' && (
     <div className="grid grid-cols-2 gap-4 h-full">
       <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-        <div className="text-cyan-400">// REPORTS</div>
+        <div className="text-primary-400">// REPORTS</div>
         <div>+24 Incoming</div>
       </div>
 
       <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-        <div className="text-cyan-400">// AI SUGGESTION</div>
+        <div className="text-primary-400">// AI SUGGESTION</div>
         <div>Deploy 2 teams</div>
       </div>
 
