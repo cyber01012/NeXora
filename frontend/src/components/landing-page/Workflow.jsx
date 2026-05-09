@@ -22,7 +22,7 @@ const steps = [
   },
   {
     title: 'Resource Allocation',
-    desc: 'Automated dispatching of nearest available responders.',
+    desc: 'Automated dispatching of nearest available responders and volunteers.',
     icon: Database,
     color: 'text-primary-400',
     bg: 'bg-primary-500/10',

@@ -19,7 +19,7 @@ const features = [
   {
     icon: Users ,
     title: "Smart Coordination",
-    desc: "Connect citizens, NGOs, and responders seamlessly through dedicated operational dashboards."
+    desc: "Connect citizens, NGOs, volunteers, and responders seamlessly through dedicated role-specific dashboards."
   },
   {
     icon: ActivitySquare,

@@ -18,6 +18,10 @@ const faqs = [
   {
     question: "How do NGOs integrate with the NeXora system?",
     answer: "NGOs have a dedicated dashboard to register their available resources (food, medical supplies, volunteers). When the AI detects a shortage in a disaster zone, it automatically pings relevant NGOs to deploy those specific resources."
+  },
+  {
+    question: "How can I contribute as a volunteer?",
+    answer: "Once registered as a volunteer, you can browse nearby missions, join active response teams, and collaborate with NGOs to provide ground-level support during emergencies and civic tasks."
   }
 ];
 

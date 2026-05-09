@@ -7,6 +7,7 @@ import Workflow from '../components/landing-page/Workflow';
 import Testimonials from '../components/landing-page/Testimonials';
 import FAQ from '../components/landing-page/FAQ';
 import SplashScreen from '../components/landing-page/SplashScreen';
+import CTA from '../components/landing-page/CTA';
 import { AnimatePresence, motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { ArrowUp, AlertTriangle } from 'lucide-react';
 import Footer from '../components/common/Footer';
@@ -60,6 +61,7 @@ const LandingPage = () => {
             <Dashboards />
             <Testimonials />
             <FAQ />
+            <CTA />
           </main>
           
           {/* HUD Footer */}

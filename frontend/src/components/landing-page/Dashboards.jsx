@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Shield, HandHeart, Settings } from 'lucide-react';
+import { User, Shield, HandHeart, Settings, Users } from 'lucide-react';
 
 const roles = [
   {
@@ -30,6 +30,13 @@ const roles = [
     icon: <Settings className="w-5 h-5" />,
     desc: 'Full system oversight. Monitor heatmaps, manage users, and manually override AI triage decisions when necessary.',
     color: 'from-primary-500 to-blue-500'
+  },
+  {
+    id: 'volunteers',
+    title: 'Volunteers',
+    icon: <Users className="w-5 h-5" />,
+    desc: 'Browse nearby missions, join active response teams, and collaborate with NGOs through a lightweight mobile interface.',
+    color: 'from-primary-400 to-blue-400'
   }
 ];
 
@@ -44,7 +51,7 @@ const Dashboards = () => {
       <div className="container mx-auto px-6 max-w-7xl relative z-10">
         <div className="text-center mb-12 mt-0">
           <h2 className="text-4xl md:text-5xl font-data text-white mb-6 uppercase tracking-wider">
-            One Platform. <span className="text-glow-primary">Four Views.</span>
+            One Platform. <span className="text-glow-primary">Five Views.</span>
           </h2>
           <p className="text-primary-500 font-mono text-sm max-w-2xl mx-auto">
             // TAILORED INTERFACES ENSURE EVERYONE HAS EXACTLY THE TOOLS THEY NEED.
@@ -206,34 +213,63 @@ const Dashboards = () => {
 
       {/* Heatmap */}
       <div className="col-span-2 relative rounded-xl bg-black border border-white/10 overflow-hidden">
+        {/* Grid */}
+        <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#ffffff14_1px,transparent_1px),linear-gradient(to_bottom,#ffffff14_1px,transparent_1px)] bg-[size:2rem_2rem]" />
+        {/* Ambient glow */}
+        <div className="absolute inset-0 bg-orange-400/5" />
+        {/* Heat blobs */}
+        <div className="absolute top-1/3 left-1/3 w-40 h-40 bg-orange-400/25 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-2/3 w-32 h-32 bg-orange-300/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 left-1/2 w-28 h-28 bg-yellow-300/15 rounded-full blur-3xl"></div>
+        {/* Core hotspots */}
+        <div className="absolute top-1/3 left-1/3 w-3 h-3 bg-yellow-300 rounded-full shadow-[0_0_12px_#facc15]"></div>
+        <div className="absolute top-1/2 left-2/3 w-3 h-3 bg-yellow-300 rounded-full shadow-[0_0_12px_#facc15]"></div>
+        {/* Pulse */}
+        <div className="absolute top-1/3 left-1/3 w-6 h-6 bg-yellow-300/40 rounded-full animate-ping"></div>
+        {/* Scan line */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-yellow-300/10 to-transparent animate-[scan_4s_linear_infinite]" />
+        {/* Label */}
+        <div className="absolute top-2 left-3 text-[10px] text-white/50 font-mono">// VISUALS</div>
+      </div>
+    </div>
+  )}
 
-  {/* Grid */}
-  <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#ffffff14_1px,transparent_1px),linear-gradient(to_bottom,#ffffff14_1px,transparent_1px)] bg-[size:2rem_2rem]" />
+  {/* VOLUNTEER VIEW */}
+  {activeRole.id === 'volunteers' && (
+    <div className="grid grid-cols-2 gap-4 h-full opacity-80">
+      
+      {/* Active Task */}
+      <div className="col-span-2 bg-white/5 border border-white/10 rounded-xl p-4">
+        <div className="text-primary-400 mb-1 text-[10px] font-bold tracking-widest uppercase">// CURRENT_MISSION</div>
+        <div className="flex justify-between items-center">
+          <span className="text-sm">Sector 7 — Relief Setup</span>
+          <span className="text-primary-400 text-[9px] px-2 py-0.5 border border-primary-500/30 rounded uppercase tracking-tighter">On-Site</span>
+        </div>
+      </div>
 
-  {/* Ambient glow */}
-  <div className="absolute inset-0 bg-orange-400/5" />
+      {/* Simplified stats */}
+      <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col justify-center gap-1">
+        <div className="text-primary-400 text-[10px] uppercase font-bold tracking-widest opacity-60">TEAM_SYNC</div>
+        <div className="flex -space-x-1 mt-1">
+           <div className="w-5 h-5 rounded-full bg-primary-500/20 border border-primary-500/30" />
+           <div className="w-5 h-5 rounded-full bg-primary-500/20 border border-primary-500/30" />
+           <div className="w-5 h-5 rounded-full bg-primary-500/20 border border-primary-500/30" />
+        </div>
+      </div>
 
-  {/* Heat blobs (same hue, diff intensity) */}
-  <div className="absolute top-1/3 left-1/3 w-40 h-40 bg-orange-400/25 rounded-full blur-3xl"></div>
-  <div className="absolute top-1/2 left-2/3 w-32 h-32 bg-orange-300/20 rounded-full blur-3xl"></div>
-  <div className="absolute bottom-1/4 left-1/2 w-28 h-28 bg-yellow-300/15 rounded-full blur-3xl"></div>
+      <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col justify-center">
+        <div className="text-primary-400 text-[10px] uppercase font-bold tracking-widest opacity-60">PROGRESS</div>
+        <div className="w-full bg-white/5 h-1 rounded mt-1.5 overflow-hidden">
+          <div className="h-full bg-green-400/60 shadow-[0_0_8px_rgba(74,222,128,0.3)]" style={{ width: '65%' }} />
+        </div>
+      </div>
 
-  {/* Core hotspots */}
-  <div className="absolute top-1/3 left-1/3 w-3 h-3 bg-yellow-300 rounded-full shadow-[0_0_12px_#facc15]"></div>
-  <div className="absolute top-1/2 left-2/3 w-3 h-3 bg-yellow-300 rounded-full shadow-[0_0_12px_#facc15]"></div>
+      {/* Available Mission */}
+      <div className="col-span-2 bg-white/5 border border-white/5 rounded-xl px-4 py-2 flex items-center justify-between opacity-50 italic">
+        <span className="text-[10px]">Nearby: Medical Aid - Block C</span>
+        <span className="text-[9px] uppercase tracking-widest">Available</span>
+      </div>
 
-  {/* Pulse */}
-  <div className="absolute top-1/3 left-1/3 w-6 h-6 bg-yellow-300/40 rounded-full animate-ping"></div>
-
-  {/* Scan line */}
-  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-yellow-300/10 to-transparent animate-[scan_4s_linear_infinite]" />
-
-  {/* Label */}
-  <div className="absolute top-2 left-3 text-[10px] text-white/50 font-mono">
-    // VISUALS
-  </div>
-
-</div>
     </div>
   )}
 </div>
