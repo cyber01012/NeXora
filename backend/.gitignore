@@ -34,11 +34,6 @@ build/
 # Application properties (contains passwords)
 src/main/resources/application.properties
 
-# Maven wrapper
-.mvn/
-mvnw
-mvnw.cmd
-
 # OS files
 .DS_Store
 Thumbs.db

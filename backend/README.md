@@ -1,21 +1,44 @@
-# NeXora Backend
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-Multi-module Spring Boot backend for NeXora - Intelligent Disaster & Civil Management System.
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
 
-## Tech Stack
-- Java 17
-- Spring Boot 3.5.x
-- PostgreSQL
-- JWT Authentication
-- Maven
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
 
-## Quick Start
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-### 1. Prerequisites
-- JDK 17
-- PostgreSQL 15+
-- Maven
+### VS Code ###
+.vscode/
+# Application properties (contains passwords)
+src/main/resources/application.properties
 
-### 2. Database Setup
-```sql
-CREATE DATABASE nexora_db;
+# Maven wrapper
+.mvn/
+mvnw
+mvnw.cmd
+
+# OS files
+.DS_Store
+Thumbs.db
