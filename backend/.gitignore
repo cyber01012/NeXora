@@ -31,8 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
-# Application properties (contains passwords)
-src/main/resources/application.properties
+
 
 # Maven wrapper
 .mvn/
