@@ -32,6 +32,9 @@ public class AdminUser {
 
     private String email;
 
+    @Column(name = "email_verified")
+    private Boolean emailVerified;
+
     // ✅ Active / Inactive
     private Boolean active;
 

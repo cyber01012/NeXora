@@ -29,6 +29,13 @@ public class VolunteerWorkerCreator {
 
     private String email;
 
+    @Column(name = "email_verified")
+    private Boolean emailVerified;
+
+    @ManyToOne
+    @JoinColumn(name = "user_type_id")
+    private UserType userType;
+
     private String profilePic; // ✅ link
 
     private LocalDate createdDate;
