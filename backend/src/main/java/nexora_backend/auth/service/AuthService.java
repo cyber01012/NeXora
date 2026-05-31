@@ -19,7 +19,9 @@ import nexora_backend.database.entity.VolunteerWorkerCreator;
 import nexora_backend.database.repository.AdminUserRepository;
 import nexora_backend.database.repository.RegisterCitizenRepository;
 import nexora_backend.database.repository.VolunteerWorkerCreatorRepository;
+import nexora_backend.notificationsystem.events.PasswordResetEvent;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,7 @@ public class AuthService {
     private final UserLookupService userLookupService;
     private final EmailVerificationService emailVerificationService;
     private final AuthEventPublisher authEventPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Value("${jwt.expiration}")
     private long accessTokenExpirationMs;
@@ -124,6 +127,10 @@ public class AuthService {
         }
         String otp = otpService.generateAndStoreOtp(user.getSource(), user.getSourceId(), OtpPurpose.PASSWORD_RESET, request.getEmail());
         mailService.sendPasswordResetOtpEmail(request.getEmail(), otp);
+
+        // Publish event for In-App Notification System
+        applicationEventPublisher.publishEvent(new PasswordResetEvent(this, user.getSourceId()));
+
         return PasswordResetInitResponse.builder()
                 .message("Password reset OTP sent to email")
                 .source(user.getSource())
@@ -138,6 +145,9 @@ public class AuthService {
         String encoded = passwordEncoder.encode(request.getNewPassword());
         userLookupService.updatePassword(source, request.getSourceId(), encoded);
         refreshTokenService.revokeAllTokens(source, request.getSourceId());
+
+        // Publish event for In-App Notification System (Completion)
+        applicationEventPublisher.publishEvent(new PasswordResetEvent(this, request.getSourceId()));
     }
 
     @Transactional

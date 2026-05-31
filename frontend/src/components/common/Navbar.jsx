@@ -2,14 +2,16 @@ import React, { useState } from 'react'; // v2-nav-update-fix
 import { ShieldAlert, Map, Activity, User, Shield, Users, Building, Ambulance, Cpu, LayoutDashboard, Code, Network, HeartHandshake } from 'lucide-react';
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import logo from '../../assets/images/nexlogo.png';
-
-const portals = [
-  { icon: Users,    label: 'Citizen',   color: 'group-hover:text-primary-400',   bg: 'hover:bg-primary-500/15' },
-  { icon: Ambulance,label: 'Responder', color: 'group-hover:text-primary-400',    bg: 'hover:bg-primary-500/15' },
-  { icon: Building, label: 'NGO',       color: 'group-hover:text-primary-400',  bg: 'hover:bg-primary-500/15' },
-  { icon: HeartHandshake, label: 'Volunteer', color: 'group-hover:text-primary-400', bg: 'hover:bg-primary-500/15' },
-  { icon: Shield,   label: 'Admin',     color: 'group-hover:text-primary-400', bg: 'hover:bg-primary-500/15' },
-];
+import NotificationBell from '../notifications/NotificationBell';
+import NotificationPanel from '../notifications/NotificationPanel';
+// const [showSignupModal, setShowSignupModal] = useState(false);
+// const portals = [
+//   { icon: Users,    label: 'Citizen',   color: 'group-hover:text-primary-400',   bg: 'hover:bg-primary-500/15' },
+//   { icon: Ambulance,label: 'Responder', color: 'group-hover:text-primary-400',    bg: 'hover:bg-primary-500/15' },
+//   { icon: Building, label: 'NGO',       color: 'group-hover:text-primary-400',  bg: 'hover:bg-primary-500/15' },
+//   { icon: HeartHandshake, label: 'Volunteer', color: 'group-hover:text-primary-400', bg: 'hover:bg-primary-500/15' },
+//   { icon: Shield,   label: 'Admin',     color: 'group-hover:text-primary-400', bg: 'hover:bg-primary-500/15' },
+// ];
 
 const Navbar = () => {
   const [loginOpen, setLoginOpen] = useState(false);
@@ -111,43 +113,23 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* RIGHT — Dropdown Sign Up */}
-        <div 
-          className="relative flex-shrink-0"
-          onMouseEnter={() => setLoginOpen(true)}
-          onMouseLeave={() => setLoginOpen(false)}
-        >
-          <div className="bg-[var(--bg-light)]/80 rounded-full flex items-center justify-center cursor-pointer h-10 w-[130px] border border-primary-500/25 backdrop-blur-sm hover:border-primary-400/50 transition-colors">
-            <User className="w-4 h-4 text-primary-400 mr-2" />
-            <span className="font-data text-xs font-bold tracking-widest text-primary-300 uppercase">
-              Sign Up
-            </span>
+        {/* RIGHT — Bell + Dropdown Sign Up */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+
+          {/* Notification Bell */}
+          <div className="relative">
+            <NotificationBell />
+            <NotificationPanel role="CITIZEN" />
           </div>
 
-          {/* Vertical Dropdown Island */}
-          <AnimatePresence>
-            {loginOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className="absolute top-12 right-0 w-48 bg-[var(--bg-darker)]/95 backdrop-blur-xl border border-primary-500/30 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col p-2 gap-1 z-50"
-              >
-                {portals.map(({ icon: Icon, label, color, bg }) => (
-                  <button
-                    key={label}
-                    className={`group w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${bg}`}
-                  >
-                    <Icon className={`w-4 h-4 text-primary-500/50 transition-colors ${color}`} />
-                    <span className="text-xs font-data text-primary-100/70 group-hover:text-white uppercase tracking-widest transition-colors">
-                      {label}
-                    </span>
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Sign Up Dropdown */}
+        <button
+  onClick={() => {
+    // TODO: Open Sign Up Form Modal
+    setShowSignupForm(true);
+  }}
+  className="bg-[var(--bg-light)]/80 rounded-full flex items-center justify-center cursor-pointer h-10 w-[130px] border border-primary-500/25 backdrop-blur-sm hover:border-primary-400/50 transition-colors"
+ > <span className="text-primary-300 font-data" >Sign up</span> </button>
         </div>
       </motion.div>
     </nav>
