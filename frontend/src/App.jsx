@@ -7,8 +7,8 @@ import { NotificationProvider } from './components/notifications/NotificationCon
 
 function App() {
   return (
-    <DisasterProvider>
-      <NotificationProvider>
+    <NotificationProvider>
+      <DisasterProvider>
         <BrowserRouter>
           <div className="w-full min-h-screen bg-[var(--color-hud-bg)] text-white transition-colors duration-1000">
             <Routes>
@@ -17,8 +17,8 @@ function App() {
             </Routes>
           </div>
         </BrowserRouter>
-      </NotificationProvider>
-    </DisasterProvider>
+      </DisasterProvider>
+    </NotificationProvider>
   );
 }
 

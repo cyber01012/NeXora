@@ -1,8 +1,9 @@
 import React, { createContext, useState, useEffect, useCallback, useRef } from 'react';
+import ToastContainer from './ToastContainer';
 
 /**
  * ==========================================
- * NOTIFICATION CONTEXT — FIXED
+ * NOTIFICATION CONTEXT — UPDATED
  * ==========================================
  */
 
@@ -39,6 +40,7 @@ export const NotificationProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const pollRef = useRef(null);
+  const lastKnownIds = useRef(new Set());
 
   // Check if user is authenticated
   const isAuthenticated = !!getToken();
@@ -63,7 +65,20 @@ export const NotificationProvider = ({ children }) => {
       }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setNotifications(Array.isArray(data) ? data : []);
+      const newNotifications = Array.isArray(data) ? data : [];
+      
+      // Detect new notifications
+      if (lastKnownIds.current.size > 0) {
+        newNotifications.forEach(n => {
+          if (!lastKnownIds.current.has(n.id) && !n.isRead) {
+            window.addToast?.(`New Notification: ${n.title || 'You have a new update'}`);
+          }
+        });
+      }
+      
+      // Update last known
+      lastKnownIds.current = new Set(newNotifications.map(n => n.id));
+      setNotifications(newNotifications);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -181,6 +196,7 @@ export const NotificationProvider = ({ children }) => {
       closePanel,
       togglePanel,
     }}>
+      <ToastContainer />
       {children}
     </NotificationContext.Provider>
   );

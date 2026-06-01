@@ -42,3 +42,5 @@ mvnw.cmd
 .DS_Store
 Thumbs.db
 docproperties/
+application.properties
+application-*.properties

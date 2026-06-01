@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import alertSound from '../assets/audio/alertmode.mp3';
+import { NotificationContext } from '../components/notifications/NotificationContext';
 
 const DisasterContext = createContext();
 
@@ -8,6 +9,8 @@ export const useDisasterMode = () => useContext(DisasterContext);
 export const DisasterProvider = ({ children }) => {
   const [isDisasterMode, setIsDisasterMode] = useState(false);
   const audioRef = useRef(null);
+  const notificationContext = useContext(NotificationContext);
+  const fetchAll = notificationContext?.fetchAll;
 
   // Create the Audio object once
   useEffect(() => {
@@ -20,7 +23,16 @@ export const DisasterProvider = ({ children }) => {
   }, []);
 
   const toggleDisasterMode = () => {
-    setIsDisasterMode((prev) => !prev);
+    setIsDisasterMode((prev) => {
+      const next = !prev;
+      if (next) {
+        // Trigger a fetch to refresh notification list (or potential future backend record)
+        // Backend should eventually handle creation of the notification record,
+        // which the polling logic will then pick up.
+        fetchAll?.();
+      }
+      return next;
+    });
   };
 
   useEffect(() => {
