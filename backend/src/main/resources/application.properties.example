@@ -1,0 +1,49 @@
+# ==========================================
+# NeXora Backend Configuration Example
+# Copy this file to application.properties and fill in real values
+# NEVER commit application.properties — it is gitignored
+# ==========================================
+
+# Server
+server.port=8080
+spring.application.name=nexora-backend
+
+# Database
+spring.datasource.url=jdbc:postgresql://localhost:5432/nexora
+spring.datasource.username=YOUR_DB_USERNAME
+spring.datasource.password=YOUR_DB_PASSWORD
+
+# JPA
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# JWT (generate a secure 256-bit key)
+jwt.secret=YOUR_JWT_SECRET_KEY_HERE
+jwt.expiration=900000
+jwt.refresh-expiration=604800000
+
+# Redis
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+
+# Mail (configure for your SMTP provider)
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=${MAIL_USERNAME:YOUR_EMAIL@gmail.com}
+spring.mail.password=${MAIL_PASSWORD:YOUR_APP_PASSWORD}
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+nexora.mail.from=${MAIL_FROM:YOUR_EMAIL@gmail.com}
+
+# OTP
+nexora.otp.expiration-minutes=10
+nexora.otp.length=6
+nexora.otp.resend-max-attempts=2
+nexora.otp.resend-window-minutes=60
+
+# Admin bootstrap (first startup only)
+# ADMIN_EMAIL=admin@nexora.local
+# ADMIN_PASSWORD=change-me
+
+# AES encryption for sensitive fields (32-byte hex or base64 key)
+nexora.encryption.key=${ENCRYPTION_KEY:YOUR_32_BYTE_HEX_KEY_HERE}
