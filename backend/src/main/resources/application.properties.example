@@ -3,8 +3,8 @@ spring.application.name=nexora-backend
 cors.allowed-origins=http://localhost:5173
 
 # Database Configuration
-spring.datasource.url=jdbc:postgresql://localhost:5432/nexora
-spring.datasource.username=your_username
+spring.datasource.url=jdbc:postgresql://localhost:5432/nexora_db
+spring.datasource.username=postgres
 spring.datasource.password=your_password
 
 # Gemini API Keys (Get from https://aistudio.google.com/)
