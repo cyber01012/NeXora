@@ -1,0 +1,24 @@
+server.port=8080
+spring.application.name=nexora-backend
+cors.allowed-origins=http://localhost:5173
+
+# Database Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/nexora
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+
+# Gemini API Keys (Get from https://aistudio.google.com/)
+gemini.api.key.primary=YOUR_PRIMARY_GEMINI_API_KEY
+gemini.api.key.secondary=YOUR_SECONDARY_GEMINI_API_KEY
+gemini.api.model=gemini-flash-latest
+
+# JPA / Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+
+
+# Security / JWT
+jwt.secret=YOUR_JWT_SECRET_MIN_64_CHARS
+jwt.expiration=900000
+jwt.refresh-expiration=604800000
