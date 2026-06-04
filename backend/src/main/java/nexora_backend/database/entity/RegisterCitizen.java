@@ -39,12 +39,6 @@ public class RegisterCitizen {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "email_verified")
-    private Boolean emailVerified;
-
-    @Column(name = "cnic_validated")
-    private Boolean cnicValidated;
-
     @Column(name = "entry_date")
     private LocalDate entryDate;
 

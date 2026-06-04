@@ -32,9 +32,6 @@ public class AdminUser {
 
     private String email;
 
-    @Column(name = "email_verified")
-    private Boolean emailVerified;
-
     // ✅ Active / Inactive
     private Boolean active;
 
@@ -48,11 +45,6 @@ public class AdminUser {
 
     // ✅ NGO / GOV
     private String category;
-
-    // ✅ Responder type (Responder accounts only)
-    @ManyToOne
-    @JoinColumn(name = "responder_type_id")
-    private ResponderType responderType;
 
     // ✅ FK → Department
     @ManyToOne

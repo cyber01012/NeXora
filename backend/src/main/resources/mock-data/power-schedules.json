@@ -1,0 +1,17 @@
+{
+  "gulshan-e-iqbal": { "slots": ["9:00 PM - 11:00 PM", "3:00 AM - 5:00 AM"] },
+  "north-nazimabad": { "slots": ["10:00 PM - 12:00 AM", "4:00 AM - 6:00 AM"] },
+  "north-karachi": { "slots": ["8:00 PM - 10:00 PM", "2:00 AM - 4:00 AM"] },
+  "korangi": { "slots": ["11:00 PM - 1:00 AM", "5:00 AM - 7:00 AM"] },
+  "dha-clifton": { "slots": ["Minimal - backup area"] },
+  "saddar": { "slots": ["9:30 PM - 11:30 PM", "3:30 AM - 5:30 AM"] },
+  "lyari": { "slots": ["10:30 PM - 12:30 AM", "4:30 AM - 6:30 AM"] },
+  "orangi": { "slots": ["8:30 PM - 10:30 PM", "2:30 AM - 4:30 AM"] },
+  "malir": { "slots": ["9:00 PM - 11:00 PM", "3:00 AM - 5:00 AM"] },
+  "shah-faisal-colony": { "slots": ["10:00 PM - 12:00 AM", "4:00 AM - 6:00 AM"] },
+  "landhi-bin-qasim": { "slots": ["11:00 PM - 1:00 AM", "5:00 AM - 7:00 AM"] },
+  "federal-b-area": { "slots": ["9:30 PM - 11:30 PM", "3:30 AM - 5:30 AM"] },
+  "pechs-tariq-road": { "slots": ["10:00 PM - 12:00 AM", "4:00 AM - 6:00 AM"] },
+  "keamari-kemari": { "slots": ["9:00 PM - 11:00 PM", "3:00 AM - 5:00 AM"] },
+  "surjani-town": { "slots": ["8:00 PM - 10:00 PM", "2:00 AM - 4:00 AM"] }
+}

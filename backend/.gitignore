@@ -41,4 +41,7 @@ mvnw.cmd
 # OS files
 .DS_Store
 Thumbs.db
-docproperties/
+
+# Configuration
+application.properties
+
