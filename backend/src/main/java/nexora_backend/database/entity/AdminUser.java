@@ -50,4 +50,8 @@ public class AdminUser {
     @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;
+
+    @Builder.Default
+    @Column(name = "email_verified")
+    private Boolean emailVerified = true;
 }

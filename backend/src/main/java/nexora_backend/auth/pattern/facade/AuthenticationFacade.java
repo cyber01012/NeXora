@@ -106,6 +106,10 @@ public class AuthenticationFacade {
         authService.logoutAll(user);
     }
 
+    public void logoutOthers(AuthenticatedUser user, LogoutRequest request) {
+        authService.logoutOthers(user, request);
+    }
+
     public UserProfileResponse getProfile(AuthenticatedUser user) {
         return authService.getProfile(user);
     }

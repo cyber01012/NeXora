@@ -52,7 +52,7 @@ const Stat = ({ value, label }) => (
 );
 
 /* ─── Main component ─────────────────────────────────────────── */
-const CTA = () => {
+const CTA = ({ onOpenAuth }) => {
   return (
     <section
       id="cta"
@@ -165,7 +165,7 @@ const CTA = () => {
               <motion.button
                 whileHover={{ scale: 1.03, boxShadow: '0 0 32px rgba(var(--primary-glow-rgb), 0.45)' }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={onOpenAuth}
                 className="group flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-400 to-primary-600 text-white font-data text-sm tracking-widest uppercase rounded-sm shadow-[0_0_20px_rgba(var(--primary-glow-rgb),0.3)] hover:from-primary-300 hover:to-primary-500 transition-all duration-300 cursor-pointer"
               >
                 <Zap className="w-4 h-4" />

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { X, Bell } from 'lucide-react';
 import beepSound from '../../assets/audio/beep.wav';
 

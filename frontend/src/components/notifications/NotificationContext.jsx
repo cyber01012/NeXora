@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback, useRef } from 'react';
+import { createContext, useState, useEffect, useCallback, useRef } from 'react';
 import ToastContainer from './ToastContainer';
 
 /**

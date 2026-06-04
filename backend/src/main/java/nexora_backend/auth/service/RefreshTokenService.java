@@ -81,6 +81,19 @@ public class RefreshTokenService {
         redisTemplate.delete(userTokensKey);
     }
 
+    public void revokeOtherTokens(UserSource source, String sourceId, String currentRefreshToken) {
+        String userTokensKey = userTokensKey(source, sourceId);
+        Set<String> tokens = redisTemplate.opsForSet().members(userTokensKey);
+        if (tokens != null) {
+            for (String token : tokens) {
+                if (!token.equals(currentRefreshToken)) {
+                    redisTemplate.delete(tokenKey(token));
+                    redisTemplate.opsForSet().remove(userTokensKey, token);
+                }
+            }
+        }
+    }
+
     private String tokenKey(String refreshToken) {
         return REFRESH_TOKEN_PREFIX + refreshToken;
     }

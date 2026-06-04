@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import bgVideo from '../../assets/videos/bg.mp4';
 import GradientText from './GradientText';
@@ -24,7 +24,7 @@ const TypewriterText = ({ text, delay = 0, speed = 50, resetKey }) => {
   return <span>{displayedText}</span>;
 };
 
-const Hero = () => {
+const Hero = ({ onOpenAuth }) => {
   const { isDisasterMode } = useDisasterMode();
 
   return (
@@ -94,7 +94,7 @@ const Hero = () => {
             transition={{ duration: 1, delay: 1.5 }}
           >
             <button
-              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={onOpenAuth}
               className="font-data px-8 py-3 bg-gradient-to-r from-primary-400 to-primary-600 rounded-sm text-white text-sm tracking-widest hover:shadow-[0_0_25px_rgba(var(--primary-glow-rgb), 0.5)] hover:from-primary-300 hover:to-primary-500 transition-all duration-300 pointer-events-auto cursor-pointer"
             >
               GET STARTED

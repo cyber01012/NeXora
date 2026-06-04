@@ -44,4 +44,12 @@ public class RegisterCitizen {
 
     @Column(name = "entry_time")
     private LocalTime entryTime;
+
+    @Builder.Default
+    @Column(name = "email_verified")
+    private Boolean emailVerified = true;
+
+    @Builder.Default
+    @Column(name = "cnic_validated")
+    private Boolean cnicValidated = true;
 }

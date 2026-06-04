@@ -187,6 +187,12 @@ public class AuthService {
         refreshTokenService.revokeAllTokens(user.getSource(), user.getSourceId());
     }
 
+    public void logoutOthers(AuthenticatedUser user, LogoutRequest request) {
+        if (request.getRefreshToken() != null && !request.getRefreshToken().isBlank()) {
+            refreshTokenService.revokeOtherTokens(user.getSource(), user.getSourceId(), request.getRefreshToken());
+        }
+    }
+
     public SendEmailVerificationResponse sendEmailVerification(SendEmailVerificationRequest request) {
         UserSource source = UserSource.valueOf(request.getSource());
         String email = request.getEmail().trim();

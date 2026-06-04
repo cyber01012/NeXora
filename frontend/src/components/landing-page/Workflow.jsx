@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { motion } from 'framer-motion';
-import { CheckCircle2, Shield, Activity, Map as MapIcon, Send, Wifi, ShieldAlert, Cpu, Database, ChevronRight } from 'lucide-react';
+import { Activity, ShieldAlert, Cpu, Database, ChevronRight } from 'lucide-react';
 import Heatmap from './Heatmap';
 
 const steps = [

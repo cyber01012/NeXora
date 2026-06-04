@@ -7,7 +7,7 @@ import nexora_backend.auth.exception.AuthErrors;
 import nexora_backend.auth.model.AuthenticatedUser;
 import nexora_backend.auth.model.SystemRole;
 import nexora_backend.auth.model.UserSource;
-import nexora_backend.auth.service.EmailVerificationLinkService;
+
 import nexora_backend.auth.service.UserTypeService;
 import nexora_backend.auth.util.EncryptionService;
 import nexora_backend.auth.util.PhoneValidator;
@@ -35,7 +35,7 @@ public class WorkerRegistrationStrategy implements RegistrationStrategy {
     private final VolunteerWorkerCreatorRepository volunteerWorkerCreatorRepository;
     private final PasswordEncoder passwordEncoder;
     private final EncryptionService encryptionService;
-    private final EmailVerificationLinkService emailVerificationLinkService;
+
     private final UserTypeService userTypeService;
 
     @Override

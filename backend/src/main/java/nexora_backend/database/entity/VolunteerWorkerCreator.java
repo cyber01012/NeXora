@@ -39,4 +39,12 @@ public class VolunteerWorkerCreator {
     @ManyToOne
     @JoinColumn(name = "dept_id")
     private Department department;
+
+    @ManyToOne
+    @JoinColumn(name = "user_type_id")
+    private UserType userType;
+
+    @Builder.Default
+    @Column(name = "email_verified")
+    private Boolean emailVerified = true;
 }

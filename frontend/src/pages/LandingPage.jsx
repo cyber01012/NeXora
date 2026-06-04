@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Navbar from '../components/common/Navbar';
 import Hero from '../components/landing-page/Hero';
 import Features from '../components/landing-page/Features';
@@ -14,7 +14,7 @@ import Footer from '../components/common/Footer';
 import DisasterOverlay from '../components/common/DisasterOverlay';
 import { useDisasterMode } from '../context/DisasterContext';
 
-const LandingPage = () => {
+const LandingPage = ({ onOpenAuth }) => {
   const { isDisasterMode, toggleDisasterMode } = useDisasterMode();
   const [showSplash, setShowSplash] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -34,7 +34,7 @@ const LandingPage = () => {
 
       {!showSplash && (
         <>
-          <Navbar />
+          <Navbar onOpenAuth={onOpenAuth} />
           
           {/* Disaster Mode Toggle Button */}
           <motion.button
@@ -55,13 +55,13 @@ const LandingPage = () => {
           </motion.button>
 
           <main>
-            <Hero />
+            <Hero onOpenAuth={onOpenAuth} />
             <Features />
             <Workflow />
             <Dashboards />
             <Testimonials />
             <FAQ />
-            <CTA />
+            <CTA onOpenAuth={onOpenAuth} />
           </main>
           
           {/* HUD Footer */}

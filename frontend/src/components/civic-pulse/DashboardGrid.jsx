@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDisasterMode } from '../../context/DisasterContext';
 import { 
-  Cloud, Zap, Moon, Droplets, Thermometer, Wind, 
-  MapPin, Clock, Calendar, ChevronDown, AlertTriangle,
+  Cloud, Zap, Moon, Droplets, Thermometer,
+  MapPin, Clock, ChevronDown, AlertTriangle,
   Loader2
 } from 'lucide-react';
 import './CivicPulse.css';

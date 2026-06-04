@@ -99,6 +99,15 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "Logged out from all devices"));
     }
 
+    @PostMapping("/logout-others")
+    public ResponseEntity<Map<String, String>> logoutOthers(
+            @AuthenticationPrincipal AuthenticatedUser user,
+            @RequestBody(required = false) LogoutRequest request
+    ) {
+        authenticationFacade.logoutOthers(user, request == null ? new LogoutRequest() : request);
+        return ResponseEntity.ok(Map.of("message", "Logged out from all other devices"));
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> me(@AuthenticationPrincipal AuthenticatedUser user) {
         return ResponseEntity.ok(authenticationFacade.getProfile(user));

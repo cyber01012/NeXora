@@ -1,6 +1,6 @@
 package nexora_backend.auth.util;
 
-import java.util.regex.Pattern;
+
 
 /**
  * Validates Pakistani mobile/contact numbers.
@@ -8,9 +8,7 @@ import java.util.regex.Pattern;
  */
 public final class PhoneValidator {
 
-    private static final Pattern PHONE_PATTERN = Pattern.compile(
-            "^(?:\\+92|92|0)?3[0-9]{2}[\\s-]?[0-9]{7}$"
-    );
+
 
     private PhoneValidator() {
     }

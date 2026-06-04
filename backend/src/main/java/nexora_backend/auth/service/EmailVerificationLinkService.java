@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import nexora_backend.auth.config.AuthProperties;
 import nexora_backend.auth.exception.AuthErrors;
 import nexora_backend.auth.model.UserSource;
-import nexora_backend.database.entity.AdminUser;
+
 import nexora_backend.database.entity.RegisterCitizen;
-import nexora_backend.database.entity.VolunteerWorkerCreator;
-import nexora_backend.database.repository.AdminUserRepository;
+
 import nexora_backend.database.repository.RegisterCitizenRepository;
-import nexora_backend.database.repository.VolunteerWorkerCreatorRepository;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,8 +22,7 @@ public class EmailVerificationLinkService {
     private final MailService mailService;
     private final AuthProperties authProperties;
     private final RegisterCitizenRepository registerCitizenRepository;
-    private final AdminUserRepository adminUserRepository;
-    private final VolunteerWorkerCreatorRepository volunteerWorkerCreatorRepository;
+
 
     public void sendVerificationLink(UserSource source, String sourceId, String email) {
         assertCanSendVerificationLink(source, sourceId, email);

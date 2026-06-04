@@ -1,9 +1,11 @@
 import React, { useState } from 'react'; // v2-nav-update-fix
-import { ShieldAlert, Map, Activity, User, Shield, Users, Building, Ambulance, Cpu, LayoutDashboard, Code, Network, HeartHandshake } from 'lucide-react';
-import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
+import { Activity, Cpu, LayoutDashboard, Code, Network } from 'lucide-react';
+import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import logo from '../../assets/images/nexlogo.png';
+import NotificationBell from '../notifications/NotificationBell';
+import NotificationPanel from '../notifications/NotificationPanel';
 
-const Navbar = () => {
+const Navbar = ({ onOpenAuth }) => {
   const [scrolled, setScrolled] = useState(false);
   const { scrollY } = useScroll();
 
@@ -102,15 +104,23 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* RIGHT — Sign Up Button */}
-        <button
-          onClick={() => {
-            // TODO: Open Sign Up Form Modal
-          }}
-          className="bg-[var(--bg-light)]/80 rounded-full flex items-center justify-center cursor-pointer h-10 w-[130px] border border-primary-500/25 backdrop-blur-sm hover:border-primary-400/50 transition-colors"
-        > 
-          <span className="text-primary-300 font-data">Sign up</span> 
-        </button>
+        {/* RIGHT — Bell + Dropdown Sign Up */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+
+          {/* Notification Bell */}
+          <div className="relative">
+            <NotificationBell />
+            <NotificationPanel role="CITIZEN" />
+          </div>
+
+          {/* Sign Up Dropdown */}
+          <button
+            onClick={onOpenAuth}
+            className="bg-[var(--bg-light)]/80 rounded-full flex items-center justify-center cursor-pointer h-10 w-[130px] border border-primary-500/25 backdrop-blur-sm hover:border-primary-400/50 transition-colors"
+          > 
+            <span className="text-primary-300 font-data">Sign up</span> 
+          </button>
+        </div>
 
       </motion.div>
     </nav>

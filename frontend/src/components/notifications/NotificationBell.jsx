@@ -1,5 +1,4 @@
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Bell } from 'lucide-react';
 import { useNotifications } from './useNotifications';
 import { useDisasterMode } from '../../context/DisasterContext';
