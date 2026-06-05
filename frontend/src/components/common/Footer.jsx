@@ -30,7 +30,7 @@ const Footer = () => {
               <span className="text-primary-500/30">/</span>
               <span className="hover:text-primary-300 transition-colors cursor-default">Hafsa Ather Khan</span>
               <span className="text-primary-500/30">/</span>
-              <span className="hover:text-primary-300 transition-colors cursor-default">Mariam Yasir</span>
+              <span className="hover:text-primary-300 transition-colors cursor-default">Maryam Yasir</span>
             </div>
           </div>
 

@@ -184,3 +184,130 @@ body.disaster-mode {
   z-index: 50;
   pointer-events: none;
 }
+
+/* ===add==== */
+
+/* Increase base font size */
+html {
+  font-size: 16px;
+}
+
+body {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Override Claude's tiny font sizes */
+.cp-root,
+.rp-root {
+  font-size: 15px;
+}
+
+.cp-nav-item,
+.rp-nav-item {
+  font-size: 13px !important;
+}
+
+.cp-card-title,
+.rp-card-title {
+  font-size: 13px !important;
+}
+
+.cp-stat-value,
+.rp-stat-value {
+  font-size: 32px !important;
+}
+
+.cp-stat-label,
+.rp-stat-label {
+  font-size: 11px !important;
+}
+
+.cp-report-title,
+.rp-task-title {
+  font-size: 14px !important;
+}
+
+.cp-report-id,
+.rp-task-id {
+  font-size: 11px !important;
+}
+
+.cp-btn,
+.rp-btn {
+  font-size: 12px !important;
+  padding: 10px 18px !important;
+}
+
+.cp-input,
+.cp-select,
+.cp-textarea,
+.rp-input,
+.rp-select,
+.rp-textarea {
+  font-size: 14px !important;
+  padding: 12px !important;
+}
+
+.cp-form-label,
+.rp-form-label {
+  font-size: 11px !important;
+}
+
+.cp-status-badge,
+.rp-status-badge {
+  font-size: 11px !important;
+  padding: 4px 10px !important;
+}
+
+/* Dashboard stats cards */
+.cp-stat-value,
+.rp-stat-value {
+  font-size: 36px !important;
+}
+
+/* Sidebar */
+.cp-user-name,
+.rp-user-name {
+  font-size: 14px !important;
+}
+
+.cp-user-role,
+.rp-user-role {
+  font-size: 11px !important;
+}
+
+/* Map legend */
+.cp-heatmap-legend,
+.rp-heatmap-legend {
+  font-size: 11px !important;
+}
+
+/* Notifications */
+.cp-notif-title,
+.rp-notif-title {
+  font-size: 14px !important;
+}
+
+.cp-notif-msg,
+.rp-notif-msg {
+  font-size: 12px !important;
+}
+
+/* Worker items */
+.rp-worker-name {
+  font-size: 14px !important;
+}
+
+.rp-worker-role {
+  font-size: 11px !important;
+}
+
+/* Task cards */
+.rp-task-title {
+  font-size: 14px !important;
+}
+
+.rp-task-meta {
+  font-size: 12px !important;
+}

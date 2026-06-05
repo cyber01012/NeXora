@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NeXora Debug</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #0a0a0a; color: #0f0; }
+        .error { color: #ff4444; background: #330000; padding: 10px; margin: 10px 0; border-left: 3px solid red; }
+        .success { color: #4ade80; background: #003300; padding: 10px; margin: 10px 0; border-left: 3px solid green; }
+        .info { color: #22d3ee; background: #001133; padding: 10px; margin: 10px 0; border-left: 3px solid cyan; }
+        button { background: #222; color: #0f0; border: 1px solid #0f0; padding: 10px; margin: 5px; cursor: pointer; }
+        pre { background: #111; padding: 10px; overflow: auto; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 NeXora Debug Console</h1>
+    
+    <div id="output"></div>
+    
+    <div style="margin-top: 20px">
+        <button onclick="checkBackend()">1️⃣ Check Backend Health</button>
+        <button onclick="checkApi()">2️⃣ Check Citizen API</button>
+        <button onclick="checkMap()">3️⃣ Check Map Libraries</button>
+        <button onclick="checkAll()">▶️ RUN ALL TESTS</button>
+        <button onclick="clearLog()">🗑️ Clear</button>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            output.appendChild(div);
+            console.log(message);
+        }
+        
+        function clearLog() {
+            output.innerHTML = '';
+        }
+        
+        async function checkBackend() {
+            log('Testing Backend Connection...', 'info');
+            try {
+                const res = await fetch('http://localhost:8080/api/health');
+                const data = await res.json();
+                if (res.ok) {
+                    log(`✅ Backend is running! Response: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    log(`❌ Backend returned status: ${res.status}`, 'error');
+                }
+            } catch (err) {
+                log(`❌ Backend NOT reachable! Error: ${err.message}`, 'error');
+                log(`💡 Make sure backend is running: cd backend && .\\mvnw.cmd spring-boot:run`, 'info');
+            }
+        }
+        
+        async function checkApi() {
+            log('Testing Citizen API...', 'info');
+            try {
+                const res = await fetch('http://localhost:8080/api/citizen/my-reports?citizenId=1');
+                if (res.ok) {
+                    const data = await res.json();
+                    log(`✅ Citizen API works! Response: ${JSON.stringify(data).substring(0, 200)}...`, 'success');
+                } else {
+                    log(`❌ Citizen API failed with status: ${res.status}`, 'error');
+                }
+            } catch (err) {
+                log(`❌ Citizen API error: ${err.message}`, 'error');
+            }
+        }
+        
+        function checkMap() {
+            log('Checking Leaflet libraries...', 'info');
+            
+            // Check Leaflet
+            if (typeof L !== 'undefined') {
+                log(`✅ Leaflet loaded (version: ${L.version})`, 'success');
+            } else {
+                log(`❌ Leaflet NOT loaded! Run: npm install leaflet`, 'error');
+            }
+            
+            // Check React-Leaflet
+            try {
+                const test = require('react-leaflet');
+                log(`✅ react-leaflet loaded`, 'success');
+            } catch (err) {
+                log(`❌ react-leaflet NOT loaded! Run: npm install react-leaflet`, 'error');
+            }
+            
+            // Check Leaflet.heat
+            if (typeof L !== 'undefined' && L.heatLayer) {
+                log(`✅ leaflet.heat loaded`, 'success');
+            } else {
+                log(`⚠️ leaflet.heat NOT loaded! Run: npm install leaflet.heat`, 'info');
+            }
+        }
+        
+        async function checkAll() {
+            log('========== STARTING FULL DEBUG ==========', 'info');
+            await checkBackend();
+            await checkApi();
+            checkMap();
+            log('========== DEBUG COMPLETE ==========', 'info');
+        }
+        
+        // Auto-run on page load
+        setTimeout(() => {
+            log('🔧 Debug page loaded. Click buttons to test.', 'info');
+            log('💡 Open Browser Console (F12) to see more details.', 'info');
+        }, 500);
+    </script>
+</body>
+</html>

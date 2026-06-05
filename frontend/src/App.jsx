@@ -1,13 +1,12 @@
 import React from 'react';
-import LandingPage from './pages/LandingPage';
+import PortalRoutes from './routes/PortalRoutes';
 import { DisasterProvider } from './context/DisasterContext';
-
 
 function App() {
   return (
     <DisasterProvider>
       <div className="w-full min-h-screen bg-[var(--color-hud-bg)] text-white transition-colors duration-1000">
-        <LandingPage />
+        <PortalRoutes />
       </div>
     </DisasterProvider>
   );
