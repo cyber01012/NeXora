@@ -3,6 +3,8 @@ package nexora_backend.database.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "civic_report")
 @Getter
@@ -37,7 +39,23 @@ public class CivicReport {
     private String city;
     private String evidence;
 
-    // ========== MANUAL GETTERS & SETTERS (in case Lombok fails) ==========
+    @Builder.Default
+    @Column(length = 30)
+    private String status = "PENDING_ADMIN";
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
+    // getter/setter
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    // Manual getters/setters including status
     public Long getCivicId() { return civicId; }
     public void setCivicId(Long civicId) { this.civicId = civicId; }
 
@@ -70,4 +88,8 @@ public class CivicReport {
 
     public String getEvidence() { return evidence; }
     public void setEvidence(String evidence) { this.evidence = evidence; }
+
+    // ✅ STATUS GETTER/SETTER
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

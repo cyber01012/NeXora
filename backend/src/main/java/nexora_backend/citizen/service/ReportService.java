@@ -47,6 +47,7 @@ public class ReportService {
         entity.setArea(request.getArea());
         entity.setCity(request.getCity());
         entity.setEvidence(request.getMediaPath());
+        entity.setStatus("PENDING_ADMIN");
 
         return reportRepository.save(entity);
     }

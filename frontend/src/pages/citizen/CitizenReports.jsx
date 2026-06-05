@@ -3,24 +3,37 @@ import { Link } from 'react-router-dom';
 import { citizenApi } from '../../services/api';
 
 // Status Badge Component
+// Status Badge Component
 const StatusBadge = ({ status }) => {
   const styles = {
     PENDING_ADMIN: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+    PENDING: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
     APPROVED: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     ASSIGNED: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
     IN_PROGRESS: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
     COMPLETED: 'bg-green-500/20 text-green-400 border-green-500/30',
     REJECTED: 'bg-red-500/20 text-red-400 border-red-500/30',
   };
-  const s = styles[status] || styles.PENDING_ADMIN;
-  const displayStatus = status === 'PENDING_ADMIN' ? 'PENDING' : status;
+  
+  // Normalize status
+  const normalizedStatus = status || 'PENDING_ADMIN';
+  const s = styles[normalizedStatus] || styles.PENDING_ADMIN;
+  
+  const displayStatus = {
+    PENDING_ADMIN: 'PENDING',
+    PENDING: 'PENDING',
+    IN_PROGRESS: 'IN PROGRESS',
+    ASSIGNED: 'ASSIGNED',
+    COMPLETED: 'COMPLETED',
+    REJECTED: 'REJECTED',
+  }[normalizedStatus] || normalizedStatus;
+  
   return (
     <span className={`px-3 py-1 rounded-full text-[11px] font-mono border ${s}`}>
       {displayStatus}
     </span>
   );
 };
-
 // Report Icon Component
 const ReportIcon = ({ type }) => {
   const icons = {

@@ -3,11 +3,10 @@
 // ============================================
 package nexora_backend.responder.service;
 
-import nexora_backend.database.entity.AdminUser;
-import nexora_backend.database.entity.ForwardedComplaint;
-import nexora_backend.database.entity.VolunteerWorkerCreator;
+import nexora_backend.database.entity.*;
 import nexora_backend.database.enums.Decision;
 import nexora_backend.database.repository.AdminUserRepository;
+import nexora_backend.database.repository.CivicReportRepository;
 import nexora_backend.database.repository.ForwardedComplaintRepository;
 import nexora_backend.database.repository.VolunteerWorkerCreatorRepository;
 import nexora_backend.shared.exception.BusinessException;
@@ -18,7 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TaskService {
@@ -26,13 +27,16 @@ public class TaskService {
     private final ForwardedComplaintRepository forwardedComplaintRepository;
     private final AdminUserRepository adminUserRepository;
     private final VolunteerWorkerCreatorRepository volunteerRepository;
+    private final CivicReportRepository civicReportRepository;  // ✅ ADDED
 
     public TaskService(ForwardedComplaintRepository forwardedComplaintRepository,
                        AdminUserRepository adminUserRepository,
-                       VolunteerWorkerCreatorRepository volunteerRepository) {
+                       VolunteerWorkerCreatorRepository volunteerRepository,
+                       CivicReportRepository civicReportRepository) {
         this.forwardedComplaintRepository = forwardedComplaintRepository;
         this.adminUserRepository = adminUserRepository;
         this.volunteerRepository = volunteerRepository;
+        this.civicReportRepository = civicReportRepository;
     }
 
     private Long getResponderDeptId(String username) {
@@ -106,9 +110,42 @@ public class TaskService {
         complaint.setDeptDecision(Decision.D);
         complaint.setRemarks("Task accepted by " + username);
 
+        updateCivicReportStatus(complaint.getReportId(), "COMPLETED");
         return forwardedComplaintRepository.save(complaint);
     }
 
+//    // TaskService.java
+//    public List<Map<String, Object>> getFieldReports(String username) {
+//        Long deptId = getResponderDeptId(username);
+//
+//        List<ForwardedComplaint> complaints = forwardedComplaintRepository.findByDepartment_DeptId(deptId);
+//        List<Map<String, Object>> reports = new ArrayList<>();
+//
+//        for (ForwardedComplaint complaint : complaints) {
+//            List<ForwardDecision> decisions = forwardDecisionRepository
+//                    .findByForwardedComplaint_ForwardedComplainId(complaint.getForwardedComplainId());
+//
+//            for (ForwardDecision decision : decisions) {
+//                Map<String, Object> report = new HashMap<>();
+//                report.put("id", decision.getId());
+//                report.put("forwardedComplainId", complaint.getForwardedComplainId());
+//                report.put("reportId", complaint.getReportId());
+//                report.put("evidence", decision.getEvidence());  // ✅ Image URL
+//                report.put("description", decision.getDescription());
+//                report.put("decisionType", decision.getDecisionType() != null ? decision.getDecisionType().toString() : null);
+//                report.put("date", decision.getDate() != null ? decision.getDate().toString() : null);
+//                report.put("time", decision.getTime() != null ? decision.getTime().toString() : null);
+//
+//                if (complaint.getWorker() != null) {
+//                    report.put("workerName", complaint.getWorker().getName());
+//                    report.put("workerUsername", complaint.getWorker().getUsernameCreated());
+//                }
+//
+//                reports.add(report);
+//            }
+//        }
+//        return reports;
+//    }
     @Transactional
     public ForwardedComplaint rejectTask(String username, Long complaintId, String reason) {
         Long deptId = getResponderDeptId(username);
@@ -129,6 +166,7 @@ public class TaskService {
         complaint.setDeptDecision(Decision.R);
         complaint.setRemarks(reason);
 
+        updateCivicReportStatus(complaint.getReportId(), "REJECTED");
         return forwardedComplaintRepository.save(complaint);
     }
 
@@ -184,6 +222,22 @@ public class TaskService {
         complaint.setAcceptedTime(LocalTime.now());
         complaint.setRemarks(remarks);
 
+        if (complaint.getReportId() != null) {
+            civicReportRepository.findById(complaint.getReportId()).ifPresent(report -> {
+                report.setStatus("COMPLETED");
+                civicReportRepository.save(report);
+            });
+        }
         return forwardedComplaintRepository.save(complaint);
+    }
+
+    private void updateCivicReportStatus(Long reportId, String status) {
+        if (reportId != null) {
+            CivicReport civicReport = civicReportRepository.findById(reportId).orElse(null);
+            if (civicReport != null) {
+                civicReport.setStatus(status);
+                civicReportRepository.save(civicReport);
+            }
+        }
     }
 }

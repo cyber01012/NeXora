@@ -119,18 +119,33 @@ getVolunteers: () => api.get('/responder/volunteers').then(unwrap),
 };
 
 // ========== FORWARD DECISION API ==========
+// export const forwardDecisionApi = {
+//   // Get all evidence for responder's department (no parameter needed)
+//   getByDepartment: () => api.get('/forward-decision/department').then(unwrap),
+  
+//   // Get evidence for specific complaint
+//   getByComplaint: (complaintId) => api.get(`/forward-decision/complaint/${complaintId}`).then(unwrap),
+  
+//   // Confirm completion (Responder)
+//   confirmCompletion: (complaintId) => api.put(`/forward-decision/confirm/${complaintId}`).then(unwrap),
+  
+//   // Submit evidence (Volunteer)
+//   submit: (payload) => api.post('/forward-decision', payload).then(unwrap),
+// };
+
+
+// ========== FORWARD DECISION API ==========
 export const forwardDecisionApi = {
-  // Get all evidence for responder's department (no parameter needed)
-  getByDepartment: () => api.get('/forward-decision/department').then(unwrap),
+  // Get all evidence for responder's department
+  getByDepartment: () => api.get('/responder/field-reports').then(unwrap),
   
   // Get evidence for specific complaint
-  getByComplaint: (complaintId) => api.get(`/forward-decision/complaint/${complaintId}`).then(unwrap),
+  getByComplaint: (complaintId) => api.get(`/responder/field-reports/complaint/${complaintId}`).then(unwrap),
   
   // Confirm completion (Responder)
-  confirmCompletion: (complaintId) => api.put(`/forward-decision/confirm/${complaintId}`).then(unwrap),
+  confirmCompletion: (complaintId) => api.put(`/responder/field-reports/confirm/${complaintId}`).then(unwrap),
   
   // Submit evidence (Volunteer)
-  submit: (payload) => api.post('/forward-decision', payload).then(unwrap),
+  submit: (payload) => api.post('/responder/field-reports', payload).then(unwrap),
 };
-
 export default api;

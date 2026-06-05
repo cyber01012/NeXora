@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { responderApi } from '../../services/api';
+import { responderApi, forwardDecisionApi } from '../../services/api';
 
-// Status Badge Component
+// ========== STATUS BADGE ==========
 const StatusBadge = ({ status }) => {
   const styles = {
     PENDING: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
@@ -24,7 +24,7 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-// Priority Badge
+// ========== PRIORITY BADGE ==========
 const PriorityBadge = ({ priority }) => {
   const colors = {
     HIGH: 'text-red-400 border-red-500/30 bg-red-500/10',
@@ -35,7 +35,7 @@ const PriorityBadge = ({ priority }) => {
   return <span className={`px-2 py-0.5 rounded text-[9px] font-mono border ${c}`}>{priority || 'MEDIUM'}</span>;
 };
 
-// Helper function to safely get string from objects
+// ========== HELPER FUNCTIONS ==========
 const getSafeString = (value) => {
   if (value === null || value === undefined) return 'N/A';
   if (typeof value === 'object') {
@@ -46,24 +46,107 @@ const getSafeString = (value) => {
   return String(value);
 };
 
-// Helper to get citizen name
 const getCitizenName = (citizen) => {
   if (!citizen) return 'N/A';
   return citizen.fname || citizen.fullName || citizen.name || 'N/A';
 };
 
-// Helper to get citizen phone
 const getCitizenPhone = (citizen) => {
   if (!citizen) return 'N/A';
   return citizen.phoneNum || citizen.phoneNumber || citizen.phone || 'N/A';
 };
 
-// Task Detail Modal Component
+// ========== EVIDENCE IMAGE MODAL ==========
+// ========== EVIDENCE IMAGE MODAL ==========
+const EvidenceImageModal = ({ imageUrl, description, onClose }) => {
+  if (!imageUrl) return null;
+
+  // URL already full hai (http se start), toh as-is use karo
+  const fullUrl = imageUrl.startsWith('http') ? imageUrl : `http://localhost:8080${imageUrl}`;
+
+  return (
+    <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn" onClick={onClose}>
+      <div className="max-w-4xl w-full mx-4 bg-[var(--bg2)] border border-cyan-500/30 rounded-2xl overflow-hidden animate-scaleIn" onClick={e => e.stopPropagation()}>
+        <div className="p-4 border-b border-cyan-500/20 flex justify-between items-center">
+          <h3 className="font-title text-glow-primary text-lg tracking-wider flex items-center gap-2">
+            <span>📷</span> VOLUNTEER EVIDENCE
+          </h3>
+          <button onClick={onClose} className="text-cyan-400/60 hover:text-cyan-400 transition-colors text-2xl">&times;</button>
+        </div>
+        <div className="p-6">
+          <img 
+            src={fullUrl} 
+            alt="Volunteer Evidence" 
+            className="max-w-full max-h-[60vh] mx-auto rounded-lg"
+            onError={(e) => { 
+              console.error('❌ Modal image failed:', fullUrl);
+              e.target.src = 'https://placehold.co/600x400/0a1628/06b6d4?text=No+Image+Available'; 
+            }}
+          />
+          {description && (
+            <div className="mt-4 p-3 bg-cyan-900/20 rounded-lg border border-cyan-500/20">
+              <p className="font-mono text-[9px] text-cyan-400/60 mb-1">VOLUNTEER NOTES</p>
+              <p className="font-mono text-sm text-cyan-200 leading-relaxed">{description}</p>
+            </div>
+          )}
+          <div className="mt-4 text-[10px] font-mono text-cyan-400/60 text-center">Click outside to close</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ========== TASK DETAIL MODAL ==========
 const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssignVolunteer, onConfirmComplete, isProcessing, selectedVolunteer, setSelectedVolunteer }) => {
   const [rejectReason, setRejectReason] = useState('');
   const [showVolunteerList, setShowVolunteerList] = useState(false);
   const [confirmRemarks, setConfirmRemarks] = useState('');
-  const [showEvidence, setShowEvidence] = useState(false);
+  const [evidenceData, setEvidenceData] = useState(null);
+  const [loadingEvidence, setLoadingEvidence] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  // ====== LOAD EVIDENCE WHEN MODAL OPENS ======
+  useEffect(() => {
+    if (task) {
+      console.log('🟢 TaskDetailModal opened with task:', task);
+      console.log('🟢 Task ID:', task.id);
+      console.log('🟢 Forwarded Complain ID:', task.forwardedComplainId);
+      console.log('🟢 Task Status:', task.status);
+      loadEvidence();
+    }
+  }, [task]);
+
+  const loadEvidence = async () => {
+    setLoadingEvidence(true);
+    try {
+      const taskId = task.forwardedComplainId || task.id;
+      console.log('🔍 Fetching evidence for task ID:', taskId);
+      
+      const evidenceList = await forwardDecisionApi.getByComplaint(taskId).catch((err) => {
+        console.error('🔍 API Error:', err);
+        return [];
+      });
+      
+      console.log('🔍 Evidence API Response:', evidenceList);
+      console.log('🔍 Evidence List Length:', evidenceList?.length);
+      
+      if (evidenceList && evidenceList.length > 0) {
+        console.log('🔍 First evidence object:', evidenceList[0]);
+        console.log('🔍 Evidence field:', evidenceList[0].evidence);
+        console.log('🔍 Evidence Image field:', evidenceList[0].evidenceImage);
+        console.log('🔍 Image Path field:', evidenceList[0].imagePath);
+        setEvidenceData(evidenceList[0]);
+      } else {
+        console.log('🔍 No evidence found for this task');
+        setEvidenceData(null);
+      }
+    } catch (error) {
+      console.error('🔍 Failed to load evidence:', error);
+      setEvidenceData(null);
+    } finally {
+      setLoadingEvidence(false);
+    }
+  };
 
   if (!task) return null;
 
@@ -73,6 +156,10 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
   const isAwaitingReview = task.status === 'AWAITING_REVIEW';
   const isCompleted = task.status === 'COMPLETED';
   const isRejected = task.status === 'REJECTED';
+
+  // Get evidence URL with all possible field names
+  const evidenceUrl = evidenceData?.evidence || evidenceData?.evidenceImage || evidenceData?.imagePath || evidenceData?.fileUrl || evidenceData?.url;
+  console.log('🔍 Final evidenceUrl:', evidenceUrl);
 
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn" onClick={onClose}>
@@ -138,38 +225,72 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
             <p className="font-mono text-sm text-cyan-200">{getSafeString(task.department)}</p>
           </div>
 
+          {/* Evidence Section */}
+{(isAwaitingReview || isCompleted || isWithVolunteER) && (
+  <div className={`rounded-xl p-4 border ${
+    isAwaitingReview ? 'bg-orange-500/10 border-orange-500/30' : 
+    isCompleted ? 'bg-green-500/10 border-green-500/30' : 
+    'bg-purple-500/10 border-purple-500/30'
+  }`}>
+    <p className="font-mono text-[9px] text-cyan-400/60 mb-2 flex items-center gap-1">
+      <span>📷</span> VOLUNTEER EVIDENCE
+    </p>
+    
+    {loadingEvidence ? (
+      <div className="text-center py-4">
+        <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="font-mono text-[9px] text-cyan-400/60 mt-2">Loading evidence...</p>
+      </div>
+    ) : evidenceUrl ? (
+      <div>
+        <div 
+          className="relative group cursor-pointer overflow-hidden rounded-lg mb-3"
+          onClick={() => setSelectedImage({ url: evidenceUrl, description: evidenceData?.description })}
+        >
+          <img 
+            src={evidenceUrl.startsWith('http') ? evidenceUrl : `http://localhost:8080${evidenceUrl}`}
+            alt="Evidence" 
+            className="w-full max-h-48 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+            crossOrigin="anonymous"
+            onError={(e) => { 
+              console.error('❌ Image failed to load. URL:', evidenceUrl);
+              console.error('❌ Full URL tried:', evidenceUrl.startsWith('http') ? evidenceUrl : `http://localhost:8080${evidenceUrl}`);
+              // Fallback: placeholder dikhana
+              e.target.onerror = null; // Infinite loop prevent karo
+              e.target.src = 'https://placehold.co/400x200/0a1628/06b6d4?text=No+Image'; 
+            }}
+          />
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+            <span className="text-cyan-400 text-sm">Click to enlarge</span>
+          </div>
+        </div>
+        {evidenceData?.description && (
+          <p className="font-mono text-xs text-cyan-300 mt-2">{evidenceData.description}</p>
+        )}
+        <p className="font-mono text-[9px] text-cyan-400/60 mt-2">
+          Submitted: {evidenceData?.date} {evidenceData?.time}
+        </p>
+      </div>
+    ) : (
+      <div className="bg-cyan-900/20 rounded-lg p-3 text-center">
+        <p className="font-mono text-[9px] text-cyan-400/60">No evidence uploaded yet</p>
+      </div>
+    )}
+  </div>
+)}
+
           {/* Volunteer Info (if assigned) */}
           {(isWithVolunteer || isAwaitingReview || isCompleted) && task.worker && (
-            <div className="bg-cyan-900/10 rounded-xl p-4 border border-purple-500/30">
-              <p className="font-mono text-[9px] text-cyan-400/60 mb-2 flex items-center gap-1"><span>👥</span> ASSIGNED VOLUNTEER</p>
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-mono text-sm text-purple-400">{task.worker.name}</p>
-                  <p className="font-mono text-[9px] text-cyan-400/60">📞 {task.worker.phoneNumber || 'N/A'}</p>
-                </div>
-                {isAwaitingReview && (
-                  <button onClick={() => setShowEvidence(!showEvidence)} className="px-3 py-1 bg-cyan-500/20 border border-cyan-400 rounded-lg text-xs text-glow-primary">
-                    {showEvidence ? 'HIDE EVIDENCE' : 'VIEW EVIDENCE'}
-                  </button>
-                )}
-              </div>
+            <div className="bg-purple-500/10 rounded-xl p-4 border border-purple-500/30">
+              <p className="font-mono text-[9px] text-cyan-400/60 mb-1 flex items-center gap-1"><span>👥</span> ASSIGNED VOLUNTEER</p>
+              <p className="font-mono text-sm text-purple-400">{task.worker.name}</p>
+              <p className="font-mono text-[9px] text-cyan-400/60">📞 {task.worker.phoneNumber || 'N/A'}</p>
             </div>
           )}
 
-          {/* Evidence Section (for AWAITING_REVIEW) */}
-          {isAwaitingReview && showEvidence && (
-            <div className="bg-cyan-900/10 rounded-xl p-4 border border-cyan-500/20">
-              <p className="font-mono text-[9px] text-cyan-400/60 mb-2 flex items-center gap-1"><span>📷</span> VOLUNTEER EVIDENCE</p>
-              <p className="font-mono text-xs text-cyan-300 mb-3">{task.remarks || 'Work completed by volunteer'}</p>
-              <div className="bg-cyan-900/20 rounded-lg p-3 text-center">
-                <p className="font-mono text-[9px] text-cyan-400/60">Evidence will be uploaded by volunteer</p>
-              </div>
-            </div>
-          )}
+          {/* ========== ACTION BUTTONS ========== */}
 
-          {/* ========== ACTION BUTTONS BASED ON STATUS ========== */}
-
-          {/* Case 1: PENDING - Accept/Reject */}
+          {/* PENDING - Accept/Reject */}
           {isPending && (
             <div className="flex gap-3 pt-3">
               <button onClick={() => onAccept(task.forwardedComplainId || task.id)} disabled={isProcessing} className="flex-1 py-3 bg-green-500/20 border border-green-500 rounded-xl font-mono text-sm text-green-400 hover:bg-green-500/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
@@ -184,7 +305,7 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
             </div>
           )}
 
-          {/* Case 2: ACCEPTED - Assign to Volunteer */}
+          {/* ACCEPTED - Assign to Volunteer */}
           {isAccepted && !isWithVolunteer && (
             <div className="space-y-3 pt-3">
               <div className="bg-cyan-900/10 rounded-xl p-4 border border-cyan-500/20 text-center">
@@ -196,18 +317,18 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
                   </button>
                 ) : (
                   <div className="space-y-2">
-                   <select 
-    className="w-full bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-2 font-mono text-sm text-cyan-200"
-    value={selectedVolunteer}
-    onChange={(e) => setSelectedVolunteer(e.target.value)}
->
-    <option value="">Select a volunteer...</option>
-    {volunteers.map(vol => (
-        <option key={vol.usernameCreated || vol.username} value={vol.usernameCreated || vol.username}>
-            {vol.name} - {vol.department?.deptName || 'No Department'}
-        </option>
-    ))}
-</select>
+                    <select 
+                      className="w-full bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-2 font-mono text-sm text-cyan-200"
+                      value={selectedVolunteer}
+                      onChange={(e) => setSelectedVolunteer(e.target.value)}
+                    >
+                      <option value="">Select a volunteer...</option>
+                      {volunteers.map(vol => (
+                        <option key={vol.usernameCreated || vol.username} value={vol.usernameCreated || vol.username}>
+                          {vol.name} - {vol.department?.deptName || 'No Department'}
+                        </option>
+                      ))}
+                    </select>
                     <button 
                       onClick={() => onAssignVolunteer(task.forwardedComplainId || task.id, selectedVolunteer)} 
                       disabled={!selectedVolunteer || isProcessing}
@@ -221,7 +342,7 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
             </div>
           )}
 
-          {/* Case 3: WITH_VOLUNTEER - Waiting for volunteer */}
+          {/* WITH_VOLUNTEER - Waiting */}
           {isWithVolunteer && (
             <div className="bg-purple-500/10 rounded-xl p-4 border border-purple-500/30 text-center">
               <p className="font-mono text-sm text-purple-400">👤 Task assigned to volunteer: {task.worker?.name || task.workerName || 'Unknown'}</p>
@@ -229,7 +350,7 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
             </div>
           )}
 
-          {/* Case 4: AWAITING_REVIEW - Confirm Completion */}
+          {/* AWAITING_REVIEW - Confirm Completion */}
           {isAwaitingReview && (
             <div className="space-y-3 pt-3">
               <div className="bg-orange-500/10 rounded-xl p-4 border border-orange-500/30">
@@ -252,7 +373,7 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
             </div>
           )}
 
-          {/* Case 5: COMPLETED */}
+          {/* COMPLETED */}
           {isCompleted && (
             <div className="bg-green-500/10 rounded-xl p-4 border border-green-500/30 text-center">
               <p className="font-mono text-sm text-green-400">🎉 Task Completed Successfully!</p>
@@ -260,7 +381,7 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
             </div>
           )}
 
-          {/* Case 6: REJECTED */}
+          {/* REJECTED */}
           {isRejected && (
             <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/30 text-center">
               <p className="font-mono text-sm text-red-400">❌ Task Rejected</p>
@@ -273,10 +394,20 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
           <button onClick={onClose} className="w-full py-2.5 bg-cyan-500/20 border border-cyan-400 rounded-xl font-mono text-sm text-glow-primary hover:bg-cyan-500/30 transition-all">CLOSE</button>
         </div>
       </div>
+
+      {/* Evidence Image Modal */}
+      {selectedImage && (
+        <EvidenceImageModal 
+          imageUrl={selectedImage.url} 
+          description={selectedImage.description}
+          onClose={() => setSelectedImage(null)} 
+        />
+      )}
     </div>
   );
 };
 
+// ========== MAIN COMPONENT ==========
 export default function ResponderTasks() {
   const [tasks, setTasks] = useState([]);
   const [history, setHistory] = useState([]);
