@@ -4,6 +4,8 @@ import nexora_backend.database.entity.VolunteerWorkerCreator;
 import nexora_backend.responder.dto.response.WorkerResponse;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class WorkerMapper {
 
@@ -11,22 +13,19 @@ public class WorkerMapper {
         if (worker == null) return null;
 
         WorkerResponse response = new WorkerResponse();
-        response.setId(null); // VolunteerWorkerCreator doesn't have Long id, uses username as PK
         response.setUsername(worker.getUsernameCreated());
         response.setName(worker.getName());
         response.setPhone(worker.getPhoneNumber());
-        response.setCnic(null); // Not in VolunteerWorkerCreator table
         response.setRole("VOLUNTEER");
         response.setIsActive(worker.getActive() != null ? worker.getActive() : true);
-        response.setCreatedAt(worker.getCreatedDate() != null ?
-                worker.getCreatedDate().atTime(worker.getCreatedTime()) : null);
+        response.setTasksCompleted(0);
 
-        return response;
-    }
+        if (worker.getCreatedDate() != null && worker.getCreatedTime() != null) {
+            response.setCreatedAt(LocalDateTime.of(worker.getCreatedDate(), worker.getCreatedTime()));
+        } else if (worker.getCreatedDate() != null) {
+            response.setCreatedAt(worker.getCreatedDate().atStartOfDay());
+        }
 
-    public WorkerResponse toResponseWithDepartment(VolunteerWorkerCreator worker, String departmentName) {
-        WorkerResponse response = toResponse(worker);
-        // Could add department info if needed
         return response;
     }
 }

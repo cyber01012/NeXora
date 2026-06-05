@@ -1,16 +1,13 @@
-package nexora_backend.citizen.entity;
+// ============================================
+// FILE: nexora_backend/independent/entity/CitizenSavedLocation.java
+// ============================================
+package nexora_backend.independent.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "citizen_saved_location")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class CitizenSavedLocation {
 
     @Id
@@ -40,20 +37,23 @@ public class CitizenSavedLocation {
         createdAt = LocalDateTime.now();
     }
 
+    // ========== GETTERS ==========
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
     public Long getCitizenId() { return citizenId; }
-    public void setCitizenId(Long citizenId) { this.citizenId = citizenId; }
     public String getLabel() { return label; }
-    public void setLabel(String label) { this.label = label; }
     public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
     public Double getLatitude() { return latitude; }
-    public void setLatitude(Double latitude) { this.latitude = latitude; }
     public Double getLongitude() { return longitude; }
-    public void setLongitude(Double longitude) { this.longitude = longitude; }
     public Boolean getIsDefault() { return isDefault; }
-    public void setIsDefault(Boolean isDefault) { this.isDefault = isDefault; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+
+    // ========== SETTERS ==========
+    public void setId(Long id) { this.id = id; }
+    public void setCitizenId(Long citizenId) { this.citizenId = citizenId; }
+    public void setLabel(String label) { this.label = label; }
+    public void setAddress(String address) { this.address = address; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
+    public void setIsDefault(Boolean isDefault) { this.isDefault = isDefault; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

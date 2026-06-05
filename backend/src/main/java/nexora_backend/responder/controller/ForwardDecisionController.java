@@ -18,7 +18,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/forward-decision")
+@RequestMapping("/api/responder/field-reports")
 public class ForwardDecisionController {
 
     private final ForwardDecisionRepository forwardDecisionRepository;
@@ -36,7 +36,7 @@ public class ForwardDecisionController {
         this.requestContext = requestContext;
     }
 
-    @GetMapping("/department")
+    @GetMapping
     public ApiResponse<List<ForwardDecision>> getByDepartment() {
         String username = requestContext.getResponderUsername();
 
@@ -84,25 +84,17 @@ public class ForwardDecisionController {
     @PutMapping("/confirm/{complaintId}")
     @Transactional
     public ApiResponse<Void> confirmCompletion(@PathVariable Long complaintId) {
-        System.out.println("🔵 CONFIRMING COMPLETION: " + complaintId);
-
         ForwardedComplaint complaint = forwardedComplaintRepository
                 .findById(complaintId)
                 .orElseThrow(() -> new RuntimeException("Complaint not found: " + complaintId));
 
-        System.out.println("Before - workerDecision: " + complaint.getWorkerDecision());
-
-        // ✅ UPDATE ALL FIELDS
         complaint.setWorkerDecision(Decision.D);
         complaint.setAcceptedByWorker(true);
         complaint.setAcceptedDate(LocalDate.now());
         complaint.setAcceptedTime(LocalTime.now());
         complaint.setRemarks("Task completed. Evidence verified by responder on " + LocalDate.now());
 
-        ForwardedComplaint saved = forwardedComplaintRepository.save(complaint);
-
-        System.out.println("After - workerDecision: " + saved.getWorkerDecision());
-        System.out.println("After - acceptedByWorker: " + saved.getAcceptedByWorker());
+        forwardedComplaintRepository.save(complaint);
 
         return ApiResponse.okMessage("Task marked as COMPLETED successfully");
     }

@@ -3,8 +3,8 @@ package nexora_backend.responder.service;
 import nexora_backend.database.entity.AdminUser;
 import nexora_backend.database.repository.AdminUserRepository;
 import nexora_backend.database.repository.ForwardedComplaintRepository;
+import nexora_backend.independent.entity.ResponderPerformance;
 import nexora_backend.responder.dto.response.PerformanceResponse;
-import nexora_backend.responder.entity.ResponderPerformance;
 import nexora_backend.responder.repository.ResponderPerformanceRepository;
 import nexora_backend.shared.exception.BusinessException;
 import org.springframework.stereotype.Service;
@@ -30,12 +30,15 @@ public class PerformanceService {
         AdminUser responder = adminUserRepository.findByUsername(username)
                 .orElseThrow(() -> new BusinessException("Responder not found"));
 
-        ResponderPerformance performance = performanceRepository.findByResponderId(username)
+        String performanceId = responder.getDepartment() != null ?
+                String.valueOf(responder.getDepartment().getDeptId()) : username;
+
+        ResponderPerformance performance = performanceRepository.findByResponderId(performanceId)
                 .orElse(null);
 
         PerformanceResponse response = new PerformanceResponse();
         response.setResponderId(username);
-        
+
         if (performance != null) {
             response.setTotalTasks(performance.getTotalTasks());
             response.setCompletedTasks(performance.getCompletedTasks());
@@ -43,8 +46,8 @@ public class PerformanceService {
             response.setRating(performance.getRating());
             response.setAvgResponseTimeMinutes(performance.getAvgResponseTimeMinutes());
             response.setAvgCompletionTimeHours(performance.getAvgCompletionTimeHours());
+            response.setLastUpdated(performance.getLastUpdated());
         } else {
-            // Default if no record exists
             response.setTotalTasks(0);
             response.setCompletedTasks(0);
             response.setRejectedTasks(0);

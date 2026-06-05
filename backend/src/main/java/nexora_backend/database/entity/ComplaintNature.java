@@ -20,4 +20,14 @@ public class ComplaintNature {
     @ManyToOne
     @JoinColumn(name = "type_id")
     private ComplaintType type;
+
+    // MANUAL GETTERS & SETTERS
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public ComplaintType getType() { return type; }
+    public void setType(ComplaintType type) { this.type = type; }
 }

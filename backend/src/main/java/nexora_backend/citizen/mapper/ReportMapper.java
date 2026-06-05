@@ -1,7 +1,10 @@
+// ============================================
+// FILE: nexora_backend/citizen/mapper/ReportMapper.java
+// ============================================
 package nexora_backend.citizen.mapper;
 
 import nexora_backend.citizen.dto.response.ReportResponse;
-import nexora_backend.citizen.entity.CitizenReport;
+import nexora_backend.database.entity.CivicReport;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -10,10 +13,11 @@ import java.util.Map;
 @Component
 public class ReportMapper {
 
-    public ReportResponse toResponse(CitizenReport entity) {
+    public ReportResponse toResponse(CivicReport entity) {
         if (entity == null) return null;
 
-        String typeName = getTypeNameFromNatureId(entity.getNatureId());
+        Integer natureId = entity.getComplaintNature() != null ? entity.getComplaintNature().getId() : null;
+        String typeName = getTypeNameFromNatureId(natureId);
 
         return ReportResponse.builder()
                 .id(entity.getCivicId())
@@ -22,7 +26,7 @@ public class ReportMapper {
                 .locationAddress(entity.getArea() + ", " + entity.getCity())
                 .status("PENDING")
                 .trackingCode("CIV-" + entity.getCivicId())
-                .createdAt(entity.getCreatedAt())
+                .createdAt(null) // CivicReport has no createdAt field, set null or add field
                 .build();
     }
 

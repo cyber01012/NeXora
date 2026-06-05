@@ -1,3 +1,6 @@
+// ============================================
+// FILE: nexora_backend/responder/controller/TaskController.java
+// ============================================
 package nexora_backend.responder.controller;
 
 import nexora_backend.database.entity.ForwardedComplaint;
@@ -5,7 +8,6 @@ import nexora_backend.database.enums.Decision;
 import nexora_backend.responder.service.TaskService;
 import nexora_backend.shared.dto.ApiResponse;
 import nexora_backend.shared.util.RequestContext;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -26,24 +28,23 @@ public class TaskController {
         this.requestContext = requestContext;
     }
 
-    // ========== GET TASKS ==========
-
     @GetMapping("/tasks")
     public ApiResponse<List<Map<String, Object>>> getTasks(@RequestParam(required = false) String status) {
         String username = requestContext.getResponderUsername();
 
-        List<ForwardedComplaint> complaints = taskService.getTasks(username);
+        List<ForwardedComplaint> complaints;
+
+        if ("PENDING".equalsIgnoreCase(status)) {
+            complaints = taskService.getPendingTasks(username);
+        } else if ("ACTIVE".equalsIgnoreCase(status)) {
+            complaints = taskService.getActiveTasks(username);
+        } else if ("HISTORY".equalsIgnoreCase(status)) {
+            complaints = taskService.getHistoryTasks(username);
+        } else {
+            complaints = taskService.getAllTasks(username);
+        }
 
         List<Map<String, Object>> tasks = complaints.stream()
-                .filter(c -> {
-                    String taskStatus = getTaskStatus(c);
-                    if ("PENDING".equals(status)) {
-                        return "PENDING".equals(taskStatus);
-                    } else if ("ACTIVE".equals(status)) {
-                        return "ACCEPTED".equals(taskStatus) || "WITH_VOLUNTEER".equals(taskStatus);
-                    }
-                    return true;
-                })
                 .map(this::toTaskResponse)
                 .collect(Collectors.toList());
 
@@ -56,16 +57,12 @@ public class TaskController {
         return ApiResponse.ok(toTaskResponse(complaint));
     }
 
-    // ========== RESPONDER ACCEPTS TASK ==========
-
     @PostMapping("/tasks/{id}/accept")
     public ApiResponse<Void> acceptTask(@PathVariable Long id) {
         String username = requestContext.getResponderUsername();
         taskService.acceptTask(username, id);
-        return ApiResponse.okMessage("Task accepted. Status: ACCEPTED");
+        return ApiResponse.okMessage("Task accepted successfully");
     }
-
-    // ========== RESPONDER REJECTS TASK ==========
 
     @PostMapping("/tasks/{id}/reject")
     public ApiResponse<Void> rejectTask(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
@@ -74,8 +71,6 @@ public class TaskController {
         taskService.rejectTask(username, id, reason);
         return ApiResponse.okMessage("Task rejected");
     }
-
-    // ========== RESPONDER ASSIGNS TASK TO VOLUNTEER ==========
 
     @PutMapping("/tasks/{id}/assign-volunteer")
     public ApiResponse<Void> assignToVolunteer(@PathVariable Long id, @RequestBody Map<String, String> body) {
@@ -86,60 +81,37 @@ public class TaskController {
             return ApiResponse.error("Volunteer username is required");
         }
 
-        taskService.forwardToVolunteer(username, id, volunteerUsername);
-
-        return ApiResponse.okMessage("Task assigned to volunteer");
+        taskService.assignToVolunteer(username, id, volunteerUsername);
+        return ApiResponse.okMessage("Task assigned to volunteer: " + volunteerUsername);
     }
-
-    // ========== RESPONDER VIEWS VOLUNTEER'S EVIDENCE ==========
-
-    @GetMapping("/tasks/{id}/evidence")
-    public ApiResponse<Map<String, Object>> getTaskEvidence(@PathVariable Long id) {
-        ForwardedComplaint complaint = taskService.getTask(id);
-
-        Map<String, Object> evidence = new HashMap<>();
-        evidence.put("taskId", complaint.getForwardedComplainId());
-        evidence.put("workerName", complaint.getWorker() != null ? complaint.getWorker().getName() : null);
-        evidence.put("remarks", complaint.getRemarks());
-        evidence.put("submittedAt", complaint.getAssignedWorkerDate());
-
-        // Evidence would come from forward_decision table
-        // For now, return what we have
-
-        return ApiResponse.ok(evidence);
-    }
-
-    // ========== RESPONDER CONFIRMS TASK COMPLETION (After viewing evidence) ==========
 
     @PutMapping("/tasks/{id}/confirm-complete")
     public ApiResponse<Void> confirmCompletion(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
         String username = requestContext.getResponderUsername();
-        taskService.completeTask(username, id);
-        return ApiResponse.okMessage("Task marked as COMPLETED. Citizen and Admin will see the updated status.");
+        String remarks = (body != null && body.containsKey("remarks")) ? body.get("remarks") : "Task completed";
+        taskService.confirmCompletion(username, id, remarks);
+        return ApiResponse.okMessage("Task marked as COMPLETED");
     }
-
-    // ========== GET TASK HISTORY (Completed/Rejected) ==========
 
     @GetMapping("/task-history")
     public ApiResponse<List<Map<String, Object>>> getTaskHistory() {
         String username = requestContext.getResponderUsername();
+        List<ForwardedComplaint> history = taskService.getHistoryTasks(username);
 
-        List<ForwardedComplaint> complaints = taskService.getTasks(username);
-
-        List<Map<String, Object>> history = complaints.stream()
-                .filter(c -> c.getWorkerDecision() == Decision.D || c.getDeptDecision() == Decision.R)
+        List<Map<String, Object>> result = history.stream()
                 .map(this::toHistoryResponse)
                 .collect(Collectors.toList());
 
-        return ApiResponse.ok(history);
+        return ApiResponse.ok(result);
     }
-
-    // ========== HELPER METHODS ==========
 
     private String getTaskStatus(ForwardedComplaint c) {
         if (c.getWorkerDecision() == Decision.D) return "COMPLETED";
         if (c.getDeptDecision() == Decision.R) return "REJECTED";
-        if (c.getAssignedToWorker() != null && c.getAssignedToWorker()) return "WITH_VOLUNTEER";
+        if (Boolean.TRUE.equals(c.getAssignedToWorker())) {
+            if (Boolean.TRUE.equals(c.getAcceptedByWorker())) return "IN_PROGRESS";
+            return "WITH_VOLUNTEER";
+        }
         if (c.getDeptDecision() == Decision.D) return "ACCEPTED";
         return "PENDING";
     }
@@ -155,9 +127,9 @@ public class TaskController {
         task.put("workerDecision", c.getWorkerDecision() != null ? c.getWorkerDecision().toString() : null);
         task.put("assignedToWorker", c.getAssignedToWorker());
         task.put("submitDate", c.getSubmitDate() != null ? c.getSubmitDate().toString() : null);
+        task.put("submitTime", c.getSubmitTime() != null ? c.getSubmitTime().toString() : null);
         task.put("acceptedByWorker", c.getAcceptedByWorker());
 
-        // Department info
         if (c.getDepartment() != null) {
             Map<String, Object> dept = new HashMap<>();
             dept.put("deptId", c.getDepartment().getDeptId());
@@ -166,16 +138,14 @@ public class TaskController {
             task.put("department", dept);
         }
 
-        // Citizen info
         if (c.getCitizen() != null) {
             Map<String, Object> citizen = new HashMap<>();
             citizen.put("id", c.getCitizen().getId());
-            citizen.put("fname", c.getCitizen().getFullName());
-            citizen.put("phoneNum", c.getCitizen().getPhoneNumber());
+            citizen.put("fullName", c.getCitizen().getFullName());
+            citizen.put("phoneNumber", c.getCitizen().getPhoneNumber());
             task.put("citizen", citizen);
         }
 
-        // Worker/Volunteer info
         if (c.getWorker() != null) {
             Map<String, Object> worker = new HashMap<>();
             worker.put("usernameCreated", c.getWorker().getUsernameCreated());
@@ -185,14 +155,20 @@ public class TaskController {
             task.put("workerName", c.getWorker().getName());
         }
 
+        if (c.getDeptUser() != null) {
+            task.put("responderUsername", c.getDeptUser().getUsername());
+            task.put("responderName", c.getDeptUser().getName());
+        }
+
         return task;
     }
 
     private Map<String, Object> toHistoryResponse(ForwardedComplaint c) {
         Map<String, Object> task = toTaskResponse(c);
-        task.put("decision", c.getWorkerDecision() == Decision.D ? "COMPLETED" : "REJECTED");
-        task.put("completedAt", c.getAcceptedDate() != null ? c.getAcceptedDate().toString() :
-                (c.getAssignedWorkerDate() != null ? c.getAssignedWorkerDate().toString() : null));
+        task.put("finalDecision", c.getWorkerDecision() == Decision.D ? "COMPLETED" : "REJECTED");
+        task.put("completedAt", c.getAcceptedDate() != null ? c.getAcceptedDate().toString() : null);
+        task.put("completedTime", c.getAcceptedTime() != null ? c.getAcceptedTime().toString() : null);
+        task.put("rejectedDate", c.getReadByDeptDate() != null && c.getDeptDecision() == Decision.R ? c.getReadByDeptDate().toString() : null);
         return task;
     }
 }

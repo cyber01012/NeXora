@@ -3,19 +3,22 @@ import { responderApi, forwardDecisionApi } from '../../services/api';
 import {
   PhotoIcon,
   CheckCircleIcon,
-  ClockIcon,
-  XMarkIcon,
+  XCircleIcon,
   ArrowPathIcon,
   UserIcon,
   CalendarIcon,
   MapPinIcon,
   DocumentTextIcon,
-  EyeIcon
+  EyeIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 
-// ========== EVIDENCE MODAL COMPONENT ==========
-const EvidenceModal = ({ evidence, onClose }) => {
-  if (!evidence) return null;
+// ========== EVIDENCE IMAGE MODAL ==========
+const EvidenceImageModal = ({ imageUrl, description, onClose }) => {
+  if (!imageUrl) return null;
+
+  // Construct full URL if relative path
+  const fullUrl = imageUrl.startsWith('http') ? imageUrl : `http://localhost:8080${imageUrl}`;
 
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn" onClick={onClose}>
@@ -29,34 +32,30 @@ const EvidenceModal = ({ evidence, onClose }) => {
           </button>
         </div>
         <div className="p-6">
-          {evidence.evidence && (
-            <img 
-              src={evidence.evidence} 
-              alt="Evidence" 
-              className="max-w-full max-h-[60vh] mx-auto rounded-lg"
-              onError={(e) => { e.target.src = 'https://placehold.co/600x400/0a1628/06b6d4?text=No+Image'; }}
-            />
-          )}
-          {evidence.description && (
+          <img 
+            src={fullUrl} 
+            alt="Volunteer Evidence" 
+            className="max-w-full max-h-[60vh] mx-auto rounded-lg"
+            onError={(e) => { 
+              e.target.src = 'https://placehold.co/600x400/0a1628/06b6d4?text=No+Image+Available'; 
+            }}
+          />
+          {description && (
             <div className="mt-4 p-3 bg-cyan-900/20 rounded-lg border border-cyan-500/20">
               <p className="font-mono text-[9px] text-cyan-400/60 mb-1 flex items-center gap-1">
                 <DocumentTextIcon className="w-3 h-3" /> VOLUNTEER NOTES
               </p>
-              <p className="font-mono text-sm text-cyan-200 leading-relaxed">{evidence.description}</p>
+              <p className="font-mono text-sm text-cyan-200 leading-relaxed">{description}</p>
             </div>
           )}
-          <div className="mt-4 flex justify-between text-[10px] font-mono text-cyan-400/60">
-            <span>Submitted: {evidence.date ? `${evidence.date} ${evidence.time || ''}` : 'N/A'}</span>
-            <span>Complaint ID: {evidence.forwardedComplaint?.forwardedComplainId || 'N/A'}</span>
-          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// ========== FIELD REPORT CARD COMPONENT ==========
-const FieldReportCard = ({ report, onViewEvidence, onConfirmComplete, isConfirming }) => {
+// ========== FIELD REPORT CARD ==========
+const FieldReportCard = ({ report, onViewImage, onConfirmComplete, isConfirming }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const formatDate = (date) => {
@@ -64,12 +63,12 @@ const FieldReportCard = ({ report, onViewEvidence, onConfirmComplete, isConfirmi
     return new Date(date).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
-  const formatTime = (time) => {
-    if (!time) return 'N/A';
-    return time;
-  };
+  const isCompleted = report.workerDecision === 'D';
+  const isRejected = report.workerDecision === 'R';
+  const isPending = !isCompleted && !isRejected;
 
-  const isCompleted = report.workerDecision === 'D' || report.completed === true;
+  // Construct image URL
+  const evidenceUrl = report.evidence || report.evidenceImage || report.imagePath;
 
   return (
     <div className="bg-[var(--bg2)] border border-[var(--border)] rounded-xl overflow-hidden transition-all duration-300 hover:border-cyan-500/30">
@@ -87,11 +86,11 @@ const FieldReportCard = ({ report, onViewEvidence, onConfirmComplete, isConfirmi
               <span className={`text-[8px] px-1.5 py-0.5 rounded-full border ${
                 isCompleted 
                   ? 'border-green-500/30 bg-green-500/10 text-green-400' 
-                  : report.workerDecision === 'R'
+                  : isRejected
                     ? 'border-red-500/30 bg-red-500/10 text-red-400'
                     : 'border-yellow-500/30 bg-yellow-500/10 text-yellow-400'
               }`}>
-                {isCompleted ? 'COMPLETED' : report.workerDecision === 'R' ? 'REJECTED' : 'PENDING CONFIRMATION'}
+                {isCompleted ? 'COMPLETED' : isRejected ? 'REJECTED' : 'PENDING CONFIRMATION'}
               </span>
             </div>
             <div className="flex flex-wrap gap-3 mt-2">
@@ -99,18 +98,18 @@ const FieldReportCard = ({ report, onViewEvidence, onConfirmComplete, isConfirmi
                 <UserIcon className="w-3 h-3" /> {report.volunteerName || 'Volunteer'}
               </span>
               <span className="font-mono text-[9px] text-cyan-400/60 flex items-center gap-1">
-                <CalendarIcon className="w-3 h-3" /> {formatDate(report.submittedAt)}
+                <CalendarIcon className="w-3 h-3" /> {formatDate(report.submittedDate || report.date)}
               </span>
               <span className="font-mono text-[9px] text-cyan-400/60 flex items-center gap-1">
-                <ClockIcon className="w-3 h-3" /> {formatTime(report.submittedTime)}
+                <MapPinIcon className="w-3 h-3" /> {report.location || 'Location pending'}
               </span>
             </div>
           </div>
           <div className="text-right">
             <div className="flex items-center gap-2">
-              {report.evidenceCount > 0 && (
+              {evidenceUrl && (
                 <div className="flex items-center gap-1 text-[9px] font-mono text-cyan-400/60">
-                  <PhotoIcon className="w-3 h-3" /> {report.evidenceCount}
+                  <PhotoIcon className="w-3 h-3" /> Evidence
                 </div>
               )}
               <ArrowPathIcon className={`w-4 h-4 text-cyan-400/60 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
@@ -129,6 +128,29 @@ const FieldReportCard = ({ report, onViewEvidence, onConfirmComplete, isConfirmi
       {/* Expanded Details */}
       {isExpanded && (
         <div className="border-t border-[var(--border)] p-4 bg-gradient-to-b from-[var(--bg3)]/20 to-transparent space-y-3 animate-fadeIn">
+          {/* Evidence Image Preview */}
+          {evidenceUrl && (
+            <div className="p-3 bg-cyan-900/10 rounded-lg border border-cyan-500/20">
+              <p className="font-mono text-[9px] text-cyan-400/60 flex items-center gap-1 mb-2">
+                <PhotoIcon className="w-3 h-3" /> VOLUNTEER EVIDENCE
+              </p>
+              <div className="relative group cursor-pointer" onClick={() => onViewImage(evidenceUrl, report.description)}>
+                <img 
+                  src={evidenceUrl.startsWith('http') ? evidenceUrl : `http://localhost:8080${evidenceUrl}`}
+                  alt="Evidence" 
+                  className="w-full max-h-48 object-cover rounded-lg"
+                  onError={(e) => { 
+                    e.target.src = 'https://placehold.co/400x200/0a1628/06b6d4?text=No+Image'; 
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                  <EyeIcon className="w-8 h-8 text-cyan-400" />
+                </div>
+              </div>
+              <p className="font-mono text-[9px] text-cyan-400/60 mt-2 text-center">Click image to view full size</p>
+            </div>
+          )}
+
           {/* Full Description */}
           {report.description && (
             <div className="p-3 bg-cyan-900/10 rounded-lg border border-cyan-500/20">
@@ -140,60 +162,28 @@ const FieldReportCard = ({ report, onViewEvidence, onConfirmComplete, isConfirmi
           )}
 
           {/* Location */}
-          {report.locationAddress && (
+          {report.location && (
             <div className="p-3 bg-cyan-900/10 rounded-lg border border-cyan-500/20">
               <p className="font-mono text-[9px] text-cyan-400/60 flex items-center gap-1 mb-1">
                 <MapPinIcon className="w-3 h-3" /> LOCATION
               </p>
-              <p className="font-mono text-sm text-cyan-200">{report.locationAddress}</p>
+              <p className="font-mono text-sm text-cyan-200">{report.location}</p>
             </div>
           )}
 
-          {/* Evidence Gallery */}
-          {report.evidenceList && report.evidenceList.length > 0 && (
-            <div>
-              <p className="font-mono text-[9px] text-cyan-400/60 flex items-center gap-1 mb-2">
-                <PhotoIcon className="w-3 h-3" /> EVIDENCE ({report.evidenceList.length})
-              </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {report.evidenceList.map((ev, idx) => (
-                  <div
-                    key={ev.id || idx}
-                    onClick={() => onViewEvidence(ev)}
-                    className="aspect-square bg-cyan-900/20 rounded-lg border border-cyan-500/20 overflow-hidden cursor-pointer hover:border-cyan-400 hover:scale-105 transition-all duration-300 flex items-center justify-center group"
-                  >
-                    {ev.evidence ? (
-                      <img 
-                        src={ev.evidence} 
-                        alt={`Evidence ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => { e.target.src = 'https://placehold.co/200x200/0a1628/06b6d4?text=No+Image'; }}
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center text-cyan-400/60">
-                        <PhotoIcon className="w-8 h-8 group-hover:scale-110 transition-transform" />
-                        <span className="text-[8px] mt-1">No Preview</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Confirm Button */}
-          {!isCompleted && report.workerDecision !== 'R' && (
+          {/* Confirm Completion Button */}
+          {isPending && (
             <button
-              onClick={() => onConfirmComplete(report.forwardedComplainId)}
+              onClick={() => onConfirmComplete(report.forwardedComplainId, report.description)}
               disabled={isConfirming}
               className="w-full py-2.5 bg-green-500/20 border border-green-500 rounded-lg font-mono text-sm text-green-400 hover:bg-green-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <CheckCircleIcon className="w-4 h-4" /> 
-              {isConfirming ? 'CONFIRMING...' : 'CONFIRM COMPLETION'}
+              {isConfirming ? 'CONFIRMING...' : '✓ CONFIRM COMPLETION'}
             </button>
           )}
 
-          {/* Show if already completed */}
+          {/* Already completed */}
           {isCompleted && (
             <div className="w-full py-2.5 bg-green-500/10 border border-green-500/30 rounded-lg font-mono text-sm text-green-400 flex items-center justify-center gap-2">
               <CheckCircleIcon className="w-4 h-4" /> 
@@ -201,10 +191,10 @@ const FieldReportCard = ({ report, onViewEvidence, onConfirmComplete, isConfirmi
             </div>
           )}
 
-          {/* Show if rejected */}
-          {report.workerDecision === 'R' && (
+          {/* Rejected */}
+          {isRejected && (
             <div className="w-full py-2.5 bg-red-500/10 border border-red-500/30 rounded-lg font-mono text-sm text-red-400 flex items-center justify-center gap-2">
-              <XMarkIcon className="w-4 h-4" /> 
+              <XCircleIcon className="w-4 h-4" /> 
               EVIDENCE REJECTED — NEEDS REWORK
             </div>
           )}
@@ -220,7 +210,7 @@ export default function ResponderFieldReports() {
   const [filteredReports, setFilteredReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirmingId, setConfirmingId] = useState(null);
-  const [selectedEvidence, setSelectedEvidence] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
 
@@ -228,42 +218,50 @@ export default function ResponderFieldReports() {
     loadFieldReports();
   }, []);
 
-  // Load real data from forward_decision table
+  // Load field reports - tasks where volunteer has submitted evidence
   const loadFieldReports = async () => {
     setLoading(true);
     try {
-      // Step 1: Get all evidence for this department from forward_decision
-      const evidenceList = await forwardDecisionApi.getByDepartment().catch(() => []);
+      // Get all tasks for this department that have been assigned to workers
+      const tasksData = await responderApi.tasks().catch(() => []);
       
-      if (!evidenceList || evidenceList.length === 0) {
-        setFieldReports([]);
-        setFilteredReports([]);
-        setLoading(false);
-        return;
+      // Filter tasks that have evidence (forward_decision exists)
+      // We need to fetch forward_decision for each task
+      const reportsWithEvidence = [];
+      
+      for (const task of tasksData) {
+        // Only show tasks that are assigned to volunteer or awaiting review
+        if (task.assignedToWorker === true || task.workerDecision === null) {
+          try {
+            // Get evidence for this task
+            const evidenceList = await forwardDecisionApi.getByComplaint(task.forwardedComplainId).catch(() => []);
+            
+            if (evidenceList && evidenceList.length > 0) {
+              for (const ev of evidenceList) {
+                reportsWithEvidence.push({
+                  id: ev.id,
+                  forwardedComplainId: task.forwardedComplainId,
+                  reportId: task.reportId,
+                  volunteerName: task.worker?.name || task.workerName || 'Volunteer',
+                  description: ev.description,
+                  evidence: ev.evidence, // Image path
+                  location: task.department?.deptAddress || task.locationAddress || 'N/A',
+                  submittedDate: ev.date,
+                  submittedTime: ev.time,
+                  workerDecision: task.workerDecision,
+                  deptDecision: task.deptDecision,
+                  status: task.status
+                });
+              }
+            }
+          } catch (err) {
+            console.error(`Failed to get evidence for task ${task.forwardedComplainId}:`, err);
+          }
+        }
       }
 
-      // Step 2: Transform evidence into field reports
-      const reports = evidenceList.map(ev => {
-        const complaint = ev.forwardedComplaint || {};
-        const worker = complaint.worker || {};
-        
-        return {
-          id: ev.id,
-          forwardedComplainId: complaint.forwardedComplainId,
-          volunteerName: worker.name || 'Volunteer',
-          description: ev.description,
-          locationAddress: complaint.locationAddress || complaint.department?.deptAddress || 'Location not specified',
-          submittedAt: ev.date,
-          submittedTime: ev.time,
-          evidenceCount: 1,
-          evidenceList: [ev],
-          workerDecision: complaint.workerDecision,
-          completed: complaint.workerDecision === 'D'
-        };
-      });
-
-      setFieldReports(reports);
-      setFilteredReports(reports);
+      setFieldReports(reportsWithEvidence);
+      setFilteredReports(reportsWithEvidence);
     } catch (error) {
       console.error('Failed to load field reports:', error);
       setFieldReports([]);
@@ -274,15 +272,15 @@ export default function ResponderFieldReports() {
   };
 
   // Confirm completion - updates forwarded_complaint
-  const handleConfirmComplete = async (complaintId) => {
+  const handleConfirmComplete = async (complaintId, remarks) => {
     setConfirmingId(complaintId);
     try {
-      await forwardDecisionApi.confirmCompletion(complaintId);
+      await responderApi.confirmCompletion(complaintId, remarks || 'Task completed - evidence verified');
       
       // Update local state
       setFieldReports(prev => prev.map(r => 
         r.forwardedComplainId === complaintId 
-          ? { ...r, workerDecision: 'D', completed: true } 
+          ? { ...r, workerDecision: 'D', status: 'COMPLETED' } 
           : r
       ));
       
@@ -295,17 +293,17 @@ export default function ResponderFieldReports() {
     }
   };
 
-  // Filter reports based on search and status
+  // Filter reports
   useEffect(() => {
     let filtered = [...fieldReports];
     
     if (statusFilter !== 'ALL') {
       if (statusFilter === 'COMPLETED') {
-        filtered = filtered.filter(r => r.completed === true);
+        filtered = filtered.filter(r => r.workerDecision === 'D');
       } else if (statusFilter === 'PENDING') {
-        filtered = filtered.filter(r => !r.completed && r.workerDecision !== 'R');
+        filtered = filtered.filter(r => !r.workerDecision && r.deptDecision !== 'R');
       } else if (statusFilter === 'REJECTED') {
-        filtered = filtered.filter(r => r.workerDecision === 'R');
+        filtered = filtered.filter(r => r.deptDecision === 'R');
       }
     }
     
@@ -314,7 +312,7 @@ export default function ResponderFieldReports() {
       filtered = filtered.filter(r =>
         r.forwardedComplainId?.toString().includes(query) ||
         r.volunteerName?.toLowerCase().includes(query) ||
-        r.locationAddress?.toLowerCase().includes(query) ||
+        r.location?.toLowerCase().includes(query) ||
         r.description?.toLowerCase().includes(query)
       );
     }
@@ -324,10 +322,9 @@ export default function ResponderFieldReports() {
 
   const stats = {
     total: fieldReports.length,
-    completed: fieldReports.filter(r => r.completed).length,
-    pending: fieldReports.filter(r => !r.completed && r.workerDecision !== 'R').length,
-    rejected: fieldReports.filter(r => r.workerDecision === 'R').length,
-    totalEvidence: fieldReports.reduce((sum, r) => sum + (r.evidenceCount || 0), 0)
+    completed: fieldReports.filter(r => r.workerDecision === 'D').length,
+    pending: fieldReports.filter(r => !r.workerDecision && r.deptDecision !== 'R').length,
+    rejected: fieldReports.filter(r => r.deptDecision === 'R').length,
   };
 
   if (loading) {
@@ -348,13 +345,12 @@ export default function ResponderFieldReports() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'TOTAL', value: stats.total, color: '#06b6d4', icon: '📋' },
           { label: 'COMPLETED', value: stats.completed, color: '#4ade80', icon: '✅' },
           { label: 'PENDING', value: stats.pending, color: '#fbbf24', icon: '⏳' },
           { label: 'REJECTED', value: stats.rejected, color: '#ef4444', icon: '❌' },
-          { label: 'EVIDENCE', value: stats.totalEvidence, color: '#c084fc', icon: '📷' },
         ].map((stat, idx) => (
           <div
             key={stat.label}
@@ -412,7 +408,7 @@ export default function ResponderFieldReports() {
         <div className="bg-[var(--bg2)] border border-[var(--border)] rounded-xl p-12 text-center">
           <div className="text-6xl mb-3 opacity-40">📝</div>
           <p className="font-mono text-sm text-gray-400">No field reports found</p>
-          <p className="font-mono text-[10px] text-cyan-500/40 mt-1">Volunteer evidence will appear here</p>
+          <p className="font-mono text-[10px] text-cyan-500/40 mt-1">Volunteer evidence will appear here when submitted</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -420,7 +416,7 @@ export default function ResponderFieldReports() {
             <div key={report.id || report.forwardedComplainId} className="animate-slideInRight" style={{ animationDelay: `${idx * 0.03}s` }}>
               <FieldReportCard 
                 report={report}
-                onViewEvidence={(evidence) => setSelectedEvidence(evidence)}
+                onViewImage={(url, desc) => setSelectedImage({ url, description: desc })}
                 onConfirmComplete={handleConfirmComplete}
                 isConfirming={confirmingId === report.forwardedComplainId}
               />
@@ -429,9 +425,13 @@ export default function ResponderFieldReports() {
         </div>
       )}
 
-      {/* Evidence Modal */}
-      {selectedEvidence && (
-        <EvidenceModal evidence={selectedEvidence} onClose={() => setSelectedEvidence(null)} />
+      {/* Image Modal */}
+      {selectedImage && (
+        <EvidenceImageModal 
+          imageUrl={selectedImage.url} 
+          description={selectedImage.description}
+          onClose={() => setSelectedImage(null)} 
+        />
       )}
 
       {/* Animations CSS */}

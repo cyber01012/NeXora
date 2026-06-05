@@ -1,3 +1,6 @@
+// ============================================
+// FILE: nexora_backend/responder/service/TaskService.java
+// ============================================
 package nexora_backend.responder.service;
 
 import nexora_backend.database.entity.AdminUser;
@@ -7,18 +10,15 @@ import nexora_backend.database.enums.Decision;
 import nexora_backend.database.repository.AdminUserRepository;
 import nexora_backend.database.repository.ForwardedComplaintRepository;
 import nexora_backend.database.repository.VolunteerWorkerCreatorRepository;
-import nexora_backend.responder.dto.request.RejectRequest;
-import nexora_backend.responder.dto.response.TaskResponse;
 import nexora_backend.shared.exception.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
@@ -35,98 +35,154 @@ public class TaskService {
         this.volunteerRepository = volunteerRepository;
     }
 
-    // Get tasks for responder's department
-    public List<ForwardedComplaint> getTasks(String username) {
+    private Long getResponderDeptId(String username) {
         AdminUser responder = adminUserRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("Responder not found"));
+                .orElseThrow(() -> new BusinessException("Responder not found", HttpStatus.NOT_FOUND));
 
-        return forwardedComplaintRepository.findByDepartment_DeptIdOrderBySubmitDateDesc(responder.getDepartment().getDeptId());
-    }
-
-    // Get single task
-    public ForwardedComplaint getTask(Long taskId) {
-        return forwardedComplaintRepository.findById(taskId)
-                .orElseThrow(() -> new BusinessException("Task not found"));
-    }
-
-    // Accept task (updates forwarded_complaint table)
-    @Transactional
-    public ForwardedComplaint acceptTask(String username, Long complaintId) {
-        AdminUser responder = adminUserRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("Responder not found"));
-
-        ForwardedComplaint complaint = forwardedComplaintRepository.findById(complaintId)
-                .orElseThrow(() -> new BusinessException("Task not found"));
-
-        // Check if task belongs to this responder's department
-        if (!complaint.getDepartment().getDeptId().equals(responder.getDepartment().getDeptId())) {
-            throw new BusinessException("You don't have access to this task");
+        if (responder.getDepartment() == null) {
+            throw new BusinessException("Responder has no department assigned", HttpStatus.BAD_REQUEST);
         }
 
-        // Update forwarded_complaint table
+        return responder.getDepartment().getDeptId();
+    }
+
+    public List<ForwardedComplaint> getAllTasks(String username) {
+        Long deptId = getResponderDeptId(username);
+        return forwardedComplaintRepository.findByDepartment_DeptIdOrderBySubmitDateDesc(deptId);
+    }
+
+    public List<ForwardedComplaint> getPendingTasks(String username) {
+        Long deptId = getResponderDeptId(username);
+        return forwardedComplaintRepository.findByDepartment_DeptIdAndDeptDecisionIsNull(deptId);
+    }
+
+    public List<ForwardedComplaint> getActiveTasks(String username) {
+        Long deptId = getResponderDeptId(username);
+        return forwardedComplaintRepository.findByDepartment_DeptIdAndDeptDecisionAndWorkerDecisionIsNull(deptId, Decision.D);
+    }
+
+    public List<ForwardedComplaint> getHistoryTasks(String username) {
+        Long deptId = getResponderDeptId(username);
+        List<ForwardedComplaint> completed = forwardedComplaintRepository
+                .findByDepartment_DeptIdAndWorkerDecision(deptId, Decision.D);
+        List<ForwardedComplaint> rejected = forwardedComplaintRepository
+                .findByDepartment_DeptIdAndDeptDecision(deptId, Decision.R);
+
+        List<ForwardedComplaint> history = new ArrayList<>();
+        history.addAll(completed);
+        history.addAll(rejected);
+
+        history.sort((a, b) -> {
+            if (a.getSubmitDate() == null) return 1;
+            if (b.getSubmitDate() == null) return -1;
+            return b.getSubmitDate().compareTo(a.getSubmitDate());
+        });
+
+        return history;
+    }
+
+    public ForwardedComplaint getTask(Long taskId) {
+        return forwardedComplaintRepository.findById(taskId)
+                .orElseThrow(() -> new BusinessException("Task not found", HttpStatus.NOT_FOUND));
+    }
+
+    @Transactional
+    public ForwardedComplaint acceptTask(String username, Long complaintId) {
+        Long deptId = getResponderDeptId(username);
+        AdminUser responder = adminUserRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException("Responder not found", HttpStatus.NOT_FOUND));
+
+        ForwardedComplaint complaint = forwardedComplaintRepository.findById(complaintId)
+                .orElseThrow(() -> new BusinessException("Task not found", HttpStatus.NOT_FOUND));
+
+        if (!complaint.getDepartment().getDeptId().equals(deptId)) {
+            throw new BusinessException("You don't have access to this task", HttpStatus.FORBIDDEN);
+        }
+
         complaint.setDeptUser(responder);
         complaint.setReadByDept(true);
         complaint.setReadByDeptDate(LocalDate.now());
         complaint.setReadByDeptTime(LocalTime.now());
-        complaint.setDeptDecision(Decision.D);  // D = Accept/Dispose
+        complaint.setDeptDecision(Decision.D);
+        complaint.setRemarks("Task accepted by " + username);
 
         return forwardedComplaintRepository.save(complaint);
     }
 
-    // Reject task
     @Transactional
     public ForwardedComplaint rejectTask(String username, Long complaintId, String reason) {
+        Long deptId = getResponderDeptId(username);
         AdminUser responder = adminUserRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("Responder not found"));
+                .orElseThrow(() -> new BusinessException("Responder not found", HttpStatus.NOT_FOUND));
 
         ForwardedComplaint complaint = forwardedComplaintRepository.findById(complaintId)
-                .orElseThrow(() -> new BusinessException("Task not found"));
+                .orElseThrow(() -> new BusinessException("Task not found", HttpStatus.NOT_FOUND));
 
-        if (!complaint.getDepartment().getDeptId().equals(responder.getDepartment().getDeptId())) {
-            throw new BusinessException("You don't have access to this task");
+        if (!complaint.getDepartment().getDeptId().equals(deptId)) {
+            throw new BusinessException("You don't have access to this task", HttpStatus.FORBIDDEN);
         }
 
         complaint.setDeptUser(responder);
         complaint.setReadByDept(true);
-        complaint.setDeptDecision(Decision.R);  // R = Reject
+        complaint.setReadByDeptDate(LocalDate.now());
+        complaint.setReadByDeptTime(LocalTime.now());
+        complaint.setDeptDecision(Decision.R);
         complaint.setRemarks(reason);
 
         return forwardedComplaintRepository.save(complaint);
     }
 
-    // Forward to volunteer
     @Transactional
-    public ForwardedComplaint forwardToVolunteer(String username, Long complaintId, String volunteerUsername) {
-        AdminUser responder = adminUserRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("Responder not found"));
+    public ForwardedComplaint assignToVolunteer(String username, Long complaintId, String volunteerUsername) {
+        Long deptId = getResponderDeptId(username);
 
         ForwardedComplaint complaint = forwardedComplaintRepository.findById(complaintId)
-                .orElseThrow(() -> new BusinessException("Task not found"));
+                .orElseThrow(() -> new BusinessException("Task not found", HttpStatus.NOT_FOUND));
+
+        if (!complaint.getDepartment().getDeptId().equals(deptId)) {
+            throw new BusinessException("You don't have access to this task", HttpStatus.FORBIDDEN);
+        }
 
         VolunteerWorkerCreator volunteer = volunteerRepository.findByUsernameCreated(volunteerUsername)
-                .orElseThrow(() -> new BusinessException("Volunteer not found"));
+                .orElseThrow(() -> new BusinessException("Volunteer not found", HttpStatus.NOT_FOUND));
+
+        if (!volunteer.getDepartment().getDeptId().equals(deptId)) {
+            throw new BusinessException("Volunteer does not belong to your department", HttpStatus.FORBIDDEN);
+        }
+
+        if (!Boolean.TRUE.equals(volunteer.getActive())) {
+            throw new BusinessException("Volunteer is not active", HttpStatus.BAD_REQUEST);
+        }
 
         complaint.setAssignedToWorker(true);
         complaint.setAssignedWorkerDate(LocalDate.now());
         complaint.setAssignedWorkerTime(LocalTime.now());
         complaint.setWorker(volunteer);
+        complaint.setRemarks("Assigned to volunteer: " + volunteer.getName());
 
         return forwardedComplaintRepository.save(complaint);
     }
 
-    // Mark as completed
     @Transactional
-    public ForwardedComplaint completeTask(String username, Long complaintId) {
-        AdminUser responder = adminUserRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("Responder not found"));
+    public ForwardedComplaint confirmCompletion(String username, Long complaintId, String remarks) {
+        Long deptId = getResponderDeptId(username);
 
         ForwardedComplaint complaint = forwardedComplaintRepository.findById(complaintId)
-                .orElseThrow(() -> new BusinessException("Task not found"));
+                .orElseThrow(() -> new BusinessException("Task not found", HttpStatus.NOT_FOUND));
+
+        if (!complaint.getDepartment().getDeptId().equals(deptId)) {
+            throw new BusinessException("You don't have access to this task", HttpStatus.FORBIDDEN);
+        }
+
+        if (!Boolean.TRUE.equals(complaint.getAssignedToWorker())) {
+            throw new BusinessException("Task was not assigned to any volunteer", HttpStatus.BAD_REQUEST);
+        }
 
         complaint.setWorkerDecision(Decision.D);
         complaint.setAcceptedByWorker(true);
         complaint.setAcceptedDate(LocalDate.now());
         complaint.setAcceptedTime(LocalTime.now());
+        complaint.setRemarks(remarks);
 
         return forwardedComplaintRepository.save(complaint);
     }

@@ -22,9 +22,7 @@ public class ResponderController {
     private final AvailabilityService availabilityService;
     private final RequestContext requestContext;
     private final AdminUserRepository adminUserRepository;
-    // ❌ REMOVED DepartmentRepository
 
-    // ✅ CONSTRUCTOR (without DepartmentRepository)
     public ResponderController(PerformanceService performanceService,
                                AvailabilityService availabilityService,
                                RequestContext requestContext,
@@ -45,10 +43,9 @@ public class ResponderController {
     public ApiResponse<Void> updateAvailability(@RequestBody AvailabilityRequest request) {
         String username = requestContext.getResponderUsername();
         availabilityService.setAvailability(username, request);
-        return ApiResponse.okMessage(request.isAvailable() ? "ONLINE" : "OFFLINE");
+        return ApiResponse.okMessage(request.isAvailable() ? "You are now ONLINE" : "You are now OFFLINE");
     }
 
-    // ✅ GET PROFILE
     @GetMapping("/profile")
     public ApiResponse<Map<String, Object>> getProfile() {
         String username = requestContext.getResponderUsername();
@@ -80,7 +77,6 @@ public class ResponderController {
         return ApiResponse.ok(profile);
     }
 
-    // ✅ UPDATE PROFILE
     @PutMapping("/profile")
     public ApiResponse<Void> updateProfile(@RequestBody Map<String, Object> updates) {
         String username = requestContext.getResponderUsername();

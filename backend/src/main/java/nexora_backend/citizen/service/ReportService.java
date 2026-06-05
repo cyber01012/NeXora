@@ -1,3 +1,6 @@
+// ============================================
+// FILE: nexora_backend/citizen/service/ReportService.java
+// ============================================
 package nexora_backend.citizen.service;
 
 import nexora_backend.citizen.dto.request.ReportRequest;
@@ -17,12 +20,9 @@ import java.util.Map;
 public class ReportService {
 
     private final CivicReportRepository reportRepository;
-    private final CitizenNotificationService notificationService;
 
-    public ReportService(CivicReportRepository reportRepository,
-                         CitizenNotificationService notificationService) {
+    public ReportService(CivicReportRepository reportRepository) {
         this.reportRepository = reportRepository;
-        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -48,16 +48,14 @@ public class ReportService {
         entity.setCity(request.getCity());
         entity.setEvidence(request.getMediaPath());
 
-        CivicReport saved = reportRepository.save(entity);
-        notificationService.notifyReportSubmitted(citizenId, "CIV-" + saved.getCivicId());
-        return saved;
+        return reportRepository.save(entity);
     }
 
     public List<CivicReport> getMyReports(Long citizenId, String statusFilter) {
         return reportRepository.findByCitizen_IdOrderByCivicIdDesc(citizenId);
     }
 
-    public Map<String, Long> getStats(Long citizenId) {
+    public Map<String, Object> getStats(Long citizenId) {
         List<CivicReport> all = reportRepository.findByCitizen_IdOrderByCivicIdDesc(citizenId);
         Map<String, Long> byType = new HashMap<>();
 
@@ -75,7 +73,11 @@ public class ReportService {
             }
             byType.merge(typeName, 1L, Long::sum);
         }
-        return byType;
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalReports", all.size());
+        stats.put("byType", byType);
+        return stats;
     }
 
     private Integer getNatureIdFromType(String type) {

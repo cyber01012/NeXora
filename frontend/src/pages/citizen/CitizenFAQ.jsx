@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import HUDCard from '../../components/ui/HUDCard';
+// import HUDCard from '../../components/ui/HUDCard';
 
 const faqCategories = [
   {
@@ -97,16 +97,6 @@ export default function CitizenFAQ() {
           </div>
         ))}
       </div>
-
-      {/* Contact Support */}
-      <HUDCard className="text-center">
-        <div className="text-3xl mb-2">💬</div>
-        <h3 className="font-title text-glow-primary text-md mb-2">Still need help?</h3>
-        <p className="font-mono text-xs text-cyan-400/60 mb-3">Our support team is available 24/7</p>
-        <button className="px-5 py-2 bg-cyan-500/20 border border-cyan-400 rounded-lg font-mono text-sm text-glow-primary hover:bg-cyan-500/30 transition-all inline-flex items-center gap-2">
-          <span>💬</span> CONTACT SUPPORT
-        </button>
-      </HUDCard>
     </div>
   );
 }

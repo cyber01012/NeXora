@@ -13,6 +13,7 @@ public class WorkerResponse {
     private String cnic;
     private String role;
     private Boolean isActive;
+    private Integer tasksCompleted;
     private LocalDateTime createdAt;
 
     public WorkerResponse() {}
@@ -31,6 +32,8 @@ public class WorkerResponse {
     public void setRole(String role) { this.role = role; }
     public Boolean getIsActive() { return isActive; }
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+    public Integer getTasksCompleted() { return tasksCompleted; }
+    public void setTasksCompleted(Integer tasksCompleted) { this.tasksCompleted = tasksCompleted; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

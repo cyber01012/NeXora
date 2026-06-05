@@ -1,8 +1,11 @@
+// ============================================
+// FILE: nexora_backend/citizen/service/SavedLocationService.java
+// ============================================
 package nexora_backend.citizen.service;
 
 import nexora_backend.citizen.dto.request.SavedLocationRequest;
 import nexora_backend.citizen.dto.response.SavedLocationResponse;
-import nexora_backend.citizen.entity.CitizenSavedLocation;
+import nexora_backend.independent.entity.CitizenSavedLocation;
 import nexora_backend.citizen.repository.CitizenSavedLocationRepository;
 import nexora_backend.shared.exception.BusinessException;
 import org.springframework.http.HttpStatus;
