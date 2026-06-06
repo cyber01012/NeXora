@@ -8,7 +8,7 @@ public class ProfileUpdateRequest {
     private String address;
     private String city;
 
-    // Getters
+
     public String getFullName() { return fullName; }
     public String getEmail() { return email; }
     public String getPhone() { return phone; }
@@ -16,7 +16,6 @@ public class ProfileUpdateRequest {
     public String getAddress() { return address; }
     public String getCity() { return city; }
 
-    // Setters
     public void setFullName(String fullName) { this.fullName = fullName; }
     public void setEmail(String email) { this.email = email; }
     public void setPhone(String phone) { this.phone = phone; }

@@ -1,8 +1,6 @@
-// ============================================
-// FILE: nexora_backend/citizen/service/ReportService.java
-// ============================================
 package nexora_backend.citizen.service;
 
+import nexora_backend.citizen.components.CivicReportComponents;
 import nexora_backend.citizen.dto.request.ReportRequest;
 import nexora_backend.database.entity.CivicReport;
 import nexora_backend.database.entity.ComplaintNature;
@@ -27,29 +25,25 @@ public class ReportService {
 
     @Transactional
     public CivicReport createReport(Long citizenId, ReportRequest request) {
-        RegisterCitizen citizen = new RegisterCitizen();
-        citizen.setId(citizenId);
 
-        ComplaintType type = new ComplaintType();
-        type.setId(2); // 2 = CIVIC
+        RegisterCitizen citizen = CivicReportComponents.createCitizen(citizenId);
+        ComplaintType type = CivicReportComponents.createCivicType();
+        ComplaintNature nature = CivicReportComponents.createNature(request.getType());
 
-        ComplaintNature nature = new ComplaintNature();
-        nature.setId(getNatureIdFromType(request.getType()));
+        CivicReport report = CivicReportComponents.createReport(
+                citizen,
+                type,
+                nature,
+                request.getDescription(),
+                request.getProvince(),
+                request.getDistrict(),
+                request.getTown(),
+                request.getArea(),
+                request.getCity(),
+                request.getMediaPath()
+        );
 
-        CivicReport entity = new CivicReport();
-        entity.setCitizen(citizen);
-        entity.setDetail(request.getDescription());
-        entity.setComplaintType(type);
-        entity.setComplaintNature(nature);
-        entity.setProvince(request.getProvince());
-        entity.setDistrict(request.getDistrict());
-        entity.setTown(request.getTown());
-        entity.setArea(request.getArea());
-        entity.setCity(request.getCity());
-        entity.setEvidence(request.getMediaPath());
-        entity.setStatus("PENDING_ADMIN");
-
-        return reportRepository.save(entity);
+        return reportRepository.save(report);
     }
 
     public List<CivicReport> getMyReports(Long citizenId, String statusFilter) {

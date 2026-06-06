@@ -10,14 +10,12 @@ public class StatsResponse {
     private long completed;
     private Map<String, Long> byType;
 
-    // Getters
     public long getTotalReports() { return totalReports; }
     public long getPending() { return pending; }
     public long getInProgress() { return inProgress; }
     public long getCompleted() { return completed; }
     public Map<String, Long> getByType() { return byType; }
 
-    // Builder
     public static StatsResponseBuilder builder() { return new StatsResponseBuilder(); }
 
     public static class StatsResponseBuilder {

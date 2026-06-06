@@ -13,7 +13,6 @@ public class PerformanceResponse {
     private BigDecimal rating;
     private LocalDateTime lastUpdated;
 
-    // ========== CONSTRUCTORS ==========
     public PerformanceResponse() {}
 
     public PerformanceResponse(String responderId, Integer totalTasks, Integer completedTasks,
@@ -30,7 +29,6 @@ public class PerformanceResponse {
         this.lastUpdated = lastUpdated;
     }
 
-    // ========== GETTERS ==========
     public String getResponderId() { return responderId; }
     public Integer getTotalTasks() { return totalTasks; }
     public Integer getCompletedTasks() { return completedTasks; }
@@ -40,7 +38,6 @@ public class PerformanceResponse {
     public BigDecimal getRating() { return rating; }
     public LocalDateTime getLastUpdated() { return lastUpdated; }
 
-    // ========== SETTERS ==========
     public void setResponderId(String responderId) { this.responderId = responderId; }
     public void setTotalTasks(Integer totalTasks) { this.totalTasks = totalTasks; }
     public void setCompletedTasks(Integer completedTasks) { this.completedTasks = completedTasks; }
@@ -50,7 +47,6 @@ public class PerformanceResponse {
     public void setRating(BigDecimal rating) { this.rating = rating; }
     public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }
 
-    // ========== BUILDER PATTERN ==========
     public static PerformanceResponseBuilder builder() {
         return new PerformanceResponseBuilder();
     }

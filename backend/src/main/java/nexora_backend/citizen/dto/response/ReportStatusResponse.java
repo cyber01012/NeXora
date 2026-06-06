@@ -12,7 +12,6 @@ public class ReportStatusResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Getters
     public Long getId() { return id; }
     public String getTrackingCode() { return trackingCode; }
     public String getStatus() { return status; }
@@ -21,7 +20,6 @@ public class ReportStatusResponse {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 
-    // Builder
     public static ReportStatusResponseBuilder builder() { return new ReportStatusResponseBuilder(); }
 
     public static class ReportStatusResponseBuilder {

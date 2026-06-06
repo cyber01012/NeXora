@@ -1,9 +1,7 @@
-// ============================================
-// FILE: nexora_backend/citizen/mapper/ReportMapper.java
-// ============================================
 package nexora_backend.citizen.mapper;
 
 import nexora_backend.citizen.dto.response.ReportResponse;
+import nexora_backend.citizen.dto.response.ReportResponseComponents;
 import nexora_backend.database.entity.CivicReport;
 import org.springframework.stereotype.Component;
 
@@ -19,15 +17,36 @@ public class ReportMapper {
         Integer natureId = entity.getComplaintNature() != null ? entity.getComplaintNature().getId() : null;
         String typeName = getTypeNameFromNatureId(natureId);
 
-        return ReportResponse.builder()
-                .id(entity.getCivicId())
-                .type(typeName)
-                .description(entity.getDetail())
-                .locationAddress(entity.getArea() + ", " + entity.getCity())
-                .status("PENDING")
-                .trackingCode("CIV-" + entity.getCivicId())
-                .createdAt(null) // CivicReport has no createdAt field, set null or add field
-                .build();
+        ReportResponse response = ReportResponseComponents.createBasicInfo(
+                entity.getCivicId(),
+                typeName,
+                entity.getDetail(),
+                "PENDING"
+        );
+
+        ReportResponseComponents.setLocation(
+                response,
+                entity.getArea() + ", " + entity.getCity(),
+                entity.getCity(),
+                entity.getArea(),
+                entity.getDistrict(),
+                entity.getProvince()
+        );
+        ReportResponseComponents.setMedia(
+                response,
+                entity.getEvidence(),
+                null,
+                null
+        );
+
+        ReportResponseComponents.setMetadata(
+                response,
+                "CIV-" + entity.getCivicId(),
+                "MEDIUM",
+                null // CivicReport has no createdAt field
+        );
+
+        return response;
     }
 
     private String getTypeNameFromNatureId(Integer natureId) {

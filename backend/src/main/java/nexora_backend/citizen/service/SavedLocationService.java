@@ -1,6 +1,4 @@
-// ============================================
-// FILE: nexora_backend/citizen/service/SavedLocationService.java
-// ============================================
+
 package nexora_backend.citizen.service;
 
 import nexora_backend.citizen.dto.request.SavedLocationRequest;

@@ -1,6 +1,4 @@
-// ============================================
-// FILE: nexora_backend/citizen/controller/ProfileController.java
-// ============================================
+
 package nexora_backend.citizen.controller;
 
 import nexora_backend.citizen.dto.request.ProfileUpdateRequest;

@@ -1,6 +1,4 @@
-// ============================================
-// FILE: nexora_backend/responder/service/TaskService.java
-// ============================================
+
 package nexora_backend.responder.service;
 
 import nexora_backend.database.entity.*;
@@ -113,39 +111,6 @@ public class TaskService {
         updateCivicReportStatus(complaint.getReportId(), "COMPLETED");
         return forwardedComplaintRepository.save(complaint);
     }
-
-//    // TaskService.java
-//    public List<Map<String, Object>> getFieldReports(String username) {
-//        Long deptId = getResponderDeptId(username);
-//
-//        List<ForwardedComplaint> complaints = forwardedComplaintRepository.findByDepartment_DeptId(deptId);
-//        List<Map<String, Object>> reports = new ArrayList<>();
-//
-//        for (ForwardedComplaint complaint : complaints) {
-//            List<ForwardDecision> decisions = forwardDecisionRepository
-//                    .findByForwardedComplaint_ForwardedComplainId(complaint.getForwardedComplainId());
-//
-//            for (ForwardDecision decision : decisions) {
-//                Map<String, Object> report = new HashMap<>();
-//                report.put("id", decision.getId());
-//                report.put("forwardedComplainId", complaint.getForwardedComplainId());
-//                report.put("reportId", complaint.getReportId());
-//                report.put("evidence", decision.getEvidence());  // ✅ Image URL
-//                report.put("description", decision.getDescription());
-//                report.put("decisionType", decision.getDecisionType() != null ? decision.getDecisionType().toString() : null);
-//                report.put("date", decision.getDate() != null ? decision.getDate().toString() : null);
-//                report.put("time", decision.getTime() != null ? decision.getTime().toString() : null);
-//
-//                if (complaint.getWorker() != null) {
-//                    report.put("workerName", complaint.getWorker().getName());
-//                    report.put("workerUsername", complaint.getWorker().getUsernameCreated());
-//                }
-//
-//                reports.add(report);
-//            }
-//        }
-//        return reports;
-//    }
     @Transactional
     public ForwardedComplaint rejectTask(String username, Long complaintId, String reason) {
         Long deptId = getResponderDeptId(username);
@@ -228,7 +193,6 @@ public class TaskService {
                 civicReportRepository.save(report);
             });
         }
-        // In confirmCompletion method, add:
         if (complaint.getSosId() != null) {
             sosReportRepository.findById(complaint.getSosId()).ifPresent(sos -> {
                 sos.setStatus("COMPLETED");

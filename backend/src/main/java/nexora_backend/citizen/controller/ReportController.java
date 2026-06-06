@@ -1,10 +1,10 @@
-// ============================================
-// FILE: nexora_backend/citizen/controller/ReportController.java
-// ============================================
+
 package nexora_backend.citizen.controller;
 
 import jakarta.validation.Valid;
 import nexora_backend.citizen.dto.request.ReportRequest;
+import nexora_backend.citizen.dto.response.ReportResponse;
+import nexora_backend.citizen.dto.response.ReportResponseComponents;
 import nexora_backend.database.entity.CivicReport;
 import nexora_backend.citizen.service.ReportService;
 import nexora_backend.shared.dto.ApiResponse;
@@ -42,21 +42,50 @@ public class ReportController {
         List<CivicReport> reports = reportService.getMyReports(citizenId, status);
 
         List<Map<String, Object>> result = reports.stream().map(r -> {
+            ReportResponse response = ReportResponseComponents.createBasicInfo(
+                    r.getCivicId(),
+                    r.getComplaintNature() != null ? getTypeName(r.getComplaintNature().getId()) : "UNKNOWN",
+                    r.getDetail(),
+                    r.getStatus()
+            );
+
+            ReportResponseComponents.setLocation(
+                    response,
+                    r.getCity(),
+                    r.getCity(),
+                    r.getArea(),
+                    r.getDistrict(),
+                    r.getProvince()
+            );
+
+            ReportResponseComponents.setMedia(
+                    response,
+                    r.getEvidence(),
+                    null,
+                    null
+            );
+            ReportResponseComponents.setMetadata(
+                    response,
+                    "CIV-" + r.getCivicId(),
+                    "MEDIUM",
+                    r.getCreatedAt()
+            );
+
             Map<String, Object> map = new HashMap<>();
-            map.put("id", r.getCivicId());
-            map.put("civicId", r.getCivicId());
-            map.put("type", r.getComplaintNature() != null ? getTypeName(r.getComplaintNature().getId()) : "UNKNOWN");
-            map.put("status", r.getStatus());
-            map.put("detail", r.getDetail());
-            map.put("description", r.getDetail());
-            map.put("city", r.getCity());
+            map.put("id", response.getId());
+            map.put("civicId", response.getId());
+            map.put("type", response.getType());
+            map.put("status", response.getStatus());
+            map.put("detail", response.getDescription());
+            map.put("description", response.getDescription());
+            map.put("city", response.getLocationAddress());
             map.put("area", r.getArea());
             map.put("district", r.getDistrict());
             map.put("province", r.getProvince());
-            map.put("locationAddress", r.getCity()); // or construct full address
-            map.put("evidence", r.getEvidence());
-            map.put("createdAt", r.getCreatedAt());
-            map.put("trackingCode", "CIV-" + r.getCivicId());
+            map.put("locationAddress", response.getLocationAddress());
+            map.put("evidence", response.getMediaPath());
+            map.put("createdAt", response.getCreatedAt());
+            map.put("trackingCode", response.getTrackingCode());
             return map;
         }).collect(Collectors.toList());
 

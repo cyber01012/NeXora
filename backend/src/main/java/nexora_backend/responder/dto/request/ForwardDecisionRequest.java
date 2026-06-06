@@ -6,7 +6,6 @@ public class ForwardDecisionRequest {
     private String evidence;
     private String description;
 
-    // ========== CONSTRUCTORS ==========
     public ForwardDecisionRequest() {}
 
     public ForwardDecisionRequest(Long forwardedComplainId, String evidence, String description) {
@@ -15,7 +14,6 @@ public class ForwardDecisionRequest {
         this.description = description;
     }
 
-    // ========== GETTERS ==========
     public Long getForwardedComplainId() {
         return forwardedComplainId;
     }
@@ -28,7 +26,6 @@ public class ForwardDecisionRequest {
         return description;
     }
 
-    // ========== SETTERS ==========
     public void setForwardedComplainId(Long forwardedComplainId) {
         this.forwardedComplainId = forwardedComplainId;
     }

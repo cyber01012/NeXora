@@ -11,7 +11,6 @@ public class CitizenMapService {
 
     private final MapService mapService;
 
-    // Manual constructor
     public CitizenMapService(MapService mapService) {
         this.mapService = mapService;
     }

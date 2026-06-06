@@ -1,6 +1,4 @@
-// ============================================
-// FILE: nexora_backend/responder/controller/TaskController.java
-// ============================================
+
 package nexora_backend.responder.controller;
 
 import nexora_backend.database.entity.ForwardedComplaint;
@@ -147,7 +145,6 @@ public class TaskController {
             citizen.put("phoneNumber", c.getCitizen().getPhoneNumber());
             task.put("citizen", citizen);
         }
-        // In toTaskResponse() method, after citizen block, add:
 
         if (c.getAnonymousId() != null) {
             task.put("anonymousId", c.getAnonymousId());

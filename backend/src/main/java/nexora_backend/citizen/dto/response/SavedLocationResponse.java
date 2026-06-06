@@ -12,7 +12,6 @@ public class SavedLocationResponse {
     private Boolean isDefault;
     private LocalDateTime createdAt;
 
-    // Getters
     public Long getId() { return id; }
     public String getLabel() { return label; }
     public String getAddress() { return address; }
@@ -21,7 +20,6 @@ public class SavedLocationResponse {
     public Boolean getIsDefault() { return isDefault; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
-    // Builder
     public static SavedLocationResponseBuilder builder() { return new SavedLocationResponseBuilder(); }
 
     public static class SavedLocationResponseBuilder {

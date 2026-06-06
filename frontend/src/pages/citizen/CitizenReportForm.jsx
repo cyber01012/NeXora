@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import HUDCard from '../../components/ui/HUDCard';
 import ProgressSteps from '../../components/ui/ProgressSteps';
 import { citizenApi } from '../../services/api';
-import { IncidentReportBuilder } from '../../utils/IncidentReportBuilder';
+// import { IncidentReportBuilder } from '../../utils/IncidentReportBuilder';
 
 const ISSUE_TYPES = [
   { key: 'ELECTRICITY', value: 'ELECTRICITY', icon: '⚡', label: 'ELECTRICITY', color: '#fbbf24', natureId: 7 },
@@ -78,33 +78,48 @@ export default function CitizenReportForm() {
     setError('');
   };
 
-  const handleSubmit = async () => {
-    setSubmitting(true);
-    setError('');
+ const handleSubmit = async () => {
+  setSubmitting(true);
+  setError('');
+  
+  // ✅ DEBUG: Check all values before sending
+  console.log('🔴 Form Data:', formData);
+  console.log('🔴 Type:', formData.type);
+  console.log('🔴 Detail:', formData.detail);
+  console.log('🔴 Province:', formData.province);
+  console.log('🔴 District:', formData.district);
+  console.log('🔴 Town:', formData.town);
+  console.log('🔴 Area:', formData.area);
+  console.log('🔴 City:', formData.city);
+  console.log('🔴 Evidence:', formData.evidence);
+  
+  try {
+    const payload = {
+      type: formData.type,
+      description: formData.detail,
+      province: formData.province || 'Sindh',
+      district: formData.district,
+      town: formData.town,
+      area: formData.area,
+      city: formData.city,
+      mediaPath: formData.evidence
+    };
     
-    try {
-      const payload = new IncidentReportBuilder()
-        .setType(formData.type)
-        .setDescription(formData.detail)
-        .setLocation(`${formData.area}, ${formData.city}`)
-        .setCity(formData.city)
-        .setArea(formData.area)
-        .setProvince(formData.province || 'Sindh')
-        .setDistrict(formData.district)
-        .setTown(formData.town)
-        .setEvidence(formData.evidence)
-        .build();
-      
-      const result = await citizenApi.createReport(payload);
-      setTrackingCode(result.trackingCode || `CIV-${Date.now()}`);
-      setSubmitted(true);
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || err.message || 'Failed to submit report');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    console.log('🔴 Payload:', payload); // Check this
+    
+    const result = await citizenApi.createReport(payload);
+    console.log('🔴 Result:', result);
+    
+    setTrackingCode(result.trackingCode || `CIV-${Date.now()}`);
+    setSubmitted(true);
+  } catch (err) {
+    console.error('🔴 Error:', err);
+    console.error('🔴 Error response:', err.response);
+    setError(err.response?.data?.message || err.message || 'Failed to submit report');
+  } finally {
+    setSubmitting(false);
+  }
+  }
 
   if (submitted) {
     return (
