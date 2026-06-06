@@ -121,10 +121,12 @@ public class TaskController {
         task.put("forwardedComplainId", c.getForwardedComplainId());
         task.put("id", c.getForwardedComplainId());
         task.put("reportId", c.getReportId());
+        task.put("sosId", c.getSosId());
         task.put("remarks", c.getRemarks());
         task.put("status", getTaskStatus(c));
         task.put("deptDecision", c.getDeptDecision() != null ? c.getDeptDecision().toString() : null);
         task.put("workerDecision", c.getWorkerDecision() != null ? c.getWorkerDecision().toString() : null);
+        task.put("anonymousId", c.getAnonymousId());
         task.put("assignedToWorker", c.getAssignedToWorker());
         task.put("submitDate", c.getSubmitDate() != null ? c.getSubmitDate().toString() : null);
         task.put("submitTime", c.getSubmitTime() != null ? c.getSubmitTime().toString() : null);
@@ -145,6 +147,14 @@ public class TaskController {
             citizen.put("phoneNumber", c.getCitizen().getPhoneNumber());
             task.put("citizen", citizen);
         }
+        // In toTaskResponse() method, after citizen block, add:
+
+        if (c.getAnonymousId() != null) {
+            task.put("anonymousId", c.getAnonymousId());
+            // Also fetch anonymous details if needed
+            // task.put("anonymousPhone", c.getAnonymousReport().getPhone());
+            // task.put("anonymousLocation", c.getAnonymousReport().getArea());
+        }
 
         if (c.getWorker() != null) {
             Map<String, Object> worker = new HashMap<>();
@@ -154,11 +164,20 @@ public class TaskController {
             task.put("worker", worker);
             task.put("workerName", c.getWorker().getName());
         }
+        // Priority logic
+        String priority = "MEDIUM";
+        if (c.getSosId() != null) {
+            priority = "HIGH";  // SOS always HIGH
+        }
+        task.put("priority", priority);
 
         if (c.getDeptUser() != null) {
             task.put("responderUsername", c.getDeptUser().getUsername());
             task.put("responderName", c.getDeptUser().getName());
         }
+
+
+
 
         return task;
     }

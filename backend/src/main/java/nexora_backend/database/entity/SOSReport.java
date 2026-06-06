@@ -16,7 +16,7 @@ public class SOSReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long sosId;
 
-    // ✅ NEW: Help Desk user who created SOS
+    // Help Desk user who created SOS
     @ManyToOne
     @JoinColumn(name = "helpdesk_username", referencedColumnName = "username")
     private AdminUser helpDeskUser;
@@ -40,4 +40,12 @@ public class SOSReport {
     private String detail;
 
     private String phoneAutoDetect;
+
+    @Builder.Default
+    @Column(length = 20)
+    private String status = "PENDING";
+
+    // Manual getter/setter for status (if not using Lombok @Getter/@Setter)
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

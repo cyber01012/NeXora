@@ -82,6 +82,16 @@ export default function ResponderDashboard() {
     fetchDisasterMode();
   }, []);
 
+  // Auto-scroll to show graph after dashboard loads
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        window.scrollBy({ top: 230, behavior: 'smooth' });
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
   const fetchDisasterMode = async () => {
     try {
       const res = await fetch('/api/disaster-mode/status');
@@ -388,7 +398,7 @@ export default function ResponderDashboard() {
           { icon: '📋', label: 'TASKS', link: '/responder/tasks', color: '#06b6d4' },
           { icon: '👥', label: 'WORKERS', link: '/responder/workers', color: '#c084fc' },
           { icon: '📈', label: 'PERFORMANCE', link: '/responder/performance', color: '#4ade80' },
-          { icon: '📜', label: 'HISTORY', link: '/responder/history', color: '#fbbf24' },
+          { icon: '📜', label: 'FAQ', link: '/responder/faq', color: '#fbbf24' },
           { icon: '👤', label: 'PROFILE', link: '/responder/profile', color: '#60a5fa' },
         ].map((action, idx) => (
           <Link

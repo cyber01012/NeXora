@@ -92,7 +92,8 @@ public class WorkerService {
             throw new BusinessException("You don't have permission to remove this volunteer", HttpStatus.FORBIDDEN);
         }
 
-        volunteer.setActive(false);
-        volunteerRepository.save(volunteer);
+//        volunteer.setActive(false);
+//        volunteerRepository.save(volunteer);
+        volunteerRepository.delete(volunteer);
     }
 }

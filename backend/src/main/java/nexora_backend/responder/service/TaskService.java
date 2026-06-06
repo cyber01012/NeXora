@@ -5,10 +5,7 @@ package nexora_backend.responder.service;
 
 import nexora_backend.database.entity.*;
 import nexora_backend.database.enums.Decision;
-import nexora_backend.database.repository.AdminUserRepository;
-import nexora_backend.database.repository.CivicReportRepository;
-import nexora_backend.database.repository.ForwardedComplaintRepository;
-import nexora_backend.database.repository.VolunteerWorkerCreatorRepository;
+import nexora_backend.database.repository.*;
 import nexora_backend.shared.exception.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,16 +24,19 @@ public class TaskService {
     private final ForwardedComplaintRepository forwardedComplaintRepository;
     private final AdminUserRepository adminUserRepository;
     private final VolunteerWorkerCreatorRepository volunteerRepository;
-    private final CivicReportRepository civicReportRepository;  // ✅ ADDED
+    private final CivicReportRepository civicReportRepository;
+    private final SOSReportRepository sosReportRepository;
 
     public TaskService(ForwardedComplaintRepository forwardedComplaintRepository,
                        AdminUserRepository adminUserRepository,
                        VolunteerWorkerCreatorRepository volunteerRepository,
-                       CivicReportRepository civicReportRepository) {
+                       CivicReportRepository civicReportRepository,
+                       SOSReportRepository sosReportRepository) {
         this.forwardedComplaintRepository = forwardedComplaintRepository;
         this.adminUserRepository = adminUserRepository;
         this.volunteerRepository = volunteerRepository;
         this.civicReportRepository = civicReportRepository;
+        this.sosReportRepository = sosReportRepository;
     }
 
     private Long getResponderDeptId(String username) {
@@ -226,6 +226,13 @@ public class TaskService {
             civicReportRepository.findById(complaint.getReportId()).ifPresent(report -> {
                 report.setStatus("COMPLETED");
                 civicReportRepository.save(report);
+            });
+        }
+        // In confirmCompletion method, add:
+        if (complaint.getSosId() != null) {
+            sosReportRepository.findById(complaint.getSosId()).ifPresent(sos -> {
+                sos.setStatus("COMPLETED");
+                sosReportRepository.save(sos);
             });
         }
         return forwardedComplaintRepository.save(complaint);

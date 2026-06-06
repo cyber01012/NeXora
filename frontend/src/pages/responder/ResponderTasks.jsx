@@ -35,6 +35,13 @@ const PriorityBadge = ({ priority }) => {
   return <span className={`px-2 py-0.5 rounded text-[9px] font-mono border ${c}`}>{priority || 'MEDIUM'}</span>;
 };
 
+// ========== SOS BADGE ==========
+const SOSBadge = () => (
+  <span className="px-2 py-0.5 rounded text-[9px] font-mono border bg-red-500/20 text-red-400 border-red-500/30 animate-pulse">
+    🚨 SOS
+  </span>
+);
+
 // ========== HELPER FUNCTIONS ==========
 const getSafeString = (value) => {
   if (value === null || value === undefined) return 'N/A';
@@ -57,11 +64,9 @@ const getCitizenPhone = (citizen) => {
 };
 
 // ========== EVIDENCE IMAGE MODAL ==========
-// ========== EVIDENCE IMAGE MODAL ==========
 const EvidenceImageModal = ({ imageUrl, description, onClose }) => {
   if (!imageUrl) return null;
 
-  // URL already full hai (http se start), toh as-is use karo
   const fullUrl = imageUrl.startsWith('http') ? imageUrl : `http://localhost:8080${imageUrl}`;
 
   return (
@@ -79,7 +84,6 @@ const EvidenceImageModal = ({ imageUrl, description, onClose }) => {
             alt="Volunteer Evidence" 
             className="max-w-full max-h-[60vh] mx-auto rounded-lg"
             onError={(e) => { 
-              console.error('❌ Modal image failed:', fullUrl);
               e.target.src = 'https://placehold.co/600x400/0a1628/06b6d4?text=No+Image+Available'; 
             }}
           />
@@ -105,13 +109,8 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
   const [loadingEvidence, setLoadingEvidence] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  // ====== LOAD EVIDENCE WHEN MODAL OPENS ======
   useEffect(() => {
     if (task) {
-      console.log('🟢 TaskDetailModal opened with task:', task);
-      console.log('🟢 Task ID:', task.id);
-      console.log('🟢 Forwarded Complain ID:', task.forwardedComplainId);
-      console.log('🟢 Task Status:', task.status);
       loadEvidence();
     }
   }, [task]);
@@ -120,29 +119,12 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
     setLoadingEvidence(true);
     try {
       const taskId = task.forwardedComplainId || task.id;
-      console.log('🔍 Fetching evidence for task ID:', taskId);
-      
-      const evidenceList = await forwardDecisionApi.getByComplaint(taskId).catch((err) => {
-        console.error('🔍 API Error:', err);
-        return [];
-      });
-      
-      console.log('🔍 Evidence API Response:', evidenceList);
-      console.log('🔍 Evidence List Length:', evidenceList?.length);
-      
+      const evidenceList = await forwardDecisionApi.getByComplaint(taskId).catch(() => []);
       if (evidenceList && evidenceList.length > 0) {
-        console.log('🔍 First evidence object:', evidenceList[0]);
-        console.log('🔍 Evidence field:', evidenceList[0].evidence);
-        console.log('🔍 Evidence Image field:', evidenceList[0].evidenceImage);
-        console.log('🔍 Image Path field:', evidenceList[0].imagePath);
         setEvidenceData(evidenceList[0]);
-      } else {
-        console.log('🔍 No evidence found for this task');
-        setEvidenceData(null);
       }
     } catch (error) {
-      console.error('🔍 Failed to load evidence:', error);
-      setEvidenceData(null);
+      console.error('Failed to load evidence:', error);
     } finally {
       setLoadingEvidence(false);
     }
@@ -156,20 +138,24 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
   const isAwaitingReview = task.status === 'AWAITING_REVIEW';
   const isCompleted = task.status === 'COMPLETED';
   const isRejected = task.status === 'REJECTED';
+  const isSOS = task.sosId != null;
+  const isAnonymous = task.anonymousId != null;
 
-  // Get evidence URL with all possible field names
-  const evidenceUrl = evidenceData?.evidence || evidenceData?.evidenceImage || evidenceData?.imagePath || evidenceData?.fileUrl || evidenceData?.url;
-  console.log('🔍 Final evidenceUrl:', evidenceUrl);
+  const evidenceUrl = evidenceData?.evidence || evidenceData?.evidenceImage || evidenceData?.imagePath;
 
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn" onClick={onClose}>
       <div className="w-full max-w-3xl max-h-[90vh] mx-4 bg-[var(--bg2)] border border-cyan-500/30 rounded-2xl overflow-hidden animate-scaleIn flex flex-col" onClick={e => e.stopPropagation()}>
         {/* Header */}
-        <div className="p-4 border-b border-cyan-500/20 flex justify-between items-center bg-gradient-to-r from-cyan-900/20 to-transparent">
+        <div className={`p-4 border-b border-cyan-500/20 flex justify-between items-center bg-gradient-to-r ${isSOS ? 'from-red-900/20' : 'from-cyan-900/20'} to-transparent`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center text-xl">📋</div>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${isSOS ? 'bg-red-500/20' : 'bg-cyan-500/20'}`}>
+              {isSOS ? '🚨' : '📋'}
+            </div>
             <div>
-              <h3 className="font-title text-glow-primary text-lg tracking-wider">TASK DETAILS</h3>
+              <h3 className="font-title text-glow-primary text-lg tracking-wider">
+                {isSOS ? 'SOS EMERGENCY TASK' : 'TASK DETAILS'}
+              </h3>
               <p className="font-mono text-[9px] text-cyan-400/60">Task #{task.forwardedComplainId || task.id}</p>
             </div>
           </div>
@@ -179,17 +165,26 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {/* Status Header */}
-          <div className="bg-cyan-900/10 rounded-xl p-4 border border-cyan-500/20">
+          <div className={`rounded-xl p-4 border ${isSOS ? 'bg-red-900/10 border-red-500/20' : 'bg-cyan-900/10 border-cyan-500/20'}`}>
             <div className="flex justify-between items-start flex-wrap gap-3">
               <div>
                 <p className="font-mono text-[9px] text-cyan-400/60">REPORT ID</p>
-                <p className="font-data text-xl text-glow-primary">#{task.reportId || task.forwardedComplainId || task.id}</p>
+                <p className="font-data text-xl text-glow-primary">
+                  #{isSOS ? `SOS-${task.sosId}` : task.reportId || task.forwardedComplainId || task.id}
+                </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
+                {isSOS && <SOSBadge />}
                 <StatusBadge status={task.status} />
-                <PriorityBadge priority={task.priority || 'MEDIUM'} />
+                <PriorityBadge priority={task.priority || (isSOS ? 'HIGH' : 'MEDIUM')} />
+                {/* <PriorityBadge priority={task.priority || 'MEDIUM'} /> */}
               </div>
             </div>
+            {isSOS && (
+              <p className="font-mono text-xs text-red-400 mt-2 animate-pulse">
+                ⚠️ This is an EMERGENCY SOS report. Immediate action required!
+              </p>
+            )}
           </div>
 
           {/* Description */}
@@ -226,60 +221,56 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
           </div>
 
           {/* Evidence Section */}
-{(isAwaitingReview || isCompleted || isWithVolunteER) && (
-  <div className={`rounded-xl p-4 border ${
-    isAwaitingReview ? 'bg-orange-500/10 border-orange-500/30' : 
-    isCompleted ? 'bg-green-500/10 border-green-500/30' : 
-    'bg-purple-500/10 border-purple-500/30'
-  }`}>
-    <p className="font-mono text-[9px] text-cyan-400/60 mb-2 flex items-center gap-1">
-      <span>📷</span> VOLUNTEER EVIDENCE
-    </p>
-    
-    {loadingEvidence ? (
-      <div className="text-center py-4">
-        <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="font-mono text-[9px] text-cyan-400/60 mt-2">Loading evidence...</p>
-      </div>
-    ) : evidenceUrl ? (
-      <div>
-        <div 
-          className="relative group cursor-pointer overflow-hidden rounded-lg mb-3"
-          onClick={() => setSelectedImage({ url: evidenceUrl, description: evidenceData?.description })}
-        >
-          <img 
-            src={evidenceUrl.startsWith('http') ? evidenceUrl : `http://localhost:8080${evidenceUrl}`}
-            alt="Evidence" 
-            className="w-full max-h-48 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
-            crossOrigin="anonymous"
-            onError={(e) => { 
-              console.error('❌ Image failed to load. URL:', evidenceUrl);
-              console.error('❌ Full URL tried:', evidenceUrl.startsWith('http') ? evidenceUrl : `http://localhost:8080${evidenceUrl}`);
-              // Fallback: placeholder dikhana
-              e.target.onerror = null; // Infinite loop prevent karo
-              e.target.src = 'https://placehold.co/400x200/0a1628/06b6d4?text=No+Image'; 
-            }}
-          />
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-            <span className="text-cyan-400 text-sm">Click to enlarge</span>
-          </div>
-        </div>
-        {evidenceData?.description && (
-          <p className="font-mono text-xs text-cyan-300 mt-2">{evidenceData.description}</p>
-        )}
-        <p className="font-mono text-[9px] text-cyan-400/60 mt-2">
-          Submitted: {evidenceData?.date} {evidenceData?.time}
-        </p>
-      </div>
-    ) : (
-      <div className="bg-cyan-900/20 rounded-lg p-3 text-center">
-        <p className="font-mono text-[9px] text-cyan-400/60">No evidence uploaded yet</p>
-      </div>
-    )}
-  </div>
-)}
+          {(isAwaitingReview || isCompleted || isWithVolunteer) && (
+            <div className={`rounded-xl p-4 border ${
+              isAwaitingReview ? 'bg-orange-500/10 border-orange-500/30' : 
+              isCompleted ? 'bg-green-500/10 border-green-500/30' : 
+              'bg-purple-500/10 border-purple-500/30'
+            }`}>
+              <p className="font-mono text-[9px] text-cyan-400/60 mb-2 flex items-center gap-1">
+                <span>📷</span> VOLUNTEER EVIDENCE
+              </p>
 
-          {/* Volunteer Info (if assigned) */}
+              {loadingEvidence ? (
+                <div className="text-center py-4">
+                  <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mx-auto" />
+                  <p className="font-mono text-[9px] text-cyan-400/60 mt-2">Loading evidence...</p>
+                </div>
+              ) : evidenceUrl ? (
+                <div>
+                  <div 
+                    className="relative group cursor-pointer overflow-hidden rounded-lg mb-3"
+                    onClick={() => setSelectedImage({ url: evidenceUrl, description: evidenceData?.description })}
+                  >
+                    <img 
+                      src={evidenceUrl.startsWith('http') ? evidenceUrl : `http://localhost:8080${evidenceUrl}`}
+                      alt="Evidence" 
+                      className="w-full max-h-48 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => { 
+                        e.target.onerror = null;
+                        e.target.src = 'https://placehold.co/400x200/0a1628/06b6d4?text=No+Image'; 
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                      <span className="text-cyan-400 text-sm">Click to enlarge</span>
+                    </div>
+                  </div>
+                  {evidenceData?.description && (
+                    <p className="font-mono text-xs text-cyan-300 mt-2">{evidenceData.description}</p>
+                  )}
+                  <p className="font-mono text-[9px] text-cyan-400/60 mt-2">
+                    Submitted: {evidenceData?.date} {evidenceData?.time}
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-cyan-900/20 rounded-lg p-3 text-center">
+                  <p className="font-mono text-[9px] text-cyan-400/60">No evidence uploaded yet</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Volunteer Info */}
           {(isWithVolunteer || isAwaitingReview || isCompleted) && task.worker && (
             <div className="bg-purple-500/10 rounded-xl p-4 border border-purple-500/30">
               <p className="font-mono text-[9px] text-cyan-400/60 mb-1 flex items-center gap-1"><span>👥</span> ASSIGNED VOLUNTEER</p>
@@ -288,9 +279,7 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
             </div>
           )}
 
-          {/* ========== ACTION BUTTONS ========== */}
-
-          {/* PENDING - Accept/Reject */}
+          {/* Action Buttons */}
           {isPending && (
             <div className="flex gap-3 pt-3">
               <button onClick={() => onAccept(task.forwardedComplainId || task.id)} disabled={isProcessing} className="flex-1 py-3 bg-green-500/20 border border-green-500 rounded-xl font-mono text-sm text-green-400 hover:bg-green-500/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
@@ -305,12 +294,10 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
             </div>
           )}
 
-          {/* ACCEPTED - Assign to Volunteer */}
           {isAccepted && !isWithVolunteer && (
             <div className="space-y-3 pt-3">
               <div className="bg-cyan-900/10 rounded-xl p-4 border border-cyan-500/20 text-center">
                 <p className="font-mono text-sm text-blue-400 mb-3">✅ Task Accepted! Now assign to a volunteer:</p>
-                
                 {!showVolunteerList ? (
                   <button onClick={() => setShowVolunteerList(true)} className="px-4 py-2 bg-cyan-500/20 border border-cyan-400 rounded-lg font-mono text-sm text-glow-primary">
                     📋 SHOW MY VOLUNTEERS
@@ -342,7 +329,6 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
             </div>
           )}
 
-          {/* WITH_VOLUNTEER - Waiting */}
           {isWithVolunteer && (
             <div className="bg-purple-500/10 rounded-xl p-4 border border-purple-500/30 text-center">
               <p className="font-mono text-sm text-purple-400">👤 Task assigned to volunteer: {task.worker?.name || task.workerName || 'Unknown'}</p>
@@ -350,7 +336,6 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
             </div>
           )}
 
-          {/* AWAITING_REVIEW - Confirm Completion */}
           {isAwaitingReview && (
             <div className="space-y-3 pt-3">
               <div className="bg-orange-500/10 rounded-xl p-4 border border-orange-500/30">
@@ -373,7 +358,6 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
             </div>
           )}
 
-          {/* COMPLETED */}
           {isCompleted && (
             <div className="bg-green-500/10 rounded-xl p-4 border border-green-500/30 text-center">
               <p className="font-mono text-sm text-green-400">🎉 Task Completed Successfully!</p>
@@ -381,7 +365,6 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
             </div>
           )}
 
-          {/* REJECTED */}
           {isRejected && (
             <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/30 text-center">
               <p className="font-mono text-sm text-red-400">❌ Task Rejected</p>
@@ -395,7 +378,6 @@ const TaskDetailModal = ({ task, volunteers, onClose, onAccept, onReject, onAssi
         </div>
       </div>
 
-      {/* Evidence Image Modal */}
       {selectedImage && (
         <EvidenceImageModal 
           imageUrl={selectedImage.url} 
@@ -567,12 +549,21 @@ export default function ResponderTasks() {
         <div className="space-y-3">
           {displayData.map((task) => {
             const status = getDisplayStatus(task);
+            const isSOS = task.sosId != null;
             return (
-              <div key={task.forwardedComplainId || task.id} className="bg-[var(--bg2)] border border-[var(--border)] rounded-xl p-4 transition-all duration-300 hover:border-cyan-500/30 cursor-pointer" onClick={() => setSelectedTask({ ...task, status })}>
+              <div key={task.forwardedComplainId || task.id} 
+                className={`bg-[var(--bg2)] border rounded-xl p-4 transition-all duration-300 hover:border-cyan-500/30 cursor-pointer ${
+                  isSOS ? 'border-red-500/30 hover:border-red-500/50' : 'border-[var(--border)]'
+                }`}
+                onClick={() => setSelectedTask({ ...task, status })}
+              >
                 <div className="flex justify-between items-start flex-wrap gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-data text-md text-glow-primary">Task #{task.forwardedComplainId || task.id}</p>
+                      <p className={`font-data text-md ${isSOS ? 'text-red-400 text-glow-red' : 'text-glow-primary'}`}>
+                        {isSOS ? `🚨 SOS-${task.sosId}` : `Task #${task.forwardedComplainId || task.id}`}
+                      </p>
+                      {isSOS && <SOSBadge />}
                       <StatusBadge status={status} />
                       <PriorityBadge priority={task.priority || 'MEDIUM'} />
                     </div>
@@ -581,6 +572,7 @@ export default function ResponderTasks() {
                       <span>🏢 {getSafeString(task.department)}</span>
                       <span>👤 {getCitizenName(task.citizen)}</span>
                       <span>📅 {task.submitDate || 'N/A'}</span>
+                      {isSOS && <span className="text-red-400 animate-pulse">⚠️ EMERGENCY</span>}
                     </div>
                   </div>
                   <div className="text-xs text-cyan-400/40">Click to view →</div>
@@ -614,6 +606,7 @@ export default function ResponderTasks() {
         .animate-slideInRight { animation: slideInRight 0.3s ease-out forwards; opacity: 0; }
         .animate-scaleIn { animation: scaleIn 0.3s ease-out forwards; opacity: 0; }
         .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .text-glow-red { text-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
       `}</style>
     </div>
   );
