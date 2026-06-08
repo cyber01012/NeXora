@@ -1,0 +1,313 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap');
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Nasaliza';
+  src: url('./assets/fonts/nasaliza.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --primary-50: #ecfeff;
+  --primary-100: #cffafe;
+  --primary-200: #a5f3fc;
+  --primary-300: #67e8f9;
+  --primary-400: #22d3ee;
+  --primary-500: #06b6d4;
+  --primary-600: #0891b2;
+  --primary-700: #0e7490;
+  --primary-800: #155e75;
+  --primary-900: #164e63;
+  --primary-glow: #00f0ff;
+  --primary-glow-rgb: 0, 240, 255;
+  
+  /* Normal Theme Backgrounds */
+  --bg-darker: #02050a;
+  --bg-dark: #050916;
+  --bg-dark-rgb: 5, 9, 22;
+  --bg-light: #050a18;
+  --color-hud-bg: #030a10;
+}
+
+body.disaster-mode {
+  --primary-50: #fef2f2;
+  --primary-100: #fee2e2;
+  --primary-200: #fecaca;
+  --primary-300: #fca5a5;
+  --primary-400: #f87171;
+  --primary-500: #ef4444;
+  --primary-600: #dc2828;
+  --primary-700: #b91c1c;
+  --primary-800: #991b1b;
+  --primary-900: #7f1d1d;
+  --primary-glow: #ff2a2a;
+  --primary-glow-rgb: 255, 42, 42;
+
+  /* Explicit Tailwind V4 color variable overrides for dynamic switching */
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+  --color-primary-glow: var(--primary-glow);
+  
+  /* Disaster Theme Backgrounds */
+  --bg-darker: #150000;
+  --bg-dark: #200000;
+  --bg-dark-rgb: 32, 0, 0;
+  --bg-light: #300000;
+  --color-hud-bg: #1a0202;
+}
+
+@theme {
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+  --color-primary-glow: var(--primary-glow);
+  
+  --font-hud-title: 'Nasaliza', sans-serif;
+  --font-hud-data: 'Orbitron', sans-serif;
+  --font-hud-mono: 'Share Tech Mono', monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--color-hud-bg)] text-white font-hud-mono antialiased overflow-x-hidden;
+    background-color: var(--color-hud-bg);
+  }
+}
+
+@layer utilities {
+  .font-title { font-family: var(--font-hud-title); }
+  .font-data { font-family: var(--font-hud-data); }
+  .font-mono { font-family: var(--font-hud-mono); }
+
+  .text-glow-primary {
+    text-shadow: 0 0 10px var(--primary-glow), 0 0 20px color-mix(in srgb, var(--primary-glow) 40%, transparent);
+    color: var(--primary-glow);
+  }
+
+  .border-hud {
+    border: 1px solid color-mix(in srgb, var(--primary-glow) 30%, transparent);
+    box-shadow: inset 0 0 10px color-mix(in srgb, var(--primary-glow) 10%, transparent), 0 0 10px color-mix(in srgb, var(--primary-glow) 10%, transparent);
+  }
+
+  .hud-glass {
+    background: rgba(var(--bg-dark-rgb), 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid color-mix(in srgb, var(--primary-glow) 20%, transparent);
+  }
+
+  /* Glitch Text Effect */
+  .glitch-text {
+    position: relative;
+  }
+  .glitch-text::before, .glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-hud-bg);
+  }
+  .glitch-text::before {
+    left: 2px;
+    text-shadow: -1px 0 var(--color-cyan-glow);
+    clip: rect(24px, 550px, 90px, 0);
+    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+  }
+  .glitch-text::after {
+    left: -2px;
+    text-shadow: -1px 0 #0055ff;
+    clip: rect(85px, 550px, 140px, 0);
+    animation: glitch-anim 2.5s infinite linear alternate-reverse;
+  }
+}
+
+@keyframes glitch-anim {
+  0% { clip: rect(10px, 9999px, 44px, 0); }
+  20% { clip: rect(66px, 9999px, 86px, 0); }
+  40% { clip: rect(84px, 9999px, 10px, 0); }
+  60% { clip: rect(14px, 9999px, 56px, 0); }
+  80% { clip: rect(24px, 9999px, 78px, 0); }
+  100% { clip: rect(98px, 9999px, 34px, 0); }
+}
+
+@keyframes glitch-anim-2 {
+  0% { clip: rect(35px, 9999px, 92px, 0); }
+  20% { clip: rect(11px, 9999px, 25px, 0); }
+  40% { clip: rect(59px, 9999px, 73px, 0); }
+  60% { clip: rect(92px, 9999px, 12px, 0); }
+  80% { clip: rect(4px, 9999px, 88px, 0); }
+  100% { clip: rect(74px, 9999px, 46px, 0); }
+}
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+ @keyframes marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+/* Scanline Effect */
+.scanlines::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0),
+    rgba(255,255,255,0) 50%,
+    rgba(0,0,0,0.2) 50%,
+    rgba(0,0,0,0.2)
+  );
+  background-size: 100% 4px;
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* ===add==== */
+
+/* Increase base font size */
+html {
+  font-size: 16px;
+}
+
+body {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Override Claude's tiny font sizes */
+.cp-root,
+.rp-root {
+  font-size: 15px;
+}
+
+.cp-nav-item,
+.rp-nav-item {
+  font-size: 13px !important;
+}
+
+.cp-card-title,
+.rp-card-title {
+  font-size: 13px !important;
+}
+
+.cp-stat-value,
+.rp-stat-value {
+  font-size: 32px !important;
+}
+
+.cp-stat-label,
+.rp-stat-label {
+  font-size: 11px !important;
+}
+
+.cp-report-title,
+.rp-task-title {
+  font-size: 14px !important;
+}
+
+.cp-report-id,
+.rp-task-id {
+  font-size: 11px !important;
+}
+
+.cp-btn,
+.rp-btn {
+  font-size: 12px !important;
+  padding: 10px 18px !important;
+}
+
+.cp-input,
+.cp-select,
+.cp-textarea,
+.rp-input,
+.rp-select,
+.rp-textarea {
+  font-size: 14px !important;
+  padding: 12px !important;
+}
+
+.cp-form-label,
+.rp-form-label {
+  font-size: 11px !important;
+}
+
+.cp-status-badge,
+.rp-status-badge {
+  font-size: 11px !important;
+  padding: 4px 10px !important;
+}
+
+/* Dashboard stats cards */
+.cp-stat-value,
+.rp-stat-value {
+  font-size: 36px !important;
+}
+
+/* Sidebar */
+.cp-user-name,
+.rp-user-name {
+  font-size: 14px !important;
+}
+
+.cp-user-role,
+.rp-user-role {
+  font-size: 11px !important;
+}
+
+/* Map legend */
+.cp-heatmap-legend,
+.rp-heatmap-legend {
+  font-size: 11px !important;
+}
+
+/* Notifications */
+.cp-notif-title,
+.rp-notif-title {
+  font-size: 14px !important;
+}
+
+.cp-notif-msg,
+.rp-notif-msg {
+  font-size: 12px !important;
+}
+
+/* Worker items */
+.rp-worker-name {
+  font-size: 14px !important;
+}
+
+.rp-worker-role {
+  font-size: 11px !important;
+}
+
+/* Task cards */
+.rp-task-title {
+  font-size: 14px !important;
+}
+
+.rp-task-meta {
+  font-size: 12px !important;
+}
