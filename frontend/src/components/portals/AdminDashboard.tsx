@@ -8,7 +8,7 @@ import { useAuth, getApiErrorMessage } from "../../context/AuthContext";
 
 type ModalType = null | "create-user" | "change-password";
 
-export function AdminDashboard() {
+export default function AdminDashboard() {
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [loading, setLoading] = useState(false);
   const { logout } = useAuth();
@@ -69,7 +69,7 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-gray-900 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] rounded-lg p-8 backdrop-blur-sm">
           <h1 className="font-['Orbitron',sans-serif] font-medium text-[32px] text-white mb-2">

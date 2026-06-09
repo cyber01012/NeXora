@@ -106,7 +106,7 @@ Password is BCrypt-hashed before storage. Username is derived from the email loc
 Roles assigned explicitly via `UserType`:
 
 - `POST /api/ngo/volunteers` → `UserType.name = VOLUNTEER`
-- `POST /api/responder/workers` → `UserType.name = WORKER`
+- `POST /api/responder/auth_workers` → `UserType.name = WORKER`
 
 Email is **mandatory** for all non-citizen roles. On account creation (and via `POST /api/auth/send-email-verification`), a **verification link** is emailed — the same `http://localhost:5173/verify-email?token=...` flow as citizens. Login blocked until `emailVerified=true`.
 
@@ -304,7 +304,7 @@ Creates `VolunteerWorkerCreator` under the NGO's department (Volunteer role infe
 }
 ```
 
-### POST `/api/responder/workers` (`ROLE_RESPONDER`)
+### POST `/api/responder/auth_workers` (`ROLE_RESPONDER`)
 
 Creates `VolunteerWorkerCreator` under the Responder's department (Worker role inferred from department category `GOV`).
 

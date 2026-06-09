@@ -19,4 +19,13 @@ public interface VolunteerWorkerCreatorRepository extends JpaRepository<Voluntee
     boolean existsByPhoneNumberAndUsernameCreatedNot(String phoneNumber, String usernameCreated);
 
     List<VolunteerWorkerCreator> findByDepartment_DeptId(Long deptId);
+
+    Optional<VolunteerWorkerCreator> findByUsernameCreated(String usernameCreated);
+
+    List<VolunteerWorkerCreator> findByDepartmentDeptIdAndActiveTrue(Long deptId);
+
+    boolean existsByUsernameCreated(String usernameCreated);
+
+
+
 }

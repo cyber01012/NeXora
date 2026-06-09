@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/responder/workers")
+@RequestMapping("/api/responder/auth_workers")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('RESPONDER')")
 public class ResponderWorkerController {

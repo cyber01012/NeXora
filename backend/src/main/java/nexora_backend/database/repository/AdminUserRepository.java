@@ -24,4 +24,7 @@ public interface AdminUserRepository extends JpaRepository<AdminUser, String> {
     List<AdminUser> findByDepartment_DeptId(Long deptId);
 
     boolean existsByUserType_NameIgnoreCase(String name);
+
+    Optional<AdminUser> findByUsername(String username);
+
 }

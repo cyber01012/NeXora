@@ -13,11 +13,11 @@ import nexora_backend.auth.util.EncryptionService;
 import nexora_backend.auth.util.PhoneValidator;
 import nexora_backend.database.entity.AdminUser;
 import nexora_backend.database.entity.Department;
-import nexora_backend.database.entity.ResponderType;
+//import nexora_backend.database.entity.ResponderType;
 import nexora_backend.database.entity.UserType;
 import nexora_backend.database.repository.AdminUserRepository;
 import nexora_backend.database.repository.DepartmentRepository;
-import nexora_backend.database.repository.ResponderTypeRepository;
+//import nexora_backend.database.repository.ResponderTypeRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +42,7 @@ public class AdminPortalRegistrationStrategy implements RegistrationStrategy {
 
     private final AdminUserRepository adminUserRepository;
     private final DepartmentRepository departmentRepository;
-    private final ResponderTypeRepository responderTypeRepository;
+//    private final ResponderTypeRepository responderTypeRepository;
     private final PasswordEncoder passwordEncoder;
     private final EncryptionService encryptionService;
 
@@ -68,7 +68,11 @@ public class AdminPortalRegistrationStrategy implements RegistrationStrategy {
         }
 
         assertAdminCreator(creator, targetRole);
-        validateResponderTypeForRole(targetRole, request.getResponderTypeId());
+//        validateResponderTypeForRole(targetRole, request.getResponderTypeId());
+        validateDepartmentForRole(
+                targetRole,
+                request.getDeptId()
+        );
 
         if (!PhoneValidator.isValidFormat(request.getContactNumber())) {
             throw AuthErrors.contactNumberInvalidFormat();
@@ -86,8 +90,11 @@ public class AdminPortalRegistrationStrategy implements RegistrationStrategy {
         }
 
         UserType userType = userTypeService.requireUserType(targetRole);
-        ResponderType responderType = resolveResponderType(targetRole, request.getResponderTypeId());
-        Department department = resolveDepartment(targetRole, responderType);
+//        ResponderType responderType = resolveResponderType(targetRole, request.getResponderTypeId());
+        Department department = resolveDepartment(
+                targetRole,
+                request.getDeptId()
+        );
 
         AdminUser adminUser = AdminUser.builder()
                  .username(request.getUsername())
@@ -96,7 +103,15 @@ public class AdminPortalRegistrationStrategy implements RegistrationStrategy {
                  .contactNumber(encryptionService.encryptDeterministic(normalizedContact))
                  .email(request.getEmail())
                  .emailVerified(true)
-                 .active(true)
+                .active(
+                        request.getActive() == null
+                                ? true
+                                : request.getActive()
+                )
+
+                .inactiveRemarks(
+                        request.getInactiveRemarks()
+                )
                  .password(passwordEncoder.encode(request.getPassword()))
                  .date(LocalDate.now())
                  .time(LocalTime.now())
@@ -123,38 +138,74 @@ public class AdminPortalRegistrationStrategy implements RegistrationStrategy {
         }
     }
 
-    private Department resolveDepartment(SystemRole targetRole, ResponderType responderType) {
+    private Department resolveDepartment(
+            SystemRole targetRole,
+            Long deptId
+    ) {
+
+        if (deptId != null) {
+
+            return departmentRepository
+                    .findById(deptId)
+                    .orElseThrow(AuthErrors::departmentNotFound);
+        }
+
         return switch (targetRole) {
+
             case NGO -> departmentRepository
                     .findFirstByResponderTypeCategoryIgnoreCaseAndActiveTrueOrderByDeptNameAsc("NGO")
                     .orElseThrow(AuthErrors::departmentNotFound);
+
             case HELP_DESK, ASSIGNING_OFFICER -> departmentRepository
                     .findFirstByResponderTypeCategoryIgnoreCaseAndActiveTrueOrderByDeptNameAsc("GOV")
                     .orElseThrow(AuthErrors::departmentNotFound);
-            case RESPONDER -> departmentRepository
-                    .findFirstByResponderType_IdAndActiveTrueOrderByDeptNameAsc(responderType.getId())
-                    .orElseThrow(AuthErrors::departmentNotFound);
+
+            case RESPONDER -> {
+
+                if (deptId == null) {
+                    throw AuthErrors.departmentNotFound();
+                }
+
+                yield departmentRepository
+                        .findById(deptId)
+                        .orElseThrow(AuthErrors::departmentNotFound);
+            }
+
             default -> throw AuthErrors.unsupportedPortalRole(targetRole.name());
         };
     }
+    private void validateDepartmentForRole(
+            SystemRole targetRole,
+            Long deptId
+    ) {
 
-    private void validateResponderTypeForRole(SystemRole targetRole, String responderTypeId) {
-        if (targetRole == SystemRole.RESPONDER) {
-            if (responderTypeId == null || responderTypeId.isBlank()) {
-                throw AuthErrors.responderTypeRequired();
+        if (
+                targetRole == SystemRole.RESPONDER
+                        || targetRole == SystemRole.NGO
+        ) {
+
+            if (deptId == null) {
+                throw AuthErrors.departmentNotFound();
             }
-            return;
-        }
-        if (responderTypeId != null && !responderTypeId.isBlank()) {
-            throw AuthErrors.responderTypeNotApplicable();
         }
     }
+//    private void validateResponderTypeForRole(SystemRole targetRole, String responderTypeId) {
+//        if (targetRole == SystemRole.RESPONDER) {
+//            if (responderTypeId == null || responderTypeId.isBlank()) {
+//                throw AuthErrors.responderTypeRequired();
+//            }
+//            return;
+//        }
+//        if (responderTypeId != null && !responderTypeId.isBlank()) {
+//            throw AuthErrors.responderTypeNotApplicable();
+//        }
+//    }
 
-    private ResponderType resolveResponderType(SystemRole targetRole, String responderTypeId) {
-        if (targetRole != SystemRole.RESPONDER) {
-            return null;
-        }
-        return responderTypeRepository.findById(responderTypeId.trim())
-                .orElseThrow(AuthErrors::responderTypeNotFound);
-    }
+//    private ResponderType resolveResponderType(SystemRole targetRole, String responderTypeId) {
+//        if (targetRole != SystemRole.RESPONDER) {
+//            return null;
+//        }
+//        return responderTypeRepository.findById(responderTypeId.trim())
+//                .orElseThrow(AuthErrors::responderTypeNotFound);
+//    }
 }

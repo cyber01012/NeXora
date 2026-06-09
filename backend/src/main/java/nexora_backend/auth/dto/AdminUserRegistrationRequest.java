@@ -29,5 +29,14 @@ public class AdminUserRegistrationRequest {
 
     private String category;
 
+    // ✅ NEW
+    private Long deptId;
+    // ✅ NEW
+    private Boolean active;
+
+    // ✅ NEW
+    private String inactiveRemarks;
+
+
     private String responderTypeId;
 }

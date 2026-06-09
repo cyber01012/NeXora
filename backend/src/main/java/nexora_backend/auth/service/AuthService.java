@@ -238,6 +238,11 @@ public class AuthService {
     }
 
     public UserProfileResponse getProfile(AuthenticatedUser user) {
+
+        if (user == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
         return switch (user.getSource()) {
             case CITIZEN -> {
                 RegisterCitizen citizen = registerCitizenRepository.findById(Long.parseLong(user.getSourceId()))

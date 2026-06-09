@@ -40,4 +40,14 @@ public class SOSReport {
     private String detail;
 
     private String phoneAutoDetect;
+
+    private String priority;
+
+    @Builder.Default
+    @Column(length = 20)
+    private String status = "PENDING";
+
+    // Manual getter/setter for status (if not using Lombok @Getter/@Setter)
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

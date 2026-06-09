@@ -143,6 +143,50 @@ export const authApi = {
     });
   },
 
+  getAdminUsers() {
+    return apiRequest(
+      "/api/admin/users",
+      {
+        method: "GET",
+      }
+    );
+  },
+
+  updateAdminUser: async (
+  username: string,
+  data: {
+    name: string;
+    email: string;
+    contactNumber: string;
+    deptId?: number | null;
+    active: boolean;
+    inactiveRemarks?: string;
+  }
+) => {
+  return apiRequest(
+    `/api/admin/users/${username}`,
+    {
+      method: "PUT",
+      body: data,
+    }
+  );
+},
+
+resetUserPassword: async (
+  username: string,
+  password: string
+) => {
+  return apiRequest(
+    `/api/admin/users/${username}/reset-password`,
+    {
+      method: "PUT",
+      body: {
+        password,
+      },
+    }
+  );
+},
+
   createVolunteer(payload: {
     usernameCreated: string;
     name?: string;
@@ -164,7 +208,7 @@ export const authApi = {
     email: string;
     profilePic?: string;
   }) {
-    return apiRequest<RegistrationResponse>("/api/responder/workers", {
+    return apiRequest<RegistrationResponse>("/api/responder/auth_workers", {
       body: payload,
     });
   },
