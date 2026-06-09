@@ -60,7 +60,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             );
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            System.err.println("JWT Parsing failed:");
+            e.printStackTrace();
             SecurityContextHolder.clearContext();
         }
 

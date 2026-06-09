@@ -21,16 +21,6 @@ import {
   getApiErrorMessage,
 } from "../context/AuthContext";
 
-const navItems = [
-  { to: "/admin", label: "DASHBOARD", icon: "▣", end: true },
-  { to: "/admin/users", label: "USERS", icon: "👥" },
-  { to: "/admin/reports", label: "REPORTS", icon: "📋" },
-  { to: "/admin/analytics", label: "ANALYTICS", icon: "📈" },
-  { to: "/admin/heatmap", label: "HEATMAP", icon: "🗺️" },
-  { to: "/admin/profile", label: "PROFILE", icon: "👤" },
-  { to: "/admin/faq", label: "FAQ", icon: "❓" },
-];
-
 export default function AdminLayout() {
   const navigate = useNavigate();
 
@@ -163,12 +153,33 @@ export default function AdminLayout() {
     }
   };
 
+  const navItems = [
+    {
+      items: [
+        { to: "/admin", label: "DASHBOARD", icon: "▣", end: true },
+        { to: "/admin/users", label: "USERS", icon: "👥" },
+        { to: "/admin/reports", label: "REPORTS", icon: "📋" },
+        { to: "/admin/analytics", label: "ANALYTICS", icon: "📈" },
+        { to: "/admin/heatmap", label: "HEATMAP", icon: "🗺️" },
+        { to: "/admin/profile", label: "PROFILE", icon: "👤" },
+        { to: "/admin/faq", label: "FAQ", icon: "❓" },
+      ],
+    },
+    {
+      title: "ACCOUNT",
+      items: [
+        { label: "CHANGE PASSWORD", icon: "🔐", onClick: () => setActiveModal("change-password") },
+        { label: "LOGOUT OTHERS", icon: "📵", onClick: () => handleLogoutOthers() },
+      ],
+    },
+  ];
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       <PortalSidebar
         title="ADMIN PORTAL"
         user={userData}
-        navItems={[{ items: navItems }]}
+        navItems={navItems}
         onLogout={handleLogout}
         disasterMode={disasterMode}
         onDisasterToggle={handleDisasterToggle}
@@ -179,64 +190,10 @@ export default function AdminLayout() {
         style={{ marginLeft: "260px" }}
       >
         <div className="p-6">
-          {/* Top Action Bar */}
-          <div className="flex gap-4 mb-6 flex-wrap">
-            <button
-              onClick={() =>
-                setActiveModal("create-user")
-              }
-              className="bg-gradient-to-r from-[#00b8db] to-[#2b7fff] rounded-lg px-6 py-3 text-white hover:opacity-90 transition-opacity"
-            >
-              Create User
-            </button>
-
-            <button
-              onClick={() =>
-                setActiveModal("change-password")
-              }
-              className="bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] rounded-lg px-6 py-3 text-white hover:bg-[rgba(255,255,255,0.15)] transition-colors"
-            >
-              Change Password
-            </button>
-
-            <button
-              onClick={handleLogoutOthers}
-              disabled={loading}
-              className="bg-[rgba(255,50,50,0.1)] border border-[rgba(255,50,50,0.2)] rounded-lg px-6 py-3 text-[#ff4d4d] hover:bg-[rgba(255,50,50,0.15)] transition-colors disabled:opacity-50"
-            >
-              {loading
-                ? "Processing..."
-                : "Logout Others"}
-            </button>
-
-            <button
-              onClick={handleLogout}
-              disabled={loading}
-              className="bg-[rgba(255,50,50,0.2)] border border-[rgba(255,50,50,0.4)] rounded-lg px-6 py-3 text-white hover:bg-[rgba(255,50,50,0.3)] transition-colors disabled:opacity-50"
-            >
-              Logout
-            </button>
-          </div>
-
           {/* Page Content */}
           <Outlet />
         </div>
       </main>
-
-      {/* Create User Modal */}
-      {activeModal === "create-user" && (
-        <AuthModalCard
-          title="Create User"
-          onClose={() => setActiveModal(null)}
-        >
-          <DynamicUserForm
-            variant="admin"
-            submitButtonText="Create User"
-            loading={loading}
-            onSubmit={handleCreateUser}
-          />
-        </AuthModalCard>
-      )}
 
       {/* Change Password Modal */}
       {activeModal === "change-password" && (

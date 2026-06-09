@@ -23,6 +23,11 @@ import HelpDeskLayout from './layouts/HelpDeskLayout';
 // Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminReports from './pages/admin/AdminReports';
+import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminHeatmap from './pages/admin/AdminHeatmap';
+import AdminProfile from './pages/admin/AdminProfile';
+import AdminFAQ from './pages/admin/AdminFAQ';
 
 // Citizen Pages
 import CitizenDashboard from '../src/pages/citizen/CitizenDashboard';
@@ -105,6 +110,11 @@ function AppContent() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="reports" element={<AdminReports />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="heatmap" element={<AdminHeatmap />} />
+            <Route path="profile" element={<AdminProfile />} />
+            <Route path="faq" element={<AdminFAQ />} />
           </Route>
 
   {/* NGO */}

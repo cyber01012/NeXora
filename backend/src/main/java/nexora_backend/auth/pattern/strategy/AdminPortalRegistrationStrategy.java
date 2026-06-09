@@ -130,6 +130,11 @@ public class AdminPortalRegistrationStrategy implements RegistrationStrategy {
     }
 
     private void assertAdminCreator(AuthenticatedUser creator, SystemRole targetRole) {
+        System.out.println(">>> assertAdminCreator CALLED");
+        System.out.println(">>> creator: " + creator);
+        if (creator != null) {
+            System.out.println(">>> creator role: " + creator.getRole());
+        }
         if (creator == null || creator.getRole() != SystemRole.ADMIN) {
             throw AuthErrors.onlyAdminCanCreatePortalAccounts();
         }

@@ -43,16 +43,27 @@ export default function PortalSidebar({ title, user, navItems, onLogout, disaste
           <div key={idx}>
             {section.title && <div className="ps-nav-section">{section.title}</div>}
             {section.items.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) => `ps-nav-item ${isActive ? 'active' : ''}`}
-                end={item.end}
-              >
-                <span className="ps-nav-icon">{item.icon}</span>
-                <span>{item.label}</span>
-                {item.badge && <span className="ps-badge">{item.badge}</span>}
-              </NavLink>
+              item.onClick ? (
+                <button
+                  key={item.label}
+                  onClick={item.onClick}
+                  className="ps-nav-item ps-nav-action"
+                >
+                  <span className="ps-nav-icon">{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              ) : (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) => `ps-nav-item ${isActive ? 'active' : ''}`}
+                  end={item.end}
+                >
+                  <span className="ps-nav-icon">{item.icon}</span>
+                  <span>{item.label}</span>
+                  {item.badge && <span className="ps-badge">{item.badge}</span>}
+                </NavLink>
+              )
             ))}
           </div>
         ))}
@@ -159,6 +170,13 @@ export default function PortalSidebar({ title, user, navItems, onLogout, disaste
           border-radius: 0 2px 2px 0;
         }
         .ps-nav-icon { font-size: 16px; width: 20px; text-align: center; }
+        .ps-nav-action {
+          background: none;
+          border: none;
+          cursor: pointer;
+          font-family: inherit;
+        }
+        .ps-nav-action:hover { color: #e0f8ff; background: rgba(0, 240, 255, 0.07); }
         .ps-badge {
           margin-left: auto;
           background: #00f0ff;

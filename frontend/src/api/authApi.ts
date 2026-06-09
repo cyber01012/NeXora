@@ -212,4 +212,8 @@ resetUserPassword: async (
       body: payload,
     });
   },
+
+  getHeatmapData() {
+    return apiRequest<any[]>("/api/admin/heatmap", { method: "GET" });
+  },
 };
