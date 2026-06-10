@@ -54,6 +54,15 @@ import ResponderFAQ from '../src/pages/responder/ResponderFAQ';
 import HelpDeskDashboard from '../src/pages/helpdesk/HelpDeskDashboard';
 import CreateSOS from '../src/pages/helpdesk/HelpDeskSOS';
 
+// Assigning Officer Pages
+import AssigningOfficerLayout from './layouts/AssigningOfficerLayout';
+import AssigningOfficerDashboard from './pages/assigning-officer/AssigningOfficerDashboard';
+import AssigningOfficerDispatch from './pages/assigning-officer/AssigningOfficerDispatch';
+import AssigningOfficerTracker from './pages/assigning-officer/AssigningOfficerTracker';
+import AssigningOfficerDepartments from './pages/assigning-officer/AssigningOfficerDepartments';
+import AssigningOfficerHistory from './pages/assigning-officer/AssigningOfficerHistory';
+import AssigningOfficerProfile from './pages/assigning-officer/AssigningOfficerProfile';
+
 function AppContent() {
   const { user, isAuthenticated } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
@@ -84,6 +93,9 @@ function AppContent() {
     
   case 'HELP_DESK':
     return <Navigate to="/helpdesk" replace />;
+
+  case 'ASSIGNING_OFFICER':
+    return <Navigate to="/assigning-officer" replace />;
 
 
   default:
@@ -140,6 +152,16 @@ function AppContent() {
           <Route path="/helpdesk" element={<HelpDeskLayout />}>
             <Route index element={<HelpDeskDashboard />}/>
             <Route path="createsos" element={<CreateSOS />} />
+          </Route>
+
+          {/* Assigning Officer Portal */}
+          <Route path="/assigning-officer" element={<AssigningOfficerLayout />}>
+            <Route index element={<AssigningOfficerDashboard />} />
+            <Route path="dispatch" element={<AssigningOfficerDispatch />} />
+            <Route path="tracker" element={<AssigningOfficerTracker />} />
+            <Route path="departments" element={<AssigningOfficerDepartments />} />
+            <Route path="history" element={<AssigningOfficerHistory />} />
+            <Route path="profile" element={<AssigningOfficerProfile />} />
           </Route>
 
                 {/* Citizen Portal */}

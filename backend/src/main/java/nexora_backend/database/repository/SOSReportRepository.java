@@ -13,4 +13,8 @@ public interface SOSReportRepository
 
     List<SOSReport>
     findTop10ByOrderBySosIdDesc();
+
+    List<SOSReport> findByStatus(String status);
+
+    List<SOSReport> findByStatusOrderBySosIdDesc(String status);
 }

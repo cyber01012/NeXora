@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import PortalSidebar from '../components/layout/PortalSidebar';
 import { citizenApi } from '../services/api';
 
+
 const navItems = [
   { to: '/citizen', label: 'DASHBOARD', icon: '▣', end: true },
   { to: '/citizen/report', label: 'REPORT ISSUE', icon: '📝' },
@@ -59,9 +60,10 @@ export default function CitizenLayout() {
         onLogout={handleLogout}
         disasterMode={disasterMode}
         onDisasterToggle={handleDisasterToggle}
+        notificationRole="CITIZEN"
       />
       {/* ✅ FIX: Add margin-left equal to sidebar width */}
-      <main className="flex-1 min-h-screen overflow-auto bg-[var(--bg)]" style={{ marginLeft: '260px' }}>
+      <main className="flex-1 min-h-screen overflow-auto bg-[var(--bg)] relative" style={{ marginLeft: '260px' }}>
         <div className="p-6">
           <Outlet />
         </div>

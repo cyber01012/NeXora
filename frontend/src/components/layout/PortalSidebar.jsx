@@ -1,7 +1,9 @@
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
+import NotificationBell from '../notifications/NotificationBell';
+import NotificationPanel from '../notifications/NotificationPanel';
 
-export default function PortalSidebar({ title, user, navItems, onLogout, disasterMode, onDisasterToggle }) {
+export default function PortalSidebar({ title, user, navItems, onLogout, disasterMode, onDisasterToggle, notificationRole }) {
   const [isDisaster, setIsDisaster] = useState(disasterMode || false);
 
   const handleDisasterToggle = () => {
@@ -20,20 +22,24 @@ export default function PortalSidebar({ title, user, navItems, onLogout, disaste
 
       {/* User Card */}
       {user && (
-        <div className="ps-user-card">
+        <div className="ps-user-card relative">
           <div className="ps-avatar">{user.avatar || user.name?.charAt(0) || 'U'}</div>
-          <div className="ps-user-info">
+          <div className="ps-user-info flex-1">
             <div className="ps-user-name">{user.name}</div>
             <div className="ps-user-role">
-
-            {user.role === "NGO"
-              ? "NGO RESPONDER"
-              : user.role === "RESPONDER"
-              ? "GOVERNMENT RESPONDER"
-              : user.role}
-
+              {user.role === "NGO"
+                ? "NGO RESPONDER"
+                : user.role === "RESPONDER"
+                ? "GOVERNMENT RESPONDER"
+                : user.role}
+            </div>
           </div>
-          </div>
+          {notificationRole && (
+            <div className="relative flex-shrink-0">
+              <NotificationBell />
+              <NotificationPanel role={notificationRole} placement="right" />
+            </div>
+          )}
         </div>
       )}
 

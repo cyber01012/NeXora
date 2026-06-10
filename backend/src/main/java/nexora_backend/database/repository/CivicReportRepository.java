@@ -11,4 +11,9 @@ public interface CivicReportRepository extends JpaRepository<CivicReport, Long> 
 
     List<CivicReport> findByCitizen_IdOrderByCivicIdDesc(Long citizenId);
 
+    List<CivicReport> findByStatus(String status);
+
+    List<CivicReport> findByStatusOrderByCivicIdDesc(String status);
+
+    long countByStatus(String status);
 }

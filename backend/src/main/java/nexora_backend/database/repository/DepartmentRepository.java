@@ -11,4 +11,10 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     );
 
     java.util.Optional<Department> findFirstByResponderType_IdAndActiveTrueOrderByDeptNameAsc(String responderTypeId);
+
+    java.util.List<Department> findAllByOrderByDeptNameAsc();
+
+    java.util.List<Department> findByActiveTrue();
+
+    java.util.List<Department> findByActiveTrueOrderByDeptNameAsc();
 }

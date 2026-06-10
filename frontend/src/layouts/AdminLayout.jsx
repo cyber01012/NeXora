@@ -21,6 +21,8 @@ import {
   getApiErrorMessage,
 } from "../context/AuthContext";
 
+
+
 export default function AdminLayout() {
   const navigate = useNavigate();
 
@@ -183,10 +185,11 @@ export default function AdminLayout() {
         onLogout={handleLogout}
         disasterMode={disasterMode}
         onDisasterToggle={handleDisasterToggle}
+        notificationRole="ADMIN"
       />
 
       <main
-        className="flex-1 min-h-screen overflow-auto"
+        className="flex-1 min-h-screen overflow-auto relative"
         style={{ marginLeft: "260px" }}
       >
         <div className="p-6">

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import PortalSidebar from '../components/layout/PortalSidebar';
 import { responderApi } from '../services/api';
 
+
 const navItems = [
   { to: '/responder', label: 'DASHBOARD', icon: '▣', end: true },
   { to: '/responder/tasks', label: 'TASKS', icon: '📋' },
@@ -61,9 +62,9 @@ export default function ResponderLayout() {
         onLogout={handleLogout}
         disasterMode={disasterMode}
         onDisasterToggle={handleDisasterToggle}
+        notificationRole="RESPONDER"
       />
-      {/* ✅ FIX: Add margin-left equal to sidebar width */}
-      <main className="flex-1 min-h-screen overflow-auto bg-[var(--bg)]" style={{ marginLeft: '260px' }}>
+      <main className="flex-1 min-h-screen overflow-auto bg-[var(--bg)] relative" style={{ marginLeft: '260px' }}>
         <div className="p-6">
           <Outlet />
         </div>

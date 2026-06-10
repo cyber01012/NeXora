@@ -175,6 +175,7 @@ export default function HelpDeskLayout() {
         onDisasterToggle={
           handleDisasterToggle
         }
+        notificationRole="HELP_DESK"
       />
 
       {/* MAIN */}

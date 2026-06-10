@@ -24,4 +24,18 @@ public interface ForwardedComplaintRepository extends JpaRepository<ForwardedCom
 
     // REJECTED: deptDecision = 'R'
     List<ForwardedComplaint> findByDepartment_DeptIdAndDeptDecision(Long deptId, Decision deptDecision);
+
+    // ========== ASSIGNING OFFICER QUERIES ==========
+
+    // All forwarded complaints created by a specific AO
+    List<ForwardedComplaint> findByAssigningOfficer_UsernameOrderBySubmitDateDesc(String username);
+
+    // Count forwarded by AO
+    long countByAssigningOfficer_Username(String username);
+
+    // Active: dispatched but not yet completed (workerDecision IS NULL)
+    List<ForwardedComplaint> findByAssigningOfficer_UsernameAndWorkerDecisionIsNull(String username);
+
+    // Completed: workerDecision = 'D'
+    List<ForwardedComplaint> findByAssigningOfficer_UsernameAndWorkerDecision(String username, Decision workerDecision);
 }

@@ -236,6 +236,23 @@ export default function AdminDashboard() {
     }
   };
 
+  const doughnutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'right',
+        labels: {
+          color: '#e0f8ff',
+          font: {
+            family: 'Share Tech Mono',
+            size: 10
+          }
+        }
+      }
+    }
+  };
+
   if (loading) {
 
     return (
@@ -542,6 +559,7 @@ export default function AdminDashboard() {
 
             <Doughnut
               data={chartData}
+              options={doughnutOptions}
             />
 
           </div>

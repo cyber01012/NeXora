@@ -6,7 +6,7 @@ import { useNotifications } from './useNotifications';
 import { useDisasterMode } from '../../context/DisasterContext';
 import NotificationItem from './NotificationItem';
 
-const NotificationPanel = ({ role = 'CITIZEN' }) => {
+const NotificationPanel = ({ role = 'CITIZEN', placement = 'left' }) => {
   const {
     notifications, unreadCount, panelOpen,
     closePanel, markAllAsRead, markAsRead, loading,
@@ -80,7 +80,8 @@ const NotificationPanel = ({ role = 'CITIZEN' }) => {
           transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
           
           className={[
-            'absolute top-14 right-0 w-[380px] max-h-[70vh] flex flex-col',
+            'absolute w-[380px] max-h-[70vh] flex flex-col',
+            placement === 'right' ? 'top-0 left-[150px]' : 'top-14 right-0',
             'rounded-xl border shadow-[0_20px_60px_rgba(0,0,0,0.8)]',
             'bg-[rgba(var(--bg-dark-rgb),0.96)] backdrop-blur-xl overflow-hidden z-50',
             'cursor-grab active:cursor-grabbing', // ✅ Cursor feedback
