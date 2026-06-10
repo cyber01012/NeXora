@@ -63,6 +63,17 @@ import AssigningOfficerDepartments from './pages/assigning-officer/AssigningOffi
 import AssigningOfficerHistory from './pages/assigning-officer/AssigningOfficerHistory';
 import AssigningOfficerProfile from './pages/assigning-officer/AssigningOfficerProfile';
 
+// Worker Pages
+import WorkerLayout from './layouts/WorkerLayout';
+import WorkerDashboard from '../src/pages/worker/WorkerDashboard';
+import WorkerTasks from '../src/pages/worker/WorkerTasks';
+import WorkerHistory from '../src/pages/worker/WorkerHistory';
+import WorkerHelpDesk from '../src/pages/worker/WorkerHelpDesk';
+import WorkerOnboarding from '../src/pages/worker/WorkerOnboarding';
+import WorkerProfile from '../src/pages/worker/WorkerProfile';
+import WorkerFAQ from '../src/pages/worker/WorkerFAQ';
+import WorkerPerformance from '../src/pages/worker/WorkerPerformance';
+
 function AppContent() {
   const { user, isAuthenticated } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
@@ -97,6 +108,9 @@ function AppContent() {
   case 'ASSIGNING_OFFICER':
     return <Navigate to="/assigning-officer" replace />;
 
+  case 'WORKER':
+  case 'VOLUNTEER':
+    return <Navigate to="/worker" replace />;
 
   default:
     return (
@@ -146,6 +160,18 @@ function AppContent() {
             <Route path="profile" element={<ResponderProfile />} />
             <Route path="performance" element={<ResponderPerformance />} />
             <Route path="faq" element={<ResponderFAQ />} />
+          </Route>
+
+          {/* Worker Portal */}
+          <Route path="/worker" element={<WorkerLayout />}>
+            <Route index element={<WorkerDashboard />} />
+            <Route path="tasks" element={<WorkerTasks />} />
+            <Route path="history" element={<WorkerHistory />} />
+            <Route path="helpdesk" element={<WorkerHelpDesk />} />
+            <Route path="onboarding" element={<WorkerOnboarding />} />
+            <Route path="profile" element={<WorkerProfile />} />
+            <Route path="faq" element={<WorkerFAQ />} />
+            <Route path="performance" element={<WorkerPerformance />} />
           </Route>
 
           {/* Help Desk Portal */}
