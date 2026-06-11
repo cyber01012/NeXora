@@ -1,195 +1,86 @@
 import { useEffect, useState } from 'react';
-
-import { helpDeskApi }
-from '../../services/HelpDesk/helpDeskApi';
+import { helpDeskApi } from '../../services/HelpDesk/helpDeskApi';
+import { toast } from 'sonner';
 
 export default function CreateSOS() {
-
-  const [natures, setNatures] =
-    useState([]);
-
-  const [formData, setFormData] =
-    useState({
-
-      name: '',
-      callerPhone: '',
-      province: '',
-      district: '',
-      town: '',
-      area: '',
-      city: '',
-      complaintNatureId: '',
-      priority: 'NORMAL',
-      detail: ''
-    });
-
-    const [showConfirm, setShowConfirm] =
-  useState(false);
-
-const [showSuccess, setShowSuccess] =
-  useState(false);
-
-const [submitting, setSubmitting] =
-  useState(false);
-
-const [notification, setNotification] =
-  useState({
-
-    show: false,
-    type: '',
-    message: ''
+  const [natures, setNatures] = useState([]);
+  const [formData, setFormData] = useState({
+    name: '',
+    callerPhone: '',
+    province: '',
+    district: '',
+    town: '',
+    area: '',
+    city: '',
+    complaintNatureId: '',
+    priority: 'NORMAL',
+    detail: ''
   });
 
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   useEffect(() => {
-
     loadNatures();
-
   }, []);
 
-  const loadNatures =
-    async () => {
-
-      try {
-
-        const data =
-          await helpDeskApi
-            .sosNatures();
-
-        setNatures(data);
-
-      } catch (err) {
-
-        console.error(err);
-      }
-    };
-
-  const handleChange =
-    (field, value) => {
-
-      setFormData(prev => ({
-        ...prev,
-        [field]: value
-      }));
-    };
-
-    const showNotification =
-  (type, message) => {
-
-    setNotification({
-
-      show: true,
-      type,
-      message
-    });
-
-    setTimeout(() => {
-
-      setNotification({
-
-        show: false,
-        type: '',
-        message: ''
-      });
-
-    }, 3000);
+  const loadNatures = async () => {
+    try {
+      const data = await helpDeskApi.sosNatures();
+      setNatures(data || []);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to load emergency natures.');
+    }
   };
 
-  const handleSubmit =
-  async (e) => {
+  const handleChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
+  const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!formData.name.trim()) {
-
-      showNotification(
-        'error',
-        'Caller name is required.'
-      );
-
+      toast.error('Caller name is required.');
       return;
     }
-
     if (!formData.callerPhone.trim()) {
-
-      showNotification(
-        'error',
-        'Caller phone is required.'
-      );
-
+      toast.error('Caller phone is required.');
       return;
     }
-
     if (!formData.province.trim()) {
-
-      showNotification(
-        'error',
-        'Province is required.'
-      );
-
+      toast.error('Province is required.');
       return;
     }
-
     if (!formData.district.trim()) {
-
-      showNotification(
-        'error',
-        'District is required.'
-      );
-
+      toast.error('District is required.');
       return;
     }
-
     if (!formData.city.trim()) {
-
-      showNotification(
-        'error',
-        'City is required.'
-      );
-
+      toast.error('City is required.');
       return;
     }
-
     if (!formData.complaintNatureId) {
-
-      showNotification(
-        'error',
-        'Emergency nature required.'
-      );
-
+      toast.error('Emergency nature is required.');
       return;
     }
-
     if (!formData.detail.trim()) {
-
-      showNotification(
-        'error',
-        'Emergency details required.'
-      );
-
+      toast.error('Emergency details are required.');
       return;
     }
-
     setShowConfirm(true);
   };
 
-  const confirmTransmit =
-  async () => {
-
+  const confirmTransmit = async () => {
     try {
-
       setSubmitting(true);
-
-      await helpDeskApi
-        .createSOS(formData);
-
+      await helpDeskApi.createSOS(formData);
+      toast.success('SOS transmitted successfully.');
       setShowConfirm(false);
-
-      setShowSuccess(true);
-
-      // CLEAR FORM
-
       setFormData({
-
         name: '',
         callerPhone: '',
         province: '',
@@ -201,661 +92,194 @@ const [notification, setNotification] =
         priority: 'NORMAL',
         detail: ''
       });
-
-      // AUTO CLOSE SUCCESS
-
-      setTimeout(() => {
-
-        setShowSuccess(false);
-
-      }, 3000);
-
     } catch (err) {
-
       console.error(err);
-
+      toast.error('Failed to transmit SOS.');
     } finally {
-
       setSubmitting(false);
     }
   };
 
   return (
-
-    <div className="
-      max-w-5xl mx-auto
-      space-y-6
-    ">
-
-        {
-  notification.show && (
-
-    <div className={`
-      fixed top-6 right-6
-      z-[100]
-      min-w-[320px]
-      p-4 rounded-2xl
-      border
-      backdrop-blur-xl
-      animate-fadeIn
-
-      ${
-        notification.type === 'error'
-
-          ? `
-            bg-red-500/10
-            border-red-500/30
-            text-red-300
-            shadow-[0_0_25px_rgba(255,0,0,0.2)]
-          `
-
-          : `
-            bg-green-500/10
-            border-green-500/30
-            text-green-300
-            shadow-[0_0_25px_rgba(34,197,94,0.2)]
-          `
-      }
-    `}>
-
-      <div className="
-        flex items-center gap-3
-      ">
-
-        <span className="text-2xl">
-
-          {
-            notification.type === 'error'
-              ? '🚨'
-              : '✅'
-          }
-
-        </span>
-
-        <p className="
-          text-sm
-          tracking-wide
-        ">
-          {notification.message}
-        </p>
-
-      </div>
-
-    </div>
-
-  )
-}
-
+    <div className="max-w-4xl mx-auto space-y-6 animate-fadeIn">
       {/* HEADER */}
-
-      <div className="
-        border border-red-500/20
-        bg-red-500/5
-        rounded-3xl
-        p-6
-        animate-pulse
-      ">
-
-        <h1 className="
-          text-3xl
-          font-bold
-          text-red-400
-          tracking-widest
-          drop-shadow-[0_0_10px_#ef4444]
-        ">
-
-          🚨 CREATE SOS REPORT
-
+      <div className="border border-red-500/30 bg-red-950/20 rounded-3xl p-6 shadow-[0_0_30px_rgba(239,68,68,0.1)] relative overflow-hidden">
+        <div className="absolute right-6 top-6 text-5xl opacity-20">🚨</div>
+        <h1 className="text-3xl font-bold text-red-400 tracking-widest drop-shadow-[0_0_10px_#ef4444] font-title">
+          CREATE SOS REPORT
         </h1>
-
-        <p className="
-          text-red-300/50
-          mt-2
-        ">
-
-          Emergency transmission console
-
+        <p className="text-red-300/60 mt-1 font-mono text-sm">
+          [ EMERGENCY TRANSMISSION CONSOLE ]
         </p>
-
-        <p className="
-        text-cyan-500/40
-        text-xs
-        font-mono
-        tracking-widest
-        mt-3
-        ">
-
-  [ SECURE EMERGENCY RESPONSE NETWORK ]
-
-</p>
-
+        <p className="text-cyan-500/40 text-xs font-mono tracking-widest mt-3">
+          [ SECURE EMERGENCY RESPONSE BROADCAST NETWORK ]
+        </p>
       </div>
-
-      <div className="
-  flex items-center gap-3
-  bg-red-500/10
-  border border-red-500/20
-  rounded-2xl
-  p-4
-  animate-pulse
-">
-
-  <div className="text-3xl">
-    🚨
-  </div>
-
-  <div>
-
-    <h2 className="
-      text-red-400
-      font-bold
-      tracking-widest
-    ">
-
-      EMERGENCY TRANSMISSION ACTIVE
-
-    </h2>
-
-    <p className="
-      text-red-300/50
-      text-sm
-      mt-1
-    ">
-
-      Incoming SOS calls are being monitored.
-
-    </p>
-
-  </div>
-
-</div>
 
       {/* FORM */}
-
       <form
         onSubmit={handleSubmit}
-
-        className="
-          bg-[#071018]
-          border border-cyan-500/20
-          rounded-3xl
-          p-8
-          space-y-6
-        "
+        className="bg-[#071018] border border-cyan-500/20 rounded-3xl p-8 space-y-6 shadow-[0_0_20px_rgba(0,240,255,0.05)]"
       >
-
-        <div className="
-          grid md:grid-cols-2 gap-5
-        ">
-
-          <input
-            placeholder="Caller Name"
-
-            value={formData.name}
-
-            onChange={(e) =>
-              handleChange(
-                'name',
-                e.target.value
-              )
-            }
-
-            className="
-              bg-black/30
-              border border-cyan-500/20
-              rounded-xl
-              p-4
-              text-cyan-100
-              outline-none
-            "
-          />
-
-          <input
-            placeholder="Caller Phone"
-
-            value={formData.callerPhone}
-
-            onChange={(e) =>
-              handleChange(
-                'callerPhone',
-                e.target.value
-              )
-            }
-
-            className="
-              bg-black/30
-              border border-cyan-500/20
-              rounded-xl
-              p-4
-              text-cyan-100
-              outline-none
-            "
-          />
-
+        <div className="grid md:grid-cols-2 gap-5">
+          <div className="space-y-2">
+            <label className="text-xs font-mono text-cyan-400/70 tracking-wider">CALLER NAME</label>
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={formData.name}
+              onChange={(e) => handleChange('name', e.target.value)}
+              className="w-full bg-black/40 border border-cyan-500/20 rounded-xl px-4 py-3 text-cyan-100 placeholder-cyan-500/30 focus:outline-none focus:border-cyan-400 transition-colors font-mono"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-mono text-cyan-400/70 tracking-wider">CALLER PHONE</label>
+            <input
+              type="text"
+              placeholder="e.g. +923001234567"
+              value={formData.callerPhone}
+              onChange={(e) => handleChange('callerPhone', e.target.value)}
+              className="w-full bg-black/40 border border-cyan-500/20 rounded-xl px-4 py-3 text-cyan-100 placeholder-cyan-500/30 focus:outline-none focus:border-cyan-400 transition-colors font-mono"
+            />
+          </div>
         </div>
 
-        <div className="
-          grid md:grid-cols-2 gap-5
-        ">
-
-          <input
-            placeholder="Province"
-
-            value={formData.province}
-
-            onChange={(e) =>
-              handleChange(
-                'province',
-                e.target.value
-              )
-            }
-
-            className="
-              bg-black/30
-              border border-cyan-500/20
-              rounded-xl
-              p-4
-              text-cyan-100
-            "
-          />
-
-          <input
-            placeholder="District"
-
-            value={formData.district}
-
-            onChange={(e) =>
-              handleChange(
-                'district',
-                e.target.value
-              )
-            }
-
-            className="
-              bg-black/30
-              border border-cyan-500/20
-              rounded-xl
-              p-4
-              text-cyan-100
-            "
-          />
-
-          <input
-  placeholder="Town"
-
-  value={formData.town}
-
-  onChange={(e) =>
-    handleChange(
-      'town',
-      e.target.value
-    )
-  }
-
-  className="
-    bg-black/30
-    border border-cyan-500/20
-    rounded-xl
-    p-4
-    text-cyan-100
-  "
-/>
-
-<input
-  placeholder="Area"
-
-  value={formData.area}
-
-  onChange={(e) =>
-    handleChange(
-      'area',
-      e.target.value
-    )
-  }
-
-  className="
-    bg-black/30
-    border border-cyan-500/20
-    rounded-xl
-    p-4
-    text-cyan-100
-  "
-/>
-
-<input
-  placeholder="City"
-
-  value={formData.city}
-
-  onChange={(e) =>
-    handleChange(
-      'city',
-      e.target.value
-    )
-  }
-
-  className="
-    bg-black/30
-    border border-cyan-500/20
-    rounded-xl
-    p-4
-    text-cyan-100
-  "
-/>
-
+        <div className="border-t border-cyan-500/10 pt-4">
+          <h3 className="text-xs font-mono text-cyan-400/50 tracking-widest mb-4">[ LOCATION METADATA ]</h3>
+          <div className="grid md:grid-cols-3 gap-5">
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono text-cyan-400/60">PROVINCE</label>
+              <input
+                type="text"
+                placeholder="Province"
+                value={formData.province}
+                onChange={(e) => handleChange('province', e.target.value)}
+                className="w-full bg-black/40 border border-cyan-500/20 rounded-xl px-4 py-2.5 text-cyan-100 placeholder-cyan-500/30 focus:outline-none focus:border-cyan-400 transition-colors font-mono text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono text-cyan-400/60">DISTRICT</label>
+              <input
+                type="text"
+                placeholder="District"
+                value={formData.district}
+                onChange={(e) => handleChange('district', e.target.value)}
+                className="w-full bg-black/40 border border-cyan-500/20 rounded-xl px-4 py-2.5 text-cyan-100 placeholder-cyan-500/30 focus:outline-none focus:border-cyan-400 transition-colors font-mono text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono text-cyan-400/60">TOWN</label>
+              <input
+                type="text"
+                placeholder="Town"
+                value={formData.town}
+                onChange={(e) => handleChange('town', e.target.value)}
+                className="w-full bg-black/40 border border-cyan-500/20 rounded-xl px-4 py-2.5 text-cyan-100 placeholder-cyan-500/30 focus:outline-none focus:border-cyan-400 transition-colors font-mono text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono text-cyan-400/60">AREA</label>
+              <input
+                type="text"
+                placeholder="Area/Neighborhood"
+                value={formData.area}
+                onChange={(e) => handleChange('area', e.target.value)}
+                className="w-full bg-black/40 border border-cyan-500/20 rounded-xl px-4 py-2.5 text-cyan-100 placeholder-cyan-500/30 focus:outline-none focus:border-cyan-400 transition-colors font-mono text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono text-cyan-400/60">CITY</label>
+              <input
+                type="text"
+                placeholder="City"
+                value={formData.city}
+                onChange={(e) => handleChange('city', e.target.value)}
+                className="w-full bg-black/40 border border-cyan-500/20 rounded-xl px-4 py-2.5 text-cyan-100 placeholder-cyan-500/30 focus:outline-none focus:border-cyan-400 transition-colors font-mono text-sm"
+              />
+            </div>
+          </div>
         </div>
 
-        <select
-          value={formData.complaintNatureId}
-
-          onChange={(e) =>
-            handleChange(
-              'complaintNatureId',
-              e.target.value
-            )
-          }
-
-          className="
-            w-full
-            bg-black/30
-            border border-cyan-500/20
-            rounded-xl
-            p-4
-            text-cyan-100
-          "
-        >
-
-          <option value="">
-            Select Nature
-          </option>
-
-          {natures.map((nature) => (
-
-            <option
-                key={nature.id}
-                value={nature.id}
+        <div className="border-t border-cyan-500/10 pt-4 grid md:grid-cols-2 gap-5">
+          <div className="space-y-2">
+            <label className="text-xs font-mono text-cyan-400/70 tracking-wider">EMERGENCY NATURE</label>
+            <select
+              value={formData.complaintNatureId}
+              onChange={(e) => handleChange('complaintNatureId', e.target.value)}
+              className="w-full bg-black/40 border border-cyan-500/20 rounded-xl px-4 py-3 text-cyan-100 focus:outline-none focus:border-cyan-400 transition-colors font-mono text-sm"
             >
+              <option value="" className="bg-gray-900 text-cyan-300">Select Nature</option>
+              {natures.map((nature) => (
+                <option key={nature.id} value={nature.id} className="bg-gray-900 text-cyan-100">
+                  {nature.description || nature.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-mono text-red-400/70 tracking-wider">PRIORITY LEVEL</label>
+            <select
+              value={formData.priority}
+              onChange={(e) => handleChange('priority', e.target.value)}
+              className="w-full bg-black/40 border border-red-500/20 rounded-xl px-4 py-3 text-red-200 focus:outline-none focus:border-red-400 transition-colors font-mono text-sm"
+            >
+              <option value="NORMAL" className="bg-gray-900 text-cyan-300">NORMAL</option>
+              <option value="HIGH" className="bg-gray-900 text-yellow-300 font-bold">HIGH</option>
+              <option value="CRITICAL" className="bg-gray-900 text-red-400 font-bold">CRITICAL</option>
+            </select>
+          </div>
+        </div>
 
-                {nature.description}
-
-            </option>
-
-            ))}
-
-        </select>
-
-<select
-  value={formData.priority}
-
-  onChange={(e) =>
-    handleChange(
-      'priority',
-      e.target.value
-    )
-  }
-
-  className="
-    w-full
-    bg-black/30
-    border border-red-500/20
-    rounded-xl
-    p-4
-    text-red-200
-  "
->
-
-  <option value="NORMAL">
-    NORMAL
-  </option>
-
-  <option value="HIGH">
-    HIGH
-  </option>
-
-  <option value="CRITICAL">
-    CRITICAL
-  </option>
-
-</select>
-
-        <textarea
-          rows={5}
-
-          placeholder="Emergency Details"
-
-          value={formData.detail}
-
-          onChange={(e) =>
-            handleChange(
-              'detail',
-              e.target.value
-            )
-          }
-
-          className="
-            w-full
-            bg-black/30
-            border border-cyan-500/20
-            rounded-xl
-            p-4
-            text-cyan-100
-          "
-        />
+        <div className="space-y-2">
+          <label className="text-xs font-mono text-cyan-400/70 tracking-wider">EMERGENCY DETAILS & DISPATCH NOTES</label>
+          <textarea
+            rows={4}
+            placeholder="Type comprehensive details describing the incident..."
+            value={formData.detail}
+            onChange={(e) => handleChange('detail', e.target.value)}
+            className="w-full bg-black/40 border border-cyan-500/20 rounded-xl px-4 py-3 text-cyan-100 placeholder-cyan-500/30 focus:outline-none focus:border-cyan-400 transition-colors font-mono text-sm"
+          />
+        </div>
 
         <button
           type="submit"
-
-          className="
-            w-full
-            py-4
-            rounded-2xl
-            bg-red-500/20
-            border border-red-500
-            text-red-300
-            font-bold
-            tracking-widest
-            hover:bg-red-500/30
-            transition-all
-            shadow-[0_0_20px_rgba(255,0,0,0.2)]
-          "
+          className="w-full py-4 rounded-xl bg-red-950/40 border border-red-500/50 text-red-400 font-bold tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-[0_0_20px_rgba(255,0,0,0.15)] text-sm font-mono"
         >
-
-          TRANSMIT SOS REPORT
-
+          🚨 TRANSMIT SOS BROADCAST
         </button>
-
       </form>
 
-{
-  showConfirm && (
-
-    <div className="
-      fixed inset-0
-      bg-black/70
-      backdrop-blur-sm
-      flex items-center justify-center
-      z-50
-      animate-fadeIn
-    ">
-
-      <div className="
-        w-[90%] max-w-md
-        bg-[#071018]
-        border border-red-500/30
-        rounded-3xl
-        p-8
-        shadow-[0_0_40px_rgba(255,0,0,0.2)]
-      ">
-
-        <div className="
-          text-center space-y-5
-        ">
-
-          <div className="text-6xl">
-            🚨
+      {/* CONFIRM MODAL */}
+      {showConfirm && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-[110] animate-fadeIn">
+          <div className="w-[90%] max-w-md bg-[#071018] border border-red-500/30 rounded-3xl p-8 shadow-[0_0_50px_rgba(255,0,0,0.25)] text-center">
+            <div className="text-5xl animate-bounce mb-4">🚨</div>
+            <h2 className="text-2xl font-bold text-red-400 tracking-widest font-title">
+              CONFIRM TRANSMISSION
+            </h2>
+            <p className="text-red-300/70 text-sm mt-3 font-mono">
+              Are you sure you want to broadcast this SOS alert to the responder network?
+            </p>
+            <div className="flex gap-4 mt-6">
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                className="flex-1 py-3 rounded-xl border border-cyan-500/20 text-cyan-300 hover:bg-cyan-500/10 transition-all font-mono text-xs"
+              >
+                CANCEL
+              </button>
+              <button
+                type="button"
+                onClick={confirmTransmit}
+                disabled={submitting}
+                className="flex-1 py-3 rounded-xl bg-red-950/40 border border-red-500 text-red-400 hover:bg-red-500 hover:text-white transition-all font-mono text-xs"
+              >
+                {submitting ? 'TRANSMITTING...' : 'CONFIRM'}
+              </button>
+            </div>
           </div>
-
-          <h2 className="
-            text-2xl
-            font-bold
-            text-red-400
-            tracking-widest
-          ">
-
-            CONFIRM TRANSMISSION
-
-          </h2>
-
-          <p className="
-            text-red-300/60
-            text-sm
-          ">
-
-            Are you sure you want to
-            transmit this SOS report?
-
-          </p>
-
-          <div className="
-            flex gap-4 pt-4
-          ">
-
-            <button
-            type= "button"
-              onClick={() =>
-                setShowConfirm(false)
-              }
-
-              className="
-                flex-1
-                py-3
-                rounded-2xl
-                border border-cyan-500/20
-                text-cyan-300
-                hover:bg-cyan-500/10
-                transition-all
-              "
-            >
-
-              CANCEL
-
-            </button>
-
-            <button
-            type="button"
-              onClick={confirmTransmit}
-
-              disabled={submitting}
-
-              className="
-                flex-1
-                py-3
-                rounded-2xl
-                bg-red-500/20
-                border border-red-500
-                text-red-300
-                hover:bg-red-500/30
-                transition-all
-              "
-            >
-
-              {
-                submitting
-                  ? 'TRANSMITTING...'
-                  : 'TRANSMIT'
-              }
-
-            </button>
-
-          </div>
-
         </div>
-
-      </div>
-
-    </div>
-
-  )
-}
-
-{
-  showSuccess && (
-
-    <div className="
-      fixed inset-0
-      bg-black/70
-      backdrop-blur-sm
-      flex items-center justify-center
-      z-50
-      animate-fadeIn
-    ">
-
-      <div className="
-        w-[90%] max-w-md
-        bg-[#071018]
-        border border-green-500/30
-        rounded-3xl
-        p-8
-        shadow-[0_0_40px_rgba(34,197,94,0.2)]
-      ">
-
-        <div className="
-          text-center space-y-5
-        ">
-
-          <div className="text-6xl">
-            ✅
-          </div>
-
-          <h2 className="
-            text-2xl
-            font-bold
-            text-green-400
-            tracking-widest
-          ">
-
-            SOS TRANSMITTED
-
-          </h2>
-
-          <p className="
-            text-green-300/60
-            text-sm
-          ">
-
-            Emergency report successfully
-            transmitted to the system.
-
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  )
-}
-
-<style>{`
-
-@keyframes fadeIn {
-
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-.animate-fadeIn {
-
-  animation: fadeIn .25s ease-out;
-}
-
-`}</style>
+      )}
     </div>
   );
 }

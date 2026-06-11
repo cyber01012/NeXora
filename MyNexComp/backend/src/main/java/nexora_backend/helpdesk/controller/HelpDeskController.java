@@ -74,6 +74,13 @@ public class HelpDeskController {
         );
     }
 
+    @GetMapping("/sos/all")
+    public ResponseEntity<?> allSOS() {
+        return ResponseEntity.ok(
+                helpDeskService.allSOS()
+        );
+    }
+
     @GetMapping("/sos/natures")
     public ResponseEntity<?> sosNatures() {
 

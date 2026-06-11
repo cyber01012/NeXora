@@ -2,7 +2,11 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import PortalSidebar from '../components/layout/PortalSidebar';
 import { responderApi } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, getApiErrorMessage } from '../context/AuthContext';
+import { AuthModalCard } from '../components/auth/AuthModalCard';
+import { ChangePasswordForm } from '../components/auth/ChangePasswordForm';
+import { authApi } from '../api/authApi';
+import { toast } from 'sonner';
 
 
 
@@ -25,6 +29,7 @@ export default function ResponderLayout() {
   const { logout } = useAuth();
   const [disasterMode, setDisasterMode] = useState(false);
   const [userData, setUserData] = useState({ name: 'Loading...', role: 'FOCAL PERSON', avatar: '?' });
+  const [activeModal, setActiveModal] = useState(null);
 
   useEffect(() => {
     fetch('/api/disaster-mode/status')
@@ -45,6 +50,16 @@ export default function ResponderLayout() {
       .catch(err => console.error('Failed to load responder profile:', err));
   }, []);
 
+  const handleLogoutOthers = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refresh_token');
+      const response = await authApi.logoutOthers(refreshToken);
+      toast.success(response.message || 'Logged out other devices.');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Failed to logout other devices.'));
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -63,7 +78,16 @@ export default function ResponderLayout() {
       <PortalSidebar
         title="RESPONDER PORTAL"
         user={userData}
-        navItems={[{ items: navItems }]}
+        navItems={[
+          { items: navItems },
+          {
+            title: 'ACCOUNT',
+            items: [
+              { label: 'CHANGE PASSWORD', icon: '🔐', onClick: () => setActiveModal('change-password') },
+              { label: 'LOGOUT OTHERS', icon: '📵', onClick: handleLogoutOthers },
+            ]
+          }
+        ]}
         onLogout={handleLogout}
         disasterMode={disasterMode}
         onDisasterToggle={handleDisasterToggle}
@@ -74,6 +98,18 @@ export default function ResponderLayout() {
           <Outlet />
         </div>
       </main>
+
+      {/* Change Password Modal */}
+      {activeModal === 'change-password' && (
+        <AuthModalCard
+          title="Change Password"
+          onClose={() => setActiveModal(null)}
+        >
+          <ChangePasswordForm
+            onSuccess={() => setActiveModal(null)}
+          />
+        </AuthModalCard>
+      )}
     </div>
   );
 }

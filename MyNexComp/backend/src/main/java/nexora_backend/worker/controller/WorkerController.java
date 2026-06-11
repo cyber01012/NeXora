@@ -1,7 +1,7 @@
 package nexora_backend.worker.controller;
 
-// import nexora_backend.shared.entity.HelpDeskMessage;
-// import nexora_backend.shared.repository.HelpDeskMessageRepository;
+import nexora_backend.database.entity.HelpDeskMessage;
+import nexora_backend.database.repository.HelpDeskMessageRepository;
 import nexora_backend.shared.dto.ApiResponse;
 import nexora_backend.shared.util.RequestContext;
 import nexora_backend.worker.dto.request.WorkerTaskActionRequest;
@@ -29,20 +29,20 @@ public class WorkerController {
     private final WorkerTaskService taskService;
     private final WorkerProfileService profileService;
     private final WorkerPerformanceService performanceService;
-    // private final HelpDeskMessageRepository helpDeskRepository;
+     private final HelpDeskMessageRepository helpDeskRepository;
     private final RequestContext requestContext;
 
     public WorkerController(WorkerDashboardService dashboardService,
                             WorkerTaskService taskService,
                             WorkerProfileService profileService,
                             WorkerPerformanceService performanceService,
-                            // HelpDeskMessageRepository helpDeskRepository,
+                             HelpDeskMessageRepository helpDeskRepository,
                             RequestContext requestContext) {
         this.dashboardService   = dashboardService;
         this.taskService        = taskService;
         this.profileService     = profileService;
         this.performanceService = performanceService;
-        // this.helpDeskRepository = helpDeskRepository;
+         this.helpDeskRepository = helpDeskRepository;
         this.requestContext     = requestContext;
     }
 
@@ -186,49 +186,49 @@ public class WorkerController {
 
     // ========== HELP DESK ==========
 
-    // @GetMapping("/helpdesk")
-    // public ApiResponse<List<Map<String, Object>>> getHelpMessages(
-    //         @RequestParam(required = false) String workerUsername) {
-    //     String username = resolveUsername(workerUsername);
-    //
-    //     List<HelpDeskMessage> messages = helpDeskRepository.findBySenderUsernameOrReceiverUsernameOrderByCreatedAtAsc(username, username);
-    //
-    //     List<Map<String, Object>> result = messages.stream().map(m -> {
-    //         Map<String, Object> msg = new java.util.HashMap<>();
-    //         msg.put("id",               m.getId());
-    //         msg.put("senderUsername",   m.getSenderUsername());
-    //         msg.put("receiverUsername", m.getReceiverUsername());
-    //         msg.put("message",          m.getMessage());
-    //         msg.put("isRead",           m.getIsRead());
-    //         msg.put("createdAt",        m.getCreatedAt() != null ? m.getCreatedAt().toString() : null);
-    //         msg.put("isMine",           username.equals(m.getSenderUsername()));
-    //         return msg;
-    //     }).collect(Collectors.toList());
-    //
-    //     return ApiResponse.ok(result);
-    // }
-    //
-    // @PostMapping("/helpdesk")
-    // public ApiResponse<Void> sendHelpMessage(
-    //         @RequestParam(required = false) String workerUsername,
-    //         @RequestBody Map<String, String> body) {
-    //     String username = resolveUsername(workerUsername);
-    //     String message  = body != null ? body.get("message") : null;
-    //
-    //     if (message == null || message.isBlank()) {
-    //         return ApiResponse.error("Message cannot be empty");
-    //     }
-    //
-    //     HelpDeskMessage msg = HelpDeskMessage.builder()
-    //             .senderUsername(username)
-    //             .receiverUsername("SUPPORT")
-    //             .message(message)
-    //             .isRead(false)
-    //             .build();
-    //
-    //     helpDeskRepository.save(msg);
-    //     return ApiResponse.okMessage("Message sent");
-    // }
+     @GetMapping("/helpdesk")
+     public ApiResponse<List<Map<String, Object>>> getHelpMessages(
+             @RequestParam(required = false) String workerUsername) {
+         String username = resolveUsername(workerUsername);
+
+         List<HelpDeskMessage> messages = helpDeskRepository.findBySenderUsernameOrReceiverUsernameOrderByCreatedAtAsc(username, username);
+
+         List<Map<String, Object>> result = messages.stream().map(m -> {
+             Map<String, Object> msg = new java.util.HashMap<>();
+             msg.put("id",               m.getId());
+             msg.put("senderUsername",   m.getSenderUsername());
+             msg.put("receiverUsername", m.getReceiverUsername());
+             msg.put("message",          m.getMessage());
+             msg.put("isRead",           m.getIsRead());
+             msg.put("createdAt",        m.getCreatedAt() != null ? m.getCreatedAt().toString() : null);
+             msg.put("isMine",           username.equals(m.getSenderUsername()));
+             return msg;
+         }).collect(Collectors.toList());
+
+         return ApiResponse.ok(result);
+     }
+
+     @PostMapping("/helpdesk")
+     public ApiResponse<Void> sendHelpMessage(
+             @RequestParam(required = false) String workerUsername,
+             @RequestBody Map<String, String> body) {
+         String username = resolveUsername(workerUsername);
+         String message  = body != null ? body.get("message") : null;
+
+         if (message == null || message.isBlank()) {
+             return ApiResponse.error("Message cannot be empty");
+         }
+
+         HelpDeskMessage msg = HelpDeskMessage.builder()
+                 .senderUsername(username)
+                 .receiverUsername("SUPPORT")
+                 .message(message)
+                 .isRead(false)
+                 .build();
+
+         helpDeskRepository.save(msg);
+         return ApiResponse.okMessage("Message sent");
+     }
 
     // ========== PRIVATE HELPERS ==========
 

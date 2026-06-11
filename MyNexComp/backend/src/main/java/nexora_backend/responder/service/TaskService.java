@@ -112,7 +112,7 @@ public class TaskService {
         complaint.setDeptDecision(Decision.D);
         complaint.setRemarks("Task accepted by " + username);
 
-        updateCivicReportStatus(complaint.getReportId(), "COMPLETED");
+        // DO NOT mark report as COMPLETED here — only when worker finishes
         eventPublisher.publishEvent(new nexora_backend.notificationsystem.events.TaskAcceptedEvent(this, String.valueOf(complaint.getForwardedComplainId())));
         return forwardedComplaintRepository.save(complaint);
     }
@@ -211,6 +211,7 @@ public class TaskService {
         if (complaint.getSosId() != null) {
             sosReportRepository.findById(complaint.getSosId()).ifPresent(sos -> {
                 sos.setStatus("COMPLETED");
+                sos.setResolvedBy(username);
                 sosReportRepository.save(sos);
                 eventPublisher.publishEvent(new nexora_backend.notificationsystem.events.TaskDisposedEvent(this, "SOS-" + sos.getSosId()));
             });

@@ -47,7 +47,12 @@ public class SOSReport {
     @Column(length = 20)
     private String status = "PENDING";
 
+    private String resolvedBy;
+
     // Manual getter/setter for status (if not using Lombok @Getter/@Setter)
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getResolvedBy() { return resolvedBy; }
+    public void setResolvedBy(String resolvedBy) { this.resolvedBy = resolvedBy; }
 }

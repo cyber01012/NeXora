@@ -53,6 +53,9 @@ import ResponderFAQ from '../src/pages/responder/ResponderFAQ';
 // Help Desk Pages
 import HelpDeskDashboard from '../src/pages/helpdesk/HelpDeskDashboard';
 import CreateSOS from '../src/pages/helpdesk/HelpDeskSOS';
+import HelpDeskReports from '../src/pages/helpdesk/HelpDeskReports';
+import HelpDeskProfile from '../src/pages/helpdesk/HelpDeskProfile';
+import HelpDeskFAQ from '../src/pages/helpdesk/HelpDeskFAQ';
 
 // Assigning Officer Pages
 import AssigningOfficerLayout from './layouts/AssigningOfficerLayout';
@@ -181,6 +184,9 @@ function AppContent() {
           <Route path="/helpdesk" element={<HelpDeskLayout />}>
             <Route index element={<HelpDeskDashboard />}/>
             <Route path="createsos" element={<CreateSOS />} />
+            <Route path="reports" element={<HelpDeskReports />} />
+            <Route path="profile" element={<HelpDeskProfile />} />
+            <Route path="faq" element={<HelpDeskFAQ />} />
           </Route>
 
           {/* Assigning Officer Portal */}

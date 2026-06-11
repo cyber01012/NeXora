@@ -4,7 +4,10 @@ import { toast } from "sonner";
 
 import PortalSidebar from "../components/layout/PortalSidebar";
 
-import { useAuth } from "../context/AuthContext";
+import { useAuth, getApiErrorMessage } from "../context/AuthContext";
+import { AuthModalCard } from "../components/auth/AuthModalCard";
+import { ChangePasswordForm } from "../components/auth/ChangePasswordForm";
+import { authApi } from "../api/authApi";
 
 const navItems = [
   {
@@ -51,12 +54,27 @@ export default function HelpDeskLayout() {
   const [loading, setLoading] =
     useState(false);
 
+  const [activeModal, setActiveModal] = useState(null);
+
   const [userData, setUserData] =
     useState({
       name: "Loading...",
       role: "HELP DESK",
       avatar: "?",
     });
+
+  const handleLogoutOthers = async () => {
+    setLoading(true);
+    try {
+      const refreshToken = localStorage.getItem("refresh_token");
+      const response = await authApi.logoutOthers(refreshToken);
+      toast.success(response.message || "Logged out other devices.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Failed to logout other devices."));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
 
@@ -165,7 +183,14 @@ export default function HelpDeskLayout() {
         user={userData}
 
         navItems={[
-          { items: navItems }
+          { items: navItems },
+          {
+            title: "ACCOUNT",
+            items: [
+              { label: "CHANGE PASSWORD", icon: "🔐", onClick: () => setActiveModal("change-password") },
+              { label: "LOGOUT OTHERS", icon: "📵", onClick: handleLogoutOthers },
+            ]
+          }
         ]}
 
         onLogout={handleLogout}
@@ -340,6 +365,18 @@ export default function HelpDeskLayout() {
         </div>
 
       </main>
+
+      {/* Change Password Modal */}
+      {activeModal === "change-password" && (
+        <AuthModalCard
+          title="Change Password"
+          onClose={() => setActiveModal(null)}
+        >
+          <ChangePasswordForm
+            onSuccess={() => setActiveModal(null)}
+          />
+        </AuthModalCard>
+      )}
 
     </div>
   );

@@ -7,17 +7,24 @@ const api = axios.create({
 
 // Add auth headers for requests
 api.interceptors.request.use((config) => {
+  // 1. Always attach the JWT access token — backend uses this as primary identity
+  const accessToken = localStorage.getItem('nexora_access_token');
+  if (accessToken) {
+    config.headers['Authorization'] = `Bearer ${accessToken}`;
+  }
+
+  // 2. Also attach legacy custom headers as a fallback (used for Postman testing)
   const citizenId = localStorage.getItem('nexora_citizen_id') || '1';
-  const responderUsername = localStorage.getItem('nexora_responder_username') || 'kelectric_fp';
-  const workerUsername = localStorage.getItem('nexora_worker_username') || 'worker01';
-  
+  const responderUsername = localStorage.getItem('nexora_responder_username') || '';
+  const workerUsername = localStorage.getItem('nexora_worker_username') || '';
+
   if (config.url?.includes('/citizen')) {
     config.headers['X-Citizen-Id'] = citizenId;
   }
-  if (config.url?.includes('/responder')) {
+  if (config.url?.includes('/responder') && responderUsername) {
     config.headers['X-Responder-Username'] = responderUsername;
   }
-  if (config.url?.includes('/worker')) {
+  if (config.url?.includes('/worker') && workerUsername) {
     config.headers['X-Worker-Username'] = workerUsername;
   }
   return config;

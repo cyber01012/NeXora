@@ -186,6 +186,12 @@ public class HelpDeskService {
                 .findTop10ByOrderBySosIdDesc();
     }
 
+    public List<SOSReport>
+    allSOS() {
+        return sosReportRepository
+                .findAll(org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "sosId"));
+    }
+
     public List<ComplaintNature>
     getSOSNatures() {
 

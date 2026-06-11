@@ -54,6 +54,14 @@ export const helpDeskApi = {
     return res.data;
   },
 
+  allSOS: async () => {
+    const res = await axios.get(
+      `${API}/sos/all`,
+      authHeaders()
+    );
+    return res.data;
+  },
+
   sosNatures: async () => {
 
     const res = await axios.get(

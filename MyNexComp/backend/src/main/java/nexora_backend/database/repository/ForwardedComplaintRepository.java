@@ -1,5 +1,6 @@
 package nexora_backend.database.repository;
 
+import nexora_backend.database.entity.Department;
 import nexora_backend.database.entity.ForwardedComplaint;
 import nexora_backend.database.enums.Decision;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,8 @@ import java.util.List;
 
 @Repository
 public interface ForwardedComplaintRepository extends JpaRepository<ForwardedComplaint, Long> {
+
+    List<ForwardedComplaint> findByDepartmentAndReadByDeptFalse(Department department);
 
     List<ForwardedComplaint> findByDepartment_DeptIdOrderBySubmitDateDesc(Long deptId);
 
