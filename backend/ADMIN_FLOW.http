@@ -1,0 +1,72 @@
+### NeXora — Admin end-to-end flow (REST Client / VS Code)
+### Prerequisites: PostgreSQL, Redis, backend running on :8080
+
+@baseUrl = http://localhost:8080
+@adminEmail = admin@nexora.com
+@adminPassword = nexora123
+
+### 1) Login as bootstrapped admin
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "{{adminEmail}}",
+  "password": "{{adminPassword}}",
+  "deviceId": "rest-client"
+}
+
+###
+@accessToken = {{login.response.body.accessToken}}
+
+### 2) Profile
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{accessToken}}
+
+### 3) List departments (pick one name for category when creating users)
+GET {{baseUrl}}/api/admin/departments
+Authorization: Bearer {{accessToken}}
+
+### 4) List responder types (required for RESPONDER role)
+GET {{baseUrl}}/api/admin/responder-types
+Authorization: Bearer {{accessToken}}
+
+### 5) Create NGO user (category = exact department name from step 3)
+POST {{baseUrl}}/api/admin/users/ngo
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "username": "ngo_demo",
+  "name": "Demo NGO",
+  "contactNumber": "03001234567",
+  "email": "ngo.demo@example.com",
+  "password": "DemoPass123!",
+  "category": "Search & Rescue Coordination"
+}
+
+### 6) Create responder (category = GOV department name + responderTypeId)
+POST {{baseUrl}}/api/admin/users/responder
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "username": "resp_demo",
+  "name": "Demo Responder",
+  "contactNumber": "03007654321",
+  "email": "responder.demo@example.com",
+  "password": "DemoPass123!",
+  "category": "PDMA Operations",
+  "responderTypeId": "P1"
+}
+
+### 7) Verify OTP for new portal user (check email / logs if mail disabled)
+# POST {{baseUrl}}/api/auth/verify-otp
+# Content-Type: application/json
+#
+# {
+#   "source": "ADMIN_USER",
+#   "sourceId": "ngo_demo",
+#   "purpose": "EMAIL_VERIFICATION",
+#   "otp": "123456"
+# }
