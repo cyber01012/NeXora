@@ -238,10 +238,16 @@ public class AuthService {
     }
 
     public UserProfileResponse getProfile(AuthenticatedUser user) {
-
         if (user == null) {
-            throw new RuntimeException("User not authenticated");
+            // ✅ Return 401 instead of 500 crash
+            throw new nexora_backend.auth.exception.AuthException(
+                    org.springframework.http.HttpStatus.UNAUTHORIZED,
+                    "User not authenticated"
+            );
         }
+//        if (user == null) {
+//            throw new RuntimeException("User not authenticated");
+//        }
 
         return switch (user.getSource()) {
             case CITIZEN -> {
@@ -256,6 +262,8 @@ public class AuthService {
                         .role(user.getRole())
                         .displayName(citizen.getFullName())
                         .email(citizen.getEmail())
+//                        .maskedPhone(safeDecryptAndMask(citizen.getPhoneNumber(), SensitiveDataMasker::maskPhone))
+//                        .maskedCnic(safeDecryptAndMask(citizen.getCnic(), SensitiveDataMasker::maskCnic))
                         .maskedPhone(SensitiveDataMasker.maskPhone(encryptionService.decrypt(citizen.getPhoneNumber())))
                         .maskedCnic(citizen.getCnic() == null ? null : SensitiveDataMasker.maskCnic(encryptionService.decrypt(citizen.getCnic())))
                         .active(true)
@@ -275,7 +283,8 @@ public class AuthService {
                         .role(user.getRole())
                         .displayName(admin.getName())
                         .email(admin.getEmail())
-                        .maskedPhone(SensitiveDataMasker.maskPhone(encryptionService.decrypt(admin.getContactNumber())))
+                        .maskedPhone(safeDecryptAndMask(admin.getContactNumber(), SensitiveDataMasker::maskPhone))
+//                        .maskedPhone(SensitiveDataMasker.maskPhone(encryptionService.decrypt(admin.getContactNumber())))
                         .active(admin.getActive())
                         .emailVerified(emailVerified)
                         .cnicValidated(false)
@@ -286,6 +295,19 @@ public class AuthService {
                 VolunteerWorkerCreator worker = volunteerWorkerCreatorRepository.findById(user.getSourceId())
                         .orElseThrow(AuthErrors::volunteerWorkerNotFound);
                 boolean emailVerified = Boolean.TRUE.equals(worker.getEmailVerified());
+
+                // ✅ DEFENSIVE: Handle plaintext or corrupted phone numbers
+                String maskedPhone = null;
+                if (worker.getPhoneNumber() != null && !worker.getPhoneNumber().isBlank()) {
+                    try {
+                        maskedPhone = SensitiveDataMasker.maskPhone(encryptionService.decrypt(worker.getPhoneNumber()));
+                    } catch (Exception e) {
+                        // If decryption fails (e.g., plaintext in DB), mask the raw value or set null
+                        System.err.println("Failed to decrypt phone for worker: " + worker.getUsernameCreated() + " - " + e.getMessage());
+                        maskedPhone = null; // Or: SensitiveDataMasker.maskPhone(worker.getPhoneNumber());
+                    }
+                }
+
                 yield UserProfileResponse.builder()
                         .identifier(user.getIdentifier())
                         .sourceId(user.getSourceId())
@@ -293,7 +315,9 @@ public class AuthService {
                         .role(user.getRole())
                         .displayName(worker.getName())
                         .email(worker.getEmail())
-                        .maskedPhone(worker.getPhoneNumber() == null ? null : SensitiveDataMasker.maskPhone(encryptionService.decrypt(worker.getPhoneNumber())))
+                        .maskedPhone(safeDecryptAndMask(worker.getPhoneNumber(), SensitiveDataMasker::maskPhone))
+//                        .maskedPhone(maskedPhone)  // ✅ Safe now
+//                        .maskedPhone(worker.getPhoneNumber() == null ? null : SensitiveDataMasker.maskPhone(encryptionService.decrypt(worker.getPhoneNumber())))
                         .active(worker.getActive())
                         .emailVerified(emailVerified)
                         .cnicValidated(false)
@@ -314,5 +338,18 @@ public class AuthService {
                 .expiresIn(accessTokenExpirationMs / 1000)
                 .user(getProfile(user))
                 .build();
+    }
+
+    private String safeDecryptAndMask(String encryptedValue, java.util.function.Function<String, String> masker) {
+        if (encryptedValue == null || encryptedValue.isBlank()) {
+            return null;
+        }
+        try {
+            String decrypted = encryptionService.decrypt(encryptedValue);
+            return masker.apply(decrypted);
+        } catch (Exception e) {
+            System.err.println("❌ Decrypt failed for value: " + encryptedValue.substring(0, Math.min(10, encryptedValue.length())) + "... Error: " + e.getMessage());
+            return null;
+        }
     }
 }

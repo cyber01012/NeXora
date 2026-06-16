@@ -31,17 +31,52 @@ public class NotificationService {
     @Transactional
     public void markAsRead(Long notificationId, String recipientId) {
         notificationRepository.findById(notificationId).ifPresent(notification -> {
-            if (notification.getRecipientId().equals(recipientId)) {
+            // ✅ Allow if recipient matches OR it's a role broadcast for this user
+            if (notification.getRecipientId().equals(recipientId) ||
+                    notification.getRecipientId().equals("SYSTEM")) {
                 notification.setRead(true);
                 notification.setReadAt(LocalDateTime.now());
                 notificationRepository.save(notification);
             }
         });
-    }
+                }
+//            if (notification.getRecipientId().equals(recipientId)) {
+//                notification.setRead(true);
+//                notification.setReadAt(LocalDateTime.now());
+//                notificationRepository.save(notification);
+//            }
+//        });
+//    }
+
+//    @Transactional
+//    public void markAllAsRead(String recipientId) {
+//        List<Notification> unread = notificationRepository.findByRecipientIdAndIsReadFalseOrderByCreatedAtDesc(recipientId);
+//        LocalDateTime now = LocalDateTime.now();
+//        unread.forEach(n -> {
+//            n.setRead(true);
+//            n.setReadAt(now);
+//        });
+//        notificationRepository.saveAll(unread);
+//    }
+//
+//    @Transactional(readOnly = true)
+//    public List<Notification> getUnread(String recipientId) {
+//        return notificationRepository.findByRecipientIdAndIsReadFalseOrderByCreatedAtDesc(recipientId);
+//    }
+//
+//    @Transactional(readOnly = true)
+//    public List<Notification> getAll(String recipientId) {
+//        return notificationRepository.findByRecipientIdOrderByCreatedAtDesc(recipientId);
+//    }
+//
+//    @Transactional(readOnly = true)
+//    public long getUnreadCount(String recipientId) {
+//        return notificationRepository.countByRecipientIdAndIsReadFalse(recipientId);
+//    }
 
     @Transactional
-    public void markAllAsRead(String recipientId) {
-        List<Notification> unread = notificationRepository.findByRecipientIdAndIsReadFalseOrderByCreatedAtDesc(recipientId);
+    public void markAllAsRead(String recipientId, String role) {
+        List<Notification> unread = notificationRepository.findUnreadForUser(recipientId, role);
         LocalDateTime now = LocalDateTime.now();
         unread.forEach(n -> {
             n.setRead(true);
@@ -51,17 +86,17 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Notification> getUnread(String recipientId) {
-        return notificationRepository.findByRecipientIdAndIsReadFalseOrderByCreatedAtDesc(recipientId);
+    public List<Notification> getUnread(String recipientId, String role) {
+        return notificationRepository.findUnreadForUser(recipientId, role);
     }
 
     @Transactional(readOnly = true)
-    public List<Notification> getAll(String recipientId) {
-        return notificationRepository.findByRecipientIdOrderByCreatedAtDesc(recipientId);
+    public List<Notification> getAll(String recipientId, String role) {
+        return notificationRepository.findAllForUser(recipientId, role);
     }
 
     @Transactional(readOnly = true)
-    public long getUnreadCount(String recipientId) {
-        return notificationRepository.countByRecipientIdAndIsReadFalse(recipientId);
+    public long getUnreadCount(String recipientId, String role) {
+        return notificationRepository.countUnreadForUser(recipientId, role);
     }
 }

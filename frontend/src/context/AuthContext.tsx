@@ -83,6 +83,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
       persistUser(null);
       clearTokens();
+
+      // ✅ Also clear role-specific keys you set in setSession
+      localStorage.removeItem("nexora_citizen_id");
+      localStorage.removeItem("nexora_responder_username");
+      localStorage.removeItem("nexora_worker_username");
       return null;
     }
   }, []);

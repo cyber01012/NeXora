@@ -113,8 +113,21 @@ public class TaskService {
         complaint.setRemarks("Task accepted by " + username);
 
         // DO NOT mark report as COMPLETED here — only when worker finishes
+//        eventPublisher.publishEvent(new nexora_backend.notificationsystem.events.TaskAcceptedEvent(this, String.valueOf(complaint.getForwardedComplainId())));
+//        return forwardedComplaintRepository.save(complaint);
+
+        ForwardedComplaint saved = forwardedComplaintRepository.save(complaint);
+
+        // ✅ UPDATE PARENT STATUS so citizen/helpdesk can track
+        if (complaint.getReportId() != null) {
+            updateCivicReportStatus(complaint.getReportId(), "IN_PROGRESS");
+        }
+        if (complaint.getSosId() != null) {
+            updateSOSStatus(complaint.getSosId(), "IN_PROGRESS");
+        }
+
         eventPublisher.publishEvent(new nexora_backend.notificationsystem.events.TaskAcceptedEvent(this, String.valueOf(complaint.getForwardedComplainId())));
-        return forwardedComplaintRepository.save(complaint);
+        return saved;
     }
     @Transactional
     public ForwardedComplaint rejectTask(String username, Long complaintId, String reason) {
@@ -137,6 +150,11 @@ public class TaskService {
         complaint.setRemarks(reason);
 
         updateCivicReportStatus(complaint.getReportId(), "REJECTED");
+
+        // ✅ ADD THIS: SOS bhi reject karo
+        if (complaint.getSosId() != null) {
+            updateSOSStatus(complaint.getSosId(), "REJECTED");
+        }
         
         if (complaint.getReportId() != null) {
             civicReportRepository.findById(complaint.getReportId()).ifPresent(report -> {
@@ -177,7 +195,18 @@ public class TaskService {
         complaint.setWorker(volunteer);
         complaint.setRemarks("Assigned to volunteer: " + volunteer.getName());
 
-        return forwardedComplaintRepository.save(complaint);
+//        return forwardedComplaintRepository.save(complaint);
+        ForwardedComplaint saved = forwardedComplaintRepository.save(complaint);
+
+        // ✅ UPDATE PARENT STATUS
+        if (complaint.getReportId() != null) {
+            updateCivicReportStatus(complaint.getReportId(), "IN_PROGRESS");
+        }
+        if (complaint.getSosId() != null) {
+            updateSOSStatus(complaint.getSosId(), "IN_PROGRESS");
+        }
+
+        return saved;
     }
 
     @Transactional
@@ -216,6 +245,18 @@ public class TaskService {
                 eventPublisher.publishEvent(new nexora_backend.notificationsystem.events.TaskDisposedEvent(this, "SOS-" + sos.getSosId()));
             });
         }
+
+        System.out.println(">>> reportId: " + complaint.getReportId());
+        System.out.println(">>> sosId: " + complaint.getSosId());
+
+        if (complaint.getReportId() != null) {
+            civicReportRepository.findById(complaint.getReportId()).ifPresent(report -> {
+                System.out.println(">>> BEFORE: CivicReport status = " + report.getStatus());
+                report.setStatus("COMPLETED");
+                civicReportRepository.save(report);
+                System.out.println(">>> AFTER: CivicReport status = " + report.getStatus());
+            });
+        }
         return forwardedComplaintRepository.save(complaint);
     }
 
@@ -226,6 +267,15 @@ public class TaskService {
                 civicReport.setStatus(status);
                 civicReportRepository.save(civicReport);
             }
+        }
+    }
+
+    private void updateSOSStatus(Long sosId, String status) {
+        if (sosId != null) {
+            sosReportRepository.findById(sosId).ifPresent(sos -> {
+                sos.setStatus(status);
+                sosReportRepository.save(sos);
+            });
         }
     }
 }

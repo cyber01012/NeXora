@@ -102,8 +102,27 @@ public class AssigningOfficerService {
     
     // ========== DISPATCH ==========
 
+//    public Map<String, Object> dispatch(String aoUsername, DispatchRequest request) {
+//        return dispatchMediator.dispatch(aoUsername, request);
+//    }
+
     public Map<String, Object> dispatch(String aoUsername, DispatchRequest request) {
-        return dispatchMediator.dispatch(aoUsername, request);
+        Map<String, Object> result = dispatchMediator.dispatch(aoUsername, request);
+
+        // ✅ UPDATE PARENT STATUS so citizen/helpdesk can track
+        if ("CIVIC".equalsIgnoreCase(request.getReportType())) {
+            civicReportRepository.findById(request.getReportId()).ifPresent(report -> {
+                report.setStatus("ASSIGNED");
+                civicReportRepository.save(report);
+            });
+        } else if ("SOS".equalsIgnoreCase(request.getReportType())) {
+            sosReportRepository.findById(request.getReportId()).ifPresent(sos -> {
+                sos.setStatus("DISPATCHED");
+                sosReportRepository.save(sos);
+            });
+        }
+
+        return result;
     }
 
     // ========== FORWARDED TRACKER ==========

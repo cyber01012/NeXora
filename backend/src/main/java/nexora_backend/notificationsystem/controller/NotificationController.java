@@ -19,17 +19,23 @@ public class NotificationController {
 
     @GetMapping
     public ResponseEntity<List<Notification>> getAll(@AuthenticationPrincipal AuthenticatedUser user) {
-        return ResponseEntity.ok(notificationService.getAll(user.getSourceId()));
+        String sourceId = user.getSourceId();
+        String role = user.getRole().name();
+
+        // 🔍 DEBUG — terminal mein dikhega
+        System.out.println(">>> FETCH: sourceId=" + sourceId + ", role=" + role);
+
+        return ResponseEntity.ok(notificationService.getAll(sourceId, role));
     }
 
     @GetMapping("/unread")
     public ResponseEntity<List<Notification>> getUnread(@AuthenticationPrincipal AuthenticatedUser user) {
-        return ResponseEntity.ok(notificationService.getUnread(user.getSourceId()));
+        return ResponseEntity.ok(notificationService.getUnread(user.getSourceId(), user.getRole().name()));
     }
 
     @GetMapping("/count")
     public ResponseEntity<Map<String, Long>> getUnreadCount(@AuthenticationPrincipal AuthenticatedUser user) {
-        return ResponseEntity.ok(Map.of("count", notificationService.getUnreadCount(user.getSourceId())));
+        return ResponseEntity.ok(Map.of("count", notificationService.getUnreadCount(user.getSourceId(), user.getRole().name())));
     }
 
     @PutMapping("/{id}/read")
@@ -40,7 +46,41 @@ public class NotificationController {
 
     @PutMapping("/read-all")
     public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal AuthenticatedUser user) {
-        notificationService.markAllAsRead(user.getSourceId());
+        notificationService.markAllAsRead(user.getSourceId(), user.getRole().name());
         return ResponseEntity.ok().build();
     }
 }
+
+//@RestController
+//@RequestMapping("/api/notifications")
+//@RequiredArgsConstructor
+//public class NotificationController {
+//    private final NotificationService notificationService;
+//
+//    @GetMapping
+//    public ResponseEntity<List<Notification>> getAll(@AuthenticationPrincipal AuthenticatedUser user) {
+//        return ResponseEntity.ok(notificationService.getAll(user.getSourceId()));
+//    }
+//
+//    @GetMapping("/unread")
+//    public ResponseEntity<List<Notification>> getUnread(@AuthenticationPrincipal AuthenticatedUser user) {
+//        return ResponseEntity.ok(notificationService.getUnread(user.getSourceId()));
+//    }
+//
+//    @GetMapping("/count")
+//    public ResponseEntity<Map<String, Long>> getUnreadCount(@AuthenticationPrincipal AuthenticatedUser user) {
+//        return ResponseEntity.ok(Map.of("count", notificationService.getUnreadCount(user.getSourceId())));
+//    }
+//
+//    @PutMapping("/{id}/read")
+//    public ResponseEntity<Void> markAsRead(@PathVariable Long id, @AuthenticationPrincipal AuthenticatedUser user) {
+//        notificationService.markAsRead(id, user.getSourceId());
+//        return ResponseEntity.ok().build();
+//    }
+//
+//    @PutMapping("/read-all")
+//    public ResponseEntity<Void> markAllAsRead(@AuthenticationPrincipal AuthenticatedUser user) {
+//        notificationService.markAllAsRead(user.getSourceId());
+//        return ResponseEntity.ok().build();
+//    }
+//}

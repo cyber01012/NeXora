@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { responderApi } from '../../services/api';
+import { useAuth } from "../../context/AuthContext";
 import {
   UserIcon,
   EnvelopeIcon,
@@ -49,6 +50,7 @@ const InfoField = ({ label, value, icon, isEditing, onChange, placeholder }) => 
 );
 
 export default function ResponderProfile() {
+  const { user } = useAuth(); // ✅ ADD THIS
   const [profile, setProfile] = useState({
     username: '',
     name: '',
@@ -75,43 +77,81 @@ export default function ResponderProfile() {
   useEffect(() => {
     loadProfile();
     loadStats();
-  }, []);
+  }, [user]);
 
   const loadProfile = async () => {
   try {
+
+    // 1. Get responder-specific data (department, designation, etc.)
     const data = await responderApi.getProfile();
-    console.log('Profile data from API:', data);  // Debug log
     
-    setProfile({
-      username: data.username || '',
-      name: data.name || '',
-      email: data.email || '',
-      phoneNumber: data.phoneNumber || data.contactNumber || '',
-      department: data.department || 'Not Assigned',  // Should be "K-Electric"
-      designation: data.designation || 'Focal Person',
-      category: data.category || 'GOV',
+    // 2. Get masked phone from auth context (properly decrypted)
+    const authPhone = user?.maskedPhone || 'Not provided';
+
+    // ✅ USE AUTH USER FIRST (already has decrypted masked values)
+     setProfile({
+      username: data.username || user?.identifier || '',
+      name: data.name || user?.displayName || '',
+      email: data.email || user?.email || '',
+      phoneNumber: authPhone,  // ✅ From auth context (decrypted masked)
+      department: data.department || 'Not Assigned',  // ✅ From responder API
+      designation: data.designation || 'Focal Person',  // ✅ From responder API
+      category: data.category || 'GOV',                   // ✅ From responder API
       memberSince: data.memberSince || '2024-01-01'
     });
+    
     setTempProfile({
-      name: data.name || '',
-      email: data.email || '',
-      phoneNumber: data.phoneNumber || data.contactNumber || '',
+      name: data.name || user?.displayName || '',
+      email: data.email || user?.email || '',
+      phoneNumber: authPhone,
       department: data.department || '',
-      designation: data.designation || 'Focal Person'
+      designation: data.designation || ''
     });
+    
   } catch (error) {
     console.error('Failed to load profile:', error);
+
+    // const data = await responderApi.getProfile();
+    // console.log('Profile data from API:', data);  // Debug log
+    
+  //   setProfile({
+  //     username: data.username || '',
+  //     name: data.name || '',
+  //     email: data.email || '',
+  //     phoneNumber: data.phoneNumber || data.contactNumber || '',
+  //     department: data.department || 'Not Assigned',  // Should be "K-Electric"
+  //     designation: data.designation || 'Focal Person',
+  //     category: data.category || 'GOV',
+  //     memberSince: data.memberSince || '2024-01-01'
+  //   });
+  //   setTempProfile({
+  //     name: data.name || '',
+  //     email: data.email || '',
+  //     phoneNumber: data.phoneNumber || data.contactNumber || '',
+  //     department: data.department || '',
+  //     designation: data.designation || 'Focal Person'
+  //   });
+  // } catch (error) {
+  //   console.error('Failed to load profile:', error);
     // Fallback to localStorage or mock
     const savedDept = localStorage.getItem('nexora_department_name') || 'K-Electric';
     setProfile({
-      username: 'kelectric_fp',
-      name: 'Ahmed Raza',
-      email: 'ahmed@kelectric.com',
-      phoneNumber: '+92 300 1111111',
+      username: user?.identifier || 'kelectric_fp',
+      name: user?.displayName || 'Ahmed Raza',
+      email: user?.email || 'ahmed@kelectric.com',
+      phoneNumber: user?.maskedPhone || '+92 300 1111111',
       department: savedDept,
       designation: 'Focal Person',
       category: 'GOV',
       memberSince: '2024-01-15'
+    });
+    
+    setTempProfile({
+      name: user?.displayName || '',
+      email: user?.email || '',
+      phoneNumber: user?.maskedPhone || '',
+      department: savedDept,
+      designation: 'Focal Person'
     });
   } finally {
     setLoading(false);

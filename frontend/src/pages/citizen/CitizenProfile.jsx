@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { citizenApi } from '../../services/api';
+import { useAuth } from "../../context/AuthContext";
 
 export default function CitizenProfile() {
+  const { user } = useAuth();
   const [profile, setProfile] = useState({
     fullName: '',
     email: '',
@@ -17,14 +19,38 @@ export default function CitizenProfile() {
   const [tempProfile, setTempProfile] = useState({});
   const [message, setMessage] = useState({ text: '', type: '' });
   const [passwordData, setPasswordData] = useState({ current: '', new: '', confirm: '' });
+  
 
   useEffect(() => {
     loadProfile();
     loadStats();
-  }, []);
+  }, [user]);
 
   const loadProfile = async () => {
     try {
+
+      // Option A: Use auth context user directly (RECOMMENDED)
+    if (user) {
+      setProfile({
+        fullName: user.displayName || '',
+        email: user.email || '',
+        phone: user.maskedPhone || 'Not provided',
+        cnic: user.maskedCnic || 'Not provided',
+        address: user.address || '',  // if available
+        city: user.city || ''         // if available
+      });
+      setTempProfile({
+        fullName: user.displayName || '',
+        email: user.email || '',
+        phone: user.maskedPhone || '',
+        cnic: user.maskedCnic || '',
+        address: user.address || '',
+        city: user.city || ''
+      });
+      setLoading(false);
+      return;
+    }
+    
       const data = await citizenApi.getProfile();
       setProfile(data);
       setTempProfile(data);

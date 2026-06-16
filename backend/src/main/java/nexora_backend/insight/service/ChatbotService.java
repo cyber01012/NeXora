@@ -36,7 +36,11 @@ public class ChatbotService {
         StringBuilder sb = new StringBuilder();
 
         // System instruction
-        sb.append("You are NeXora Civic Advisor — an AI assistant for Karachi, Pakistan citizens.\n\n");
+        sb.append("You are NeXora Civic Advisor — an AI assistant for Karachi, Pakistan citizens. ");
+        sb.append("NeXora's dedicated support line for this project is 311. ");
+        sb.append("You are an advisor only and cannot create reports or contact authorities directly. ");
+        sb.append("Citizens can submit civic complaints through the NeXora Citizen Portal, while urgent situations can be reported through the NeXora helpline (311).\n\n");
+
         sb.append("YOUR EXPERTISE:\n");
         sb.append("- Disaster preparedness (floods, heatwaves, earthquakes, fires)\n");
         sb.append("- Civic issues (water shortage, garbage, traffic, power outages, gas supply)\n");
@@ -51,7 +55,10 @@ public class ChatbotService {
         sb.append("4. Reply in the SAME LANGUAGE the user used (Roman Urdu → Roman Urdu, English → English).\n");
         sb.append("5. Be practical, actionable, and concise (2-4 sentences max).\n");
         sb.append("6. Include emergency numbers when relevant: Police 15, Rescue 1122, Fire 16.\n");
-        sb.append("7. NEVER give medical advice. Suggest seeing a doctor instead.\n\n");
+        sb.append("7. NEVER give medical advice. Suggest seeing a doctor instead.\n");
+        sb.append("8. You are an advisor only. Do not claim to create reports, dispatch help, or contact authorities.\n");
+        sb.append("9. For civic complaints, suggest using the NeXora Citizen Portal.\n");
+        sb.append("10. For urgent or critical situations, advise contacting the NeXora helpline at 311. Helpline staff can guide citizens and register reports when needed.\n\n");
 
         // Conversation history
         if (history != null && !history.isEmpty()) {

@@ -46,8 +46,7 @@ export default function HelpDeskLayout() {
 
   const navigate = useNavigate();
 
-  const { logout } = useAuth();
-
+  const { user, logout } = useAuth();
   const [disasterMode, setDisasterMode] =
     useState(false);
 
@@ -85,27 +84,37 @@ export default function HelpDeskLayout() {
         setDisasterMode(data.active)
       );
 
-    const user =
-      JSON.parse(
-        localStorage.getItem("user")
-      );
+      // ✅ USE AUTH HOOK INSTEAD OF localStorage
+      if (user) {
+        setUserData({
+          name: user.displayName || "Help Desk",
+          role: "HELP DESK",
+          avatar: user.displayName?.charAt(0) || "H",
+        });
+      }
+    }, [user]); // ✅ ADD user dependency
 
-    if (user) {
+    // const user =
+    //   JSON.parse(
+    //     localStorage.getItem("user")
+    //   );
 
-      setUserData({
-        name:
-          user.displayName ||
-          "Help Desk",
+    // if (user) {
 
-        role: "HELP DESK",
+    //   setUserData({
+    //     name:
+    //       user.displayName ||
+    //       "Help Desk",
 
-        avatar:
-          user.displayName?.charAt(0) ||
-          "H",
-      });
-    }
+    //     role: "HELP DESK",
 
-  }, []);
+    //     avatar:
+    //       user.displayName?.charAt(0) ||
+    //       "H",
+    //   });
+    // }
+
+  // }, []);
 
   const handleLogout = async () => {
 

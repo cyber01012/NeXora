@@ -7,7 +7,8 @@ import ToastContainer from './ToastContainer';
  * ==========================================
  */
 
-const BASE_URL = '/api/notifications';
+// const BASE_URL = '/api/notifications';
+const BASE_URL = 'http://localhost:8080/api/notifications';
 const POLL_INTERVAL = 30_000;
 
 const NotificationContext = createContext(null);
@@ -15,9 +16,14 @@ const NotificationContext = createContext(null);
 // ---------------------------------------------------------------------------
 // Auth helper — reads token (supports both 'token' and 'accessToken')
 // ---------------------------------------------------------------------------
+// function getToken() {
+//   return localStorage.getItem('accessToken') || localStorage.getItem('token');
+// }
 function getToken() {
-  return localStorage.getItem('accessToken') || localStorage.getItem('token');
+  return localStorage.getItem('nexora_access_token');
 }
+
+
 
 function getAuthHeaders() {
   const token = getToken();
@@ -33,44 +39,49 @@ function getAuthHeaders() {
 // ---------------------------------------------------------------------------
 // Provider
 // ---------------------------------------------------------------------------
-const MOCK_NOTIFICATIONS = [
-  {
-    id: 'mock-1',
-    type: 'COMPLAINT_STATUS_UPDATE',
-    title: 'Report Submitted Successfully',
-    message: 'Your report has been successfully logged and is pending review.',
-    isRead: false,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'mock-2',
-    type: 'TASK_ASSIGNED',
-    title: 'New Task Assigned: Sector 7',
-    message: 'You have been deployed to Sector 7 for immediate action.',
-    isRead: false,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'mock-3',
-    type: 'DISASTER_MODE_ACTIVATED',
-    title: 'Disaster Mode Activated',
-    message: 'Emergency protocol engaged. All units on standby.',
-    isRead: false,
-    createdAt: new Date().toISOString(),
-  }
-];
+// const MOCK_NOTIFICATIONS = [
+//   {
+//     id: 'mock-1',
+//     type: 'COMPLAINT_STATUS_UPDATE',
+//     title: 'Report Submitted Successfully',
+//     message: 'Your report has been successfully logged and is pending review.',
+//     isRead: false,
+//     createdAt: new Date().toISOString(),
+//   },
+//   {
+//     id: 'mock-2',
+//     type: 'TASK_ASSIGNED',
+//     title: 'New Task Assigned: Sector 7',
+//     message: 'You have been deployed to Sector 7 for immediate action.',
+//     isRead: false,
+//     createdAt: new Date().toISOString(),
+//   },
+//   {
+//     id: 'mock-3',
+//     type: 'DISASTER_MODE_ACTIVATED',
+//     title: 'Disaster Mode Activated',
+//     message: 'Emergency protocol engaged. All units on standby.',
+//     isRead: false,
+//     createdAt: new Date().toISOString(),
+//   }
+// ];
 
 export const NotificationProvider = ({ children }) => {
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
-  const [unreadCount, setUnreadCount] = useState(3);
+  // CHANGE:
+const [notifications, setNotifications] = useState([]);
+const [unreadCount, setUnreadCount] = useState(0);
+  // const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+  // const [unreadCount, setUnreadCount] = useState(3);
   const [panelOpen, setPanelOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const pollRef = useRef(null);
-  const lastKnownIds = useRef(new Set(MOCK_NOTIFICATIONS.map(n => n.id)));
+  // const lastKnownIds = useRef(new Set(MOCK_NOTIFICATIONS.map(n => n.id)));
+  const lastKnownIds = useRef(new Set());
 
   // Check if user is authenticated
-  const isAuthenticated = !!getToken();
+  // const isAuthenticated = !!getToken();
+  const isAuthenticated = !!getToken() && !!localStorage.getItem('nexora_user');
 
   // ------------------------------------------------------------------
   // Fetch all notifications
@@ -92,31 +103,41 @@ export const NotificationProvider = ({ children }) => {
       }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      let newNotifications = Array.isArray(data) ? data : [];
-      
-      // Inject mock data if real API returns empty (for demonstration purposes)
-      if (newNotifications.length === 0) {
-        newNotifications = MOCK_NOTIFICATIONS;
-      }
-      
-      // Detect new notifications
-      if (lastKnownIds.current.size > 0) {
-        newNotifications.forEach(n => {
-          if (!lastKnownIds.current.has(n.id) && !n.isRead) {
-            window.addToast?.(`New Notification: ${n.title || 'You have a new update'}`);
-          }
-        });
-      }
-      
-      // Update last known
-      lastKnownIds.current = new Set(newNotifications.map(n => n.id));
+      // let newNotifications = Array.isArray(data) ? data : [];
+      const newNotifications = Array.isArray(data) ? data : [];
+
       setNotifications(newNotifications);
     } catch (e) {
       setError(e.message);
+      setNotifications([]); // empty on error
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated]);
+}, [isAuthenticated]);
+      
+      // Inject mock data if real API returns empty (for demonstration purposes)
+    //   if (newNotifications.length === 0) {
+    //     newNotifications = MOCK_NOTIFICATIONS;
+    //   }
+      
+    //   // Detect new notifications
+    //   if (lastKnownIds.current.size > 0) {
+    //     newNotifications.forEach(n => {
+    //       if (!lastKnownIds.current.has(n.id) && !n.isRead) {
+    //         window.addToast?.(`New Notification: ${n.title || 'You have a new update'}`);
+    //       }
+    //     });
+    //   }
+      
+    //   // Update last known
+    //   lastKnownIds.current = new Set(newNotifications.map(n => n.id));
+    //   setNotifications(newNotifications);
+    // } catch (e) {
+    //   setError(e.message);
+    // } finally {
+    //   setLoading(false);
+    // }
+  // }, [isAuthenticated]);
 
   // ------------------------------------------------------------------
   // Fetch unread count
@@ -133,6 +154,7 @@ export const NotificationProvider = ({ children }) => {
       const data = await res.json();
       setUnreadCount(data.count ?? 0);
     } catch {
+      setUnreadCount(0);
       // silent fail for polling
     }
   }, [isAuthenticated]);
@@ -203,15 +225,26 @@ export const NotificationProvider = ({ children }) => {
   // ------------------------------------------------------------------
   useEffect(() => {
     if (!isAuthenticated) {
-      setNotifications(MOCK_NOTIFICATIONS);
-      setUnreadCount(3);
+      // setNotifications(MOCK_NOTIFICATIONS);
+      // setUnreadCount(3);
+      setNotifications([]);
+      setUnreadCount(0);
       return;
     }
     
     fetchUnreadCount();
-    pollRef.current = setInterval(fetchUnreadCount, POLL_INTERVAL);
+    fetchAll(); // ✅ Initial load
+
+     pollRef.current = setInterval(() => {
+      fetchUnreadCount();
+    }, POLL_INTERVAL);
+    
     return () => clearInterval(pollRef.current);
-  }, [fetchUnreadCount, isAuthenticated]);
+}, [fetchUnreadCount, fetchAll, isAuthenticated]);
+
+  //   pollRef.current = setInterval(fetchUnreadCount, POLL_INTERVAL);
+  //   return () => clearInterval(pollRef.current);
+  // }, [fetchUnreadCount, isAuthenticated]);
 
   return (
     <NotificationContext.Provider value={{

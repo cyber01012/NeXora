@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { helpDeskApi } from '../../services/HelpDesk/helpDeskApi';
 
 export default function HelpDeskReports() {
+  const [expandedId, setExpandedId] = useState(null);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -41,12 +42,24 @@ export default function HelpDeskReports() {
       case 'RESOLVED':
         return 'text-green-400 border-green-500/20 bg-green-500/10';
       case 'DISPATCHED':
+      case 'IN_PROGRESS':  // ✅ ADD THIS
         return 'text-cyan-400 border-cyan-500/20 bg-cyan-500/10';
       case 'PENDING':
       default:
         return 'text-yellow-400 border-yellow-500/20 bg-yellow-500/10';
     }
   };
+
+  const getSosTimeline = (report) => {
+  const status = report.status?.toUpperCase();
+  return [
+    { label: 'SOS Received', completed: true },
+    { label: 'Dispatched to Responder', completed: ['DISPATCHED', 'IN_PROGRESS', 'COMPLETED', 'RESOLVED'].includes(status) },
+    { label: 'Responder En Route', completed: ['IN_PROGRESS', 'COMPLETED', 'RESOLVED'].includes(status) },
+    { label: 'On Site / Working', completed: ['IN_PROGRESS', 'COMPLETED', 'RESOLVED'].includes(status) },
+    { label: 'Resolved / Completed', completed: ['COMPLETED', 'RESOLVED'].includes(status) },
+  ];
+};
 
   const filteredReports = reports.filter((report) => {
     const matchesSearch =
@@ -133,40 +146,96 @@ export default function HelpDeskReports() {
                   <th className="p-4 text-xs tracking-wider">COMPLETED BY</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-cyan-500/10">
+                            <tbody className="divide-y divide-cyan-500/10">
                 {filteredReports.map((report) => (
-                  <tr key={report.sosId} className="hover:bg-cyan-950/5 transition-colors">
-                    <td className="p-4 font-bold text-cyan-400">#{report.sosId}</td>
-                    <td className="p-4">
-                      <div className="font-semibold text-cyan-100">{report.name}</div>
-                      <div className="text-xs text-cyan-400/60 mt-0.5">{report.phoneAutoDetect || 'No Phone'}</div>
-                    </td>
-                    <td className="p-4 text-xs">
-                      <div>{report.city}, {report.province}</div>
-                      <div className="text-cyan-400/60 mt-0.5">{report.district} • {report.town}</div>
-                    </td>
-                    <td className="p-4">
-                      <div className="text-xs font-semibold text-cyan-300">
-                        {report.complaintNature?.name || 'Emergency Call'}
-                      </div>
-                      <p className="text-xs text-cyan-200/70 mt-1 max-w-xs truncate" title={report.detail}>
-                        {report.detail}
-                      </p>
-                    </td>
-                    <td className="p-4">
-                      <span className={`px-2.5 py-0.5 border rounded-full text-[10px] font-bold ${getPriorityColor(report.priority)}`}>
-                        {report.priority || 'MEDIUM'}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <span className={`px-2.5 py-0.5 border rounded-full text-[10px] font-bold ${getStatusColor(report.status)}`}>
-                        {report.status || 'PENDING'}
-                      </span>
-                    </td>
-                    <td className="p-4 text-xs text-cyan-400/70">
-                      {report.resolvedBy ? `👤 @${report.resolvedBy}` : '—'}
-                    </td>
-                  </tr>
+                  <>
+                    {/* ===== ROW 1: Main Data ===== */}
+                    <tr 
+                      key={report.sosId} 
+                      className="hover:bg-cyan-950/5 transition-colors cursor-pointer"
+                      onClick={() => setExpandedId(expandedId === report.sosId ? null : report.sosId)}
+                    >
+                      <td className="p-4 font-bold text-cyan-400">#{report.sosId}</td>
+                      <td className="p-4">
+                        <div className="font-semibold text-cyan-100">{report.name}</div>
+                        <div className="text-xs text-cyan-400/60 mt-0.5">{report.phoneAutoDetect || 'No Phone'}</div>
+                      </td>
+                      <td className="p-4 text-xs">
+                        <div>{report.city}, {report.province}</div>
+                        <div className="text-cyan-400/60 mt-0.5">{report.district} • {report.town}</div>
+                      </td>
+                      <td className="p-4">
+                        <div className="text-xs font-semibold text-cyan-300">
+                          {report.complaintNature?.name || 'Emergency Call'}
+                        </div>
+                        <p className="text-xs text-cyan-200/70 mt-1 max-w-xs truncate" title={report.detail}>
+                          {report.detail}
+                        </p>
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-2.5 py-0.5 border rounded-full text-[10px] font-bold ${getPriorityColor(report.priority)}`}>
+                          {report.priority || 'MEDIUM'}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-2.5 py-0.5 border rounded-full text-[10px] font-bold ${getStatusColor(report.status)}`}>
+                          {report.status || 'PENDING'}
+                        </span>
+                      </td>
+                      <td className="p-4 text-xs text-cyan-400/70">
+                        {report.resolvedBy ? `👤 @${report.resolvedBy}` : '—'}
+                      </td>
+                    </tr>
+
+                    {/* ===== ROW 2: Expanded Detail (only when clicked) ===== */}
+                    {expandedId === report.sosId && (
+                      <tr key={`${report.sosId}-detail`}>
+                        <td colSpan={7} className="p-4 bg-cyan-950/10 border-t border-cyan-500/10">
+                          <div className="space-y-3">
+                            {/* Timeline */}
+                            <div className="p-3 bg-[#0a1628] rounded-lg border border-cyan-500/20">
+                              <p className="font-mono text-[9px] text-cyan-400/70 mb-2 tracking-wider uppercase">SOS TRACKING TIMELINE</p>
+                              <div className="space-y-2">
+                                {getSosTimeline(report).map((step, idx) => (
+                                  <div key={idx} className="flex items-center gap-3">
+                                    <div className={`w-2 h-2 rounded-full ${step.completed ? 'bg-cyan-400 shadow-[0_0_8px_#06b6d4]' : 'bg-gray-600'}`} />
+                                    <span className={`font-mono text-xs ${step.completed ? 'text-cyan-300' : 'text-gray-500'}`}>
+                                      {step.label}
+                                    </span>
+                                    {step.completed && idx === 0 && (
+                                      <span className="text-[9px] text-gray-500 ml-auto">
+                                        {new Date(report.createdAt).toLocaleString()}
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Assignment Details */}
+                            {report.assignedTo && (
+                              <div className="p-3 bg-[#0a1628] rounded-lg border border-cyan-500/20">
+                                <p className="font-mono text-[9px] text-cyan-400/70 mb-1 tracking-wider uppercase">ASSIGNED RESPONDER</p>
+                                <p className="font-mono text-sm text-cyan-200">👤 {report.assignedTo}</p>
+                                <p className="font-mono text-xs text-cyan-400/60 mt-1">Dept: {report.report.department || 'N/A'}</p>
+                              </div>
+                            )}
+
+                            {/* Resolution Details */}
+                            {report.resolvedBy && (
+                              <div className="p-3 bg-[#0a1628] rounded-lg border border-green-500/20">
+                                <p className="font-mono text-[9px] text-green-400/70 mb-1 tracking-wider uppercase">RESOLUTION</p>
+                                <p className="font-mono text-sm text-green-200">✅ Resolved by: {report.resolvedBy}</p>
+                                <p className="font-mono text-xs text-green-400/60 mt-1">
+                                  {report.resolutionTime ? `Time: ${report.resolutionTime} mins` : ''}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
                 ))}
               </tbody>
             </table>
